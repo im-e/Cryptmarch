@@ -65,6 +65,6 @@ void Player::update(GamesEngineeringBase::Window& window, float deltaTime)
 
 void Player::draw(GamesEngineeringBase::Window& window)
 {
-	Graphics::DrawImage(window, playerImage, playerX, playerY);
+	Graphics::DrawTilemapImage(window, playerImage, playerTileSize, 0, 0,  playerX, playerY);
 
 }

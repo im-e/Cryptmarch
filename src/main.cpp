@@ -2,7 +2,7 @@
 #include "Player.h"
 #include "Graphics.h"
 #include "Utilities/FPS.h"
-#include <iostream>
+#include "Utilities/Logger.h"
 
 int main()
 {
@@ -12,19 +12,19 @@ int main()
     GamesEngineeringBase::Timer timer;
 
     Player player;
-	player.load("resources/player.png");
-
-    GamesEngineeringBase::Image image;
-    image.load("resources/ShooterPack/PNG/Players/Tilemap/tilemap_packed.png");
+    std::string playerTileMapPath = "resources/ShooterPack/PNG/Players/Tilemap/tilemap_packed.png";
+    if (!player.load(playerTileMapPath)) {
+        Logger::Error("Player Tilemap failed to load at filepath: %s", playerTileMapPath);
+    }
 
     FPS fps;
-    if (!fps.load("resources/ShooterPack/PNG/Interface/Tilemap/tilemap_packed.png"))
+    std::string fpsTilemapPath = "resources/ShooterPack/PNG/Interface/Tilemap/tilemap_packed.png";
+    if (!fps.load(fpsTilemapPath))
     {
-        std::cout << "fps image not loaded" << std::endl;
+        Logger::Error("FPS Tilemap failed to load at filepath: %s", fpsTilemapPath);
     }
 
     bool running = true;
-
 
     while (running)
     {

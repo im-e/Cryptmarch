@@ -5,12 +5,21 @@ class Player
 {
 
 private:
+	//image
 	GamesEngineeringBase::Image playerImage;
+	int playerTileSize = 24; //tilesize
+
+
+	//position
 	float playerX = 50.0f;
 	float playerY = 100.0f;
+
+	//movement
 	float playerSpeed = 200.0f; // pixels per second
-	int playerWidth = 32;
-	int playerHeight = 32;
+
+	//bounding box size
+	int playerWidth = 16;
+	int playerHeight = 16;
 
 	int keyUp = VK_UP;
 	int keyDown = VK_DOWN;
