@@ -27,9 +27,6 @@
     <ClInclude Include="include\Utilities\Vector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Utilities\Vector2.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Utilities\FPS.h">
       <Filter>Header Files</Filter>
     </ClInclude>

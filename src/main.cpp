@@ -3,6 +3,7 @@
 #include "Graphics.h"
 #include "Utilities/FPS.h"
 #include "Utilities/Logger.h"
+#include "Utilities/Vector.h"
 
 int main()
 {
@@ -12,17 +13,24 @@ int main()
     GamesEngineeringBase::Timer timer;
 
     Player player;
-    std::string playerTileMapPath = "resources/ShooterPack/PNG/Players/Tilemap/tilemap_packed.png";
+    std::string playerTileMapPath = "resources/32rogues/rogues.png";
     if (!player.load(playerTileMapPath)) {
-        Logger::Error("Player Tilemap failed to load at filepath: %s", playerTileMapPath);
+        Logger::Error("Player Tilemap failed to load at filepath: " + playerTileMapPath);
     }
 
     FPS fps;
     std::string fpsTilemapPath = "resources/ShooterPack/PNG/Interface/Tilemap/tilemap_packed.png";
     if (!fps.load(fpsTilemapPath))
     {
-        Logger::Error("FPS Tilemap failed to load at filepath: %s", fpsTilemapPath);
+        Logger::Error("FPS Tilemap failed to load at filepath: " + fpsTilemapPath);
     }
+
+    Vector<int> integers;
+    integers.add(1);
+    integers.add(2);
+    integers.add(3);
+    integers.add(4);
+    integers.add(5);
 
     bool running = true;
 

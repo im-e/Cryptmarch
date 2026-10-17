@@ -161,7 +161,6 @@
     <ClInclude Include="include\Utilities\FPS.h" />
     <ClInclude Include="include\Utilities\Logger.h" />
     <ClInclude Include="include\Utilities\Vector.h" />
-    <ClInclude Include="include\Utilities\Vector2.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Graphics.cpp" />

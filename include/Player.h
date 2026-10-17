@@ -7,7 +7,7 @@ class Player
 private:
 	//image
 	GamesEngineeringBase::Image playerImage;
-	int playerTileSize = 24; //tilesize
+	int playerTileSize = 32; //tilesize
 
 
 	//position
@@ -18,8 +18,8 @@ private:
 	float playerSpeed = 200.0f; // pixels per second
 
 	//bounding box size
-	int playerWidth = 16;
-	int playerHeight = 16;
+	int playerWidth = 32;
+	int playerHeight = 32;
 
 	int keyUp = VK_UP;
 	int keyDown = VK_DOWN;

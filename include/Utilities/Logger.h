@@ -1,5 +1,5 @@
 #pragma once
-#include <cstdio>
+#include <iostream>
 
 enum LogLevel {
 	TraceLevel, DebugLevel, InfoLevel, ErrorLevel, CriticalLevel
@@ -16,73 +16,44 @@ private:
 	inline static LogLevel level = ErrorLevel; //if release set to error only
 #endif
 
-public:
 
-	static void setLevel(LogLevel newLevel)
+	static void Log(LogLevel messageLevel, std::string prefix, std::string message)
 	{
-		level = newLevel;
-	}
-
-
-	template<typename ... Args> //declares template pack, args stands for a list or zero or more types
-	static void Trace(const char* message, Args... args) {
-		//const char* is the format string
-
-		if (level <= TraceLevel)
+		if (level <= messageLevel)
 		{
-			printf("[TRACE]\t"); //trace, tab
-			printf(message, args...); //string then unpack args
-			printf("\n"); //new line
+			std::cout << prefix << message << std::endl;
 		}
 	}
 
-	template<typename ... Args> //declares template pack, args stands for a list or zero or more types
-	static void Debug(const char* message, Args... args) {
-		//const char* is the format string
-
-		if (level <= DebugLevel)
-		{
-			printf("[DEBUG]\t"); //trace, tab
-			printf(message, args...); //string then unpack args
-			printf("\n"); //new line
-		}
+public:
+	static void setLevel(LogLevel newLevel) 
+	{
+		level = newLevel; 
 	}
 
-	template<typename ... Args> //declares template pack, args stands for a list or zero or more types
-	static void Info(const char* message, Args... args) {
-		//const char* is the format string
-
-		if (level <= InfoLevel)
-		{
-			printf("[INFO]\t"); //trace, tab
-			printf(message, args...); //string then unpack args
-			printf("\n"); //new line
-		}
+	static void Trace(std::string message) 
+	{
+		Log(TraceLevel, "[TRACE]\t", message); 
 	}
 
-	template<typename ... Args> //declares template pack, args stands for a list or zero or more types
-	static void Error(const char* message, Args... args) {
-		//const char* is the format string
-
-		if (level <= ErrorLevel)
-		{
-			printf("[ERROR]\t"); //trace, tab
-			printf(message, args...); //string then unpack args
-			printf("\n"); //new line
-		}
+	static void Debug(std::string message)
+	{
+		Log(DebugLevel, "[DEBUG]\t", message);
 	}
 
-	template<typename ... Args> //declares template pack, args stands for a list or zero or more types
-	static void Critical(const char* message, Args... args) {
-		//const char* is the format string
-
-		if (level <= CriticalLevel)
-		{
-			printf("[CRITICAL]\t"); //trace, tab
-			printf(message, args...); //string then unpack args
-			printf("\n"); //new line
-		}
+	static void Info(std::string message)
+	{
+		Log(InfoLevel, "[INFO]\t", message);
 	}
 
+	static void Error(std::string message)
+	{
+		Log(ErrorLevel, "[ERROR]\t", message);
+	}
+
+	static void Critical(std::string message)
+	{
+		Log(CriticalLevel, "[CRITICAL]\t", message);
+	}
 };
 
