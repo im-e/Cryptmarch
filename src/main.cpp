@@ -1,6 +1,8 @@
 #include "GamesEngineeringBase.h"
 #include "Player.h"
 #include "Graphics.h"
+#include "Utilities/FPS.h"
+#include <iostream>
 
 int main()
 {
@@ -12,6 +14,15 @@ int main()
     Player player;
 	player.load("resources/player.png");
 
+    GamesEngineeringBase::Image image;
+    image.load("resources/ShooterPack/PNG/Players/Tilemap/tilemap_packed.png");
+
+    FPS fps;
+    if (!fps.load("resources/ShooterPack/PNG/Interface/Tilemap/tilemap_packed.png"))
+    {
+        std::cout << "fps image not loaded" << std::endl;
+    }
+
     bool running = true;
 
 
@@ -22,18 +33,21 @@ int main()
         if (window.keyPressed(VK_ESCAPE)) break;
 
 
-        float deltaTime = timer.dt();          // once per frame only
-       
+        float deltaTime = timer.dt(); // once per frame only
 
-
-        //cleart window for next frame rendering
+        //clear window for next frame rendering
         window.clear();
 
 
         //update game logic
 		player.update(window, deltaTime);
 
+
+
+
         //draw
+
+        fps.draw(window, deltaTime);         //draw fps
         player.draw(window);
          
         //display frame on screen 

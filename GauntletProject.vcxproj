@@ -158,6 +158,7 @@
     <ClInclude Include="include\GamesEngineeringBase.h" />
     <ClInclude Include="include\Graphics.h" />
     <ClInclude Include="include\Player.h" />
+    <ClInclude Include="include\Utilities\FPS.h" />
     <ClInclude Include="include\Utilities\Vector.h" />
     <ClInclude Include="include\Utilities\Vector2.h" />
   </ItemGroup>
@@ -165,7 +166,6 @@
     <ClCompile Include="src\Graphics.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Player.cpp" />
-    <ClCompile Include="src\Utilities\Vector.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="GauntletProject.slnx" />
