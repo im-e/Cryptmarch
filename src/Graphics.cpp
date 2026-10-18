@@ -50,22 +50,22 @@ void Graphics::DrawImage(GamesEngineeringBase::Window& window, GamesEngineeringB
 		renderHeight = windowHeight - startY; // reduce height by the amount clipped
 	}
 
-	for (int i = 0; i < renderWidth; i++)
+	for (int y = 0; y < renderHeight; y++)
 	{
-		for (int j = 0; j < renderHeight; j++)
+		for (int x = 0; x < renderWidth; x++)
 		{
-			unsigned char alpha = image.alphaAt(screenX + i, screenY + j); //check alpha value of the pixel 
+			unsigned char alpha = image.alphaAtUnchecked(screenX + x, screenY + y); //check alpha value of the pixel 
 
 			if (alpha == 255) //if the alpha is fully opaque, draw the pixel to the window
 			{
-				unsigned char* pixel = image.at(screenX + i, screenY + j); //get the pixel data from the image
-				window.draw(startX + i, startY + j, pixel[0], pixel[1], pixel[2]); //draw the pixel to the window
+				unsigned char* pixel = image.atUnchecked(screenX + x, screenY + y); //get the pixel data from the image
+				window.draw(startX + x, startY + y, pixel[0], pixel[1], pixel[2]); //draw the pixel to the window
 			}
 			else if (alpha > 0) //if the alpha is partially transparent, blend the pixel with the window pixel
 			{
-				unsigned char* pixel = image.at(screenX + i, screenY + j); //get the pixel data from the image
+				unsigned char* pixel = image.at(screenX + x, screenY + y); //get the pixel data from the image
 
-				int index = (startY + j) * windowWidth + (startX + i); //calculate the index of the pixel in the window back buffer
+				int index = (startY + y) * windowWidth + (startX + x); //calculate the index of the pixel in the window back buffer
 
 				unsigned char* windowPixel = window.getBackBuffer() + index * 3; //get the pixel data from the window
 				//window back buffer is a flat array of unsigned char, where each pixel is represented by 3 bytes (RGB), so we multiply the index by 3 to get the correct position in the back buffer
@@ -75,7 +75,7 @@ void Graphics::DrawImage(GamesEngineeringBase::Window& window, GamesEngineeringB
 				windowPixel[1] = (pixel[1] * alpha + windowPixel[1] * (255 - alpha)) / 255;
 				windowPixel[2] = (pixel[2] * alpha + windowPixel[2] * (255 - alpha)) / 255;
 
-				window.draw(startX + i, startY + j, windowPixel[0], windowPixel[1], windowPixel[2]); //draw the blended pixel to the window
+				window.draw(startX + x, startY + y, windowPixel[0], windowPixel[1], windowPixel[2]); //draw the blended pixel to the window
 			}
 			//ignore pixels with alpha = 0 (fully transparent)
 		}
@@ -136,22 +136,25 @@ void Graphics::DrawTilemapImage(GamesEngineeringBase::Window& window, GamesEngin
 	int tileX = tilemapOffsetX * tileSize; //use the offset eg: [3,5] and multiply it by tile size
 	int tileY = tilemapOffsetY * tileSize;	//to get the tile position 
 
-	for (int i = 0; i < renderWidth; i++)
+	//i had to swap y to the outside and x on the inside to ensure we go row by row
+	//this matters because when the cpu reads a byte it fetches a cache line (64 bytes) and keeps it, so reading close by data is faster
+	for (int y = 0; y < renderHeight; y++)
 	{
-		for (int j = 0; j < renderHeight; j++)
+		for (int x = 0; x < renderWidth; x++)
 		{
-			unsigned char alpha = image.alphaAt(screenX + i + tileX, screenY + j + tileY); //check alpha value of the pixel with the tile offset 
+			//can use at unchecked due to clipping code
+			unsigned char alpha = image.alphaAtUnchecked(screenX + x + tileX, screenY + y + tileY); //check alpha value of the pixel with the tile offset 
 
 			if (alpha == 255) //if the alpha is fully opaque, draw the pixel to the window
 			{
-				unsigned char* pixel = image.at(tileX + screenX + i, tileY + screenY + j); //get the pixel data from the image with the tile offset
-				window.draw(startX + i, startY + j, pixel[0], pixel[1], pixel[2]); //draw the pixel to the window
+				unsigned char* pixel = image.atUnchecked(tileX + screenX + x, tileY + screenY + y); //get the pixel data from the image with the tile offset
+				window.draw(startX + x, startY + y, pixel[0], pixel[1], pixel[2]); //draw the pixel to the window
 			}
 			else if (alpha > 0) //if the alpha is partially transparent, blend the pixel with the window pixel
 			{
-				unsigned char* pixel = image.at(tileX + screenX + i, tileY + screenY + j); //get the pixel data from the image with the tile offset
+				unsigned char* pixel = image.atUnchecked(tileX + screenX + x, tileY + screenY + y); //get the pixel data from the image with the tile offset
 
-				int index = (startY + j) * windowWidth + (startX + i); //calculate the index of the pixel in the window back buffer
+				int index = (startY + y) * windowWidth + (startX + x); //calculate the index of the pixel in the window back buffer
 
 				unsigned char* windowPixel = window.getBackBuffer() + index * 3; //get the pixel data from the window
 				//window back buffer is a flat array of unsigned char, where each pixel is represented by 3 bytes (RGB), so we multiply the index by 3 to get the correct position in the back buffer
@@ -161,7 +164,7 @@ void Graphics::DrawTilemapImage(GamesEngineeringBase::Window& window, GamesEngin
 				windowPixel[1] = (pixel[1] * alpha + windowPixel[1] * (255 - alpha)) / 255;
 				windowPixel[2] = (pixel[2] * alpha + windowPixel[2] * (255 - alpha)) / 255;
 
-				window.draw(startX + i, startY + j, windowPixel[0], windowPixel[1], windowPixel[2]); //draw the blended pixel to the window
+				window.draw(startX + x, startY + y, windowPixel[0], windowPixel[1], windowPixel[2]); //draw the blended pixel to the window
 			}
 			//ignore pixels with alpha = 0 (fully transparent)
 		}

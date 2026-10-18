@@ -157,9 +157,11 @@
   <ItemGroup>
     <ClInclude Include="include\GamesEngineeringBase.h" />
     <ClInclude Include="include\Graphics.h" />
+    <ClInclude Include="include\Map.h" />
     <ClInclude Include="include\Player.h" />
     <ClInclude Include="include\Utilities\FPS.h" />
     <ClInclude Include="include\Utilities\Logger.h" />
+    <ClInclude Include="include\TileDefinition.h" />
     <ClInclude Include="include\Utilities\Vector.h" />
   </ItemGroup>
   <ItemGroup>

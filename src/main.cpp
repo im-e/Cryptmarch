@@ -4,6 +4,7 @@
 #include "Utilities/FPS.h"
 #include "Utilities/Logger.h"
 #include "Utilities/Vector.h"
+#include "Map.h"
 
 int main()
 {
@@ -13,9 +14,9 @@ int main()
     GamesEngineeringBase::Timer timer;
 
     Player player;
-    std::string playerTileMapPath = "resources/32rogues/rogues.png";
-    if (!player.load(playerTileMapPath)) {
-        Logger::Error("Player Tilemap failed to load at filepath: " + playerTileMapPath);
+    std::string playerTilemapPath = "resources/32rogues/rogues.png";
+    if (!player.load(playerTilemapPath)) {
+        Logger::Error("Player Tilemap failed to load at filepath: " + playerTilemapPath);
     }
 
     FPS fps;
@@ -25,12 +26,13 @@ int main()
         Logger::Error("FPS Tilemap failed to load at filepath: " + fpsTilemapPath);
     }
 
-    Vector<int> integers;
-    integers.add(1);
-    integers.add(2);
-    integers.add(3);
-    integers.add(4);
-    integers.add(5);
+    Map map;
+    std::string mapTilemapPath = "resources/32rogues/tiles.png";
+    if (!map.load(mapTilemapPath))
+    {
+        Logger::Error("Map Tilemap failed to load at filepath: " + mapTilemapPath);
+    }
+    
 
     bool running = true;
 
@@ -39,7 +41,6 @@ int main()
         //window.checkInput();
 
         if (window.keyPressed(VK_ESCAPE)) break;
-
 
         float deltaTime = timer.dt(); // once per frame only
 
@@ -54,9 +55,11 @@ int main()
 
 
         //draw
+        map.draw(window);
 
-        fps.draw(window, deltaTime);         //draw fps
         player.draw(window);
+
+        fps.draw(window, deltaTime); //draw fps
          
         //display frame on screen 
         window.present();

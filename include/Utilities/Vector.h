@@ -77,9 +77,12 @@ public:
 		if (index >= size) //if index is bigger than size (>= to since index == size will be out of bounds)
 		{
 			Logger::Error("Index is outside of size"); //assert
-			return;
 		}
-		return data[index]; //return data at index
+		else
+		{
+			return data[index]; //return data at index
+		}
+
 	}
 
 	void remove(const T& value) //remove value preserving order
