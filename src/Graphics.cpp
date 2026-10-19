@@ -1,4 +1,5 @@
 #include "Graphics.h"
+#include "Utilities/Logger.h"
 void Graphics::DrawImage(GamesEngineeringBase::Window& window, GamesEngineeringBase::Image& image, int startX, int startY)
 {
 	//convert image width and height from unsigned int to int for calculations
@@ -16,75 +17,79 @@ void Graphics::DrawImage(GamesEngineeringBase::Window& window, GamesEngineeringB
 		return; // image is completely outside the window, no need to render
 	}
 
-
-	int renderWidth = imageWidth; //render width used for clipping calculations
+	int renderWidth = imageWidth; //used for clipping calculations
 	int renderHeight = imageHeight; 
-	int screenX = 0;
-	int screenY = 0;
+	int clippedX = 0;
+	int clippedY = 0;
 
 	//clip left
-	if (startX < 0)
+	if (startX < 0) //if startX is in the negative (offscreen)
 	{
-		screenX = -startX; // set screenX to the amount clipped
-		renderWidth += startX; // reduce width by the amount clipped
-		startX = 0; // set startX to 0
+		clippedX = -startX; // set to the positive version of amount clipped
+		renderWidth += startX; // reduce render width by the amount clipped as we will have to render less of the image
+		startX = 0; // set startX to 0 so that render starts inside the window
 	}
 	
 	//clip right
-	if (startX + renderWidth > windowWidth)
+	if (startX + renderWidth > windowWidth) //if image would go off the right of the screen
 	{
-		renderWidth = windowWidth - startX; // reduce width by the amount clipped
+		renderWidth = windowWidth - startX; // reduce width by the amount that is offscreen
 	}
 
 	//clip top
-	if (startY < 0)
+	if (startY < 0) //if startY is in the negative (offscreen)
 	{
-		screenY = -startY; // set screenY to the amount clipped
-		renderHeight += startY; // reduce height by the amount clipped
-		startY = 0; // set startY to 0
+		clippedY = -startY; // set to the positive version of amount clipped
+		renderHeight += startY; // reduce render height by the amount clipped as we will have to render less of the image
+		startY = 0; // set startY to 0 so that render starts inside the window
 	}
 
 	//clip bottom
-	if (startY + renderHeight > windowHeight)
+	if (startY + renderHeight > windowHeight) //if image would go off the bottom of the screen
 	{
 		renderHeight = windowHeight - startY; // reduce height by the amount clipped
 	}
 
+	int channels = image.channels; //find the number of channels of the image
+	if(channels != 4) //Channels of image need to be 4 for following code to work
+	{
+		Logger::Error("Channels != 4");
+		return;
+	}
+
 	for (int y = 0; y < renderHeight; y++)
 	{
+		//for each row, work out the positions once
+		unsigned char* imagePixel = image.atUnchecked(clippedX, clippedY + y); //gets the pixel of the image in the first index of the row
+		int index = ((startY + y) * windowWidth + startX) * 3; //calculate the index of the pixel in the window back buffer (window is RGB (only 3 channels))
+		unsigned char* windowPixel = window.getBackBuffer() + index; //uses the index to get the pixel of the window of where we want to draw
+
 		for (int x = 0; x < renderWidth; x++)
 		{
-			unsigned char alpha = image.alphaAtUnchecked(screenX + x, screenY + y); //check alpha value of the pixel 
+			unsigned char alpha = imagePixel[3]; //get the alpha value (A)
 
-			if (alpha == 255) //if the alpha is fully opaque, draw the pixel to the window
+			if (alpha == 255) //if max alpha (opaque)
 			{
-				unsigned char* pixel = image.atUnchecked(screenX + x, screenY + y); //get the pixel data from the image
-				window.draw(startX + x, startY + y, pixel[0], pixel[1], pixel[2]); //draw the pixel to the window
+				windowPixel[0] = imagePixel[0]; //write the image data directly to the pixel via pointer
+				windowPixel[1] = imagePixel[1];
+				windowPixel[2] = imagePixel[2];
 			}
-			else if (alpha > 0) //if the alpha is partially transparent, blend the pixel with the window pixel
-			{
-				unsigned char* pixel = image.at(screenX + x, screenY + y); //get the pixel data from the image
-
-				int index = (startY + y) * windowWidth + (startX + x); //calculate the index of the pixel in the window back buffer
-
-				unsigned char* windowPixel = window.getBackBuffer() + index * 3; //get the pixel data from the window
-				//window back buffer is a flat array of unsigned char, where each pixel is represented by 3 bytes (RGB), so we multiply the index by 3 to get the correct position in the back buffer
-
-				//blend the pixel with the window pixel using alpha blending formula
-				windowPixel[0] = (pixel[0] * alpha + windowPixel[0] * (255 - alpha)) / 255;
-				windowPixel[1] = (pixel[1] * alpha + windowPixel[1] * (255 - alpha)) / 255;
-				windowPixel[2] = (pixel[2] * alpha + windowPixel[2] * (255 - alpha)) / 255;
-
-				window.draw(startX + x, startY + y, windowPixel[0], windowPixel[1], windowPixel[2]); //draw the blended pixel to the window
+			else if (alpha > 0) //partly transparent
+			{	//apply pixel blending formula
+				windowPixel[0] = (imagePixel[0] * alpha + windowPixel[0] * (255 - alpha)) / 255; //write image data to the pixel via pointer
+				windowPixel[1] = (imagePixel[1] * alpha + windowPixel[1] * (255 - alpha)) / 255;
+				windowPixel[2] = (imagePixel[2] * alpha + windowPixel[2] * (255 - alpha)) / 255;
 			}
 			//ignore pixels with alpha = 0 (fully transparent)
+
+			imagePixel += channels; //increase the index of our image pixel by channels to get to the next pixel
+			windowPixel += 3; //same applies to the window, however we add 3 due to window being RGB not RGBA
 		}
 	}
 }
 void Graphics::DrawTilemapImage(GamesEngineeringBase::Window& window, GamesEngineeringBase::Image& image, int tileSize, int tilemapOffsetX, int tilemapOffsetY, int startX, int startY)
 {
 	//convert image width and height from unsigned int to int for calculations
-
 	int imageWidth = image.width;
 	int imageHeight = image.height;
 	int windowWidth = window.getWidth();
@@ -93,42 +98,41 @@ void Graphics::DrawTilemapImage(GamesEngineeringBase::Window& window, GamesEngin
 	//check if the image is completely outside the window boundaries
 	if (startX >= windowWidth ||
 		startY >= windowHeight ||
-		startX + tileSize <= 0 || //using tile size instead of image size
+		startX + tileSize <= 0 ||
 		startY + tileSize <= 0)
 	{
 		return; // image is completely outside the window, no need to render
 	}
 
-
-	int renderWidth = tileSize; //render width used for clipping calculations
-	int renderHeight = tileSize; //using tile size instead of image size
-	int screenX = 0;
-	int screenY = 0;
+	int renderWidth = tileSize; //used for clipping calculations
+	int renderHeight = tileSize;
+	int clippedX = 0;
+	int clippedY = 0;
 
 	//clip left
-	if (startX < 0)
+	if (startX < 0) //if startX is in the negative (offscreen)
 	{
-		screenX = -startX; // set screenX to the amount clipped
-		renderWidth += startX; // reduce width by the amount clipped
-		startX = 0; // set startX to 0
+		clippedX = -startX; // set to the positive version of amount clipped
+		renderWidth += startX; // reduce render width by the amount clipped as we will have to render less of the image
+		startX = 0; // set startX to 0 so that render starts inside the window
 	}
 
 	//clip right
-	if (startX + renderWidth > windowWidth)
+	if (startX + renderWidth > windowWidth) //if image would go off the right of the screen
 	{
-		renderWidth = windowWidth - startX; // reduce width by the amount clipped
+		renderWidth = windowWidth - startX; // reduce width by the amount that is offscreen
 	}
 
 	//clip top
-	if (startY < 0)
+	if (startY < 0) //if startY is in the negative (offscreen)
 	{
-		screenY = -startY; // set screenY to the amount clipped
-		renderHeight += startY; // reduce height by the amount clipped
-		startY = 0; // set startY to 0
+		clippedY = -startY; // set to the positive version of amount clipped
+		renderHeight += startY; // reduce render height by the amount clipped as we will have to render less of the image
+		startY = 0; // set startY to 0 so that render starts inside the window
 	}
 
 	//clip bottom
-	if (startY + renderHeight > windowHeight)
+	if (startY + renderHeight > windowHeight) //if image would go off the bottom of the screen
 	{
 		renderHeight = windowHeight - startY; // reduce height by the amount clipped
 	}
@@ -136,37 +140,41 @@ void Graphics::DrawTilemapImage(GamesEngineeringBase::Window& window, GamesEngin
 	int tileX = tilemapOffsetX * tileSize; //use the offset eg: [3,5] and multiply it by tile size
 	int tileY = tilemapOffsetY * tileSize;	//to get the tile position 
 
-	//i had to swap y to the outside and x on the inside to ensure we go row by row
-	//this matters because when the cpu reads a byte it fetches a cache line (64 bytes) and keeps it, so reading close by data is faster
+	
+	int channels = image.channels; //find the number of channels of the image
+	if (channels != 4) //Channels of image need to be 4 for following code to work
+	{
+		Logger::Error("Channels != 4");
+		return;
+	}
+
 	for (int y = 0; y < renderHeight; y++)
 	{
+		//for each row, work out the positions once
+		unsigned char* imagePixel = image.atUnchecked(tileX + clippedX, tileY + clippedY + y); //gets the pixel of the image in the first index of the row
+		int index = ((startY + y) * windowWidth + startX) * 3; //calculate the index of the pixel in the window back buffer (window is RGB (only 3 channels))
+		unsigned char* windowPixel = window.getBackBuffer() + index; //uses the index to get the pixel of the window of where we want to draw
+
 		for (int x = 0; x < renderWidth; x++)
 		{
-			//can use at unchecked due to clipping code
-			unsigned char alpha = image.alphaAtUnchecked(screenX + x + tileX, screenY + y + tileY); //check alpha value of the pixel with the tile offset 
+			unsigned char alpha = imagePixel[3]; //get the alpha value (A)
 
-			if (alpha == 255) //if the alpha is fully opaque, draw the pixel to the window
+			if (alpha == 255) //if max alpha (opaque)
 			{
-				unsigned char* pixel = image.atUnchecked(tileX + screenX + x, tileY + screenY + y); //get the pixel data from the image with the tile offset
-				window.draw(startX + x, startY + y, pixel[0], pixel[1], pixel[2]); //draw the pixel to the window
+				windowPixel[0] = imagePixel[0]; //write the image data directly to the pixel via pointer
+				windowPixel[1] = imagePixel[1];
+				windowPixel[2] = imagePixel[2];
 			}
-			else if (alpha > 0) //if the alpha is partially transparent, blend the pixel with the window pixel
-			{
-				unsigned char* pixel = image.atUnchecked(tileX + screenX + x, tileY + screenY + y); //get the pixel data from the image with the tile offset
-
-				int index = (startY + y) * windowWidth + (startX + x); //calculate the index of the pixel in the window back buffer
-
-				unsigned char* windowPixel = window.getBackBuffer() + index * 3; //get the pixel data from the window
-				//window back buffer is a flat array of unsigned char, where each pixel is represented by 3 bytes (RGB), so we multiply the index by 3 to get the correct position in the back buffer
-
-				//blend the pixel with the window pixel using alpha blending formula
-				windowPixel[0] = (pixel[0] * alpha + windowPixel[0] * (255 - alpha)) / 255;
-				windowPixel[1] = (pixel[1] * alpha + windowPixel[1] * (255 - alpha)) / 255;
-				windowPixel[2] = (pixel[2] * alpha + windowPixel[2] * (255 - alpha)) / 255;
-
-				window.draw(startX + x, startY + y, windowPixel[0], windowPixel[1], windowPixel[2]); //draw the blended pixel to the window
+			else if (alpha > 0) //partly transparent
+			{	//apply pixel blending formula
+				windowPixel[0] = (imagePixel[0] * alpha + windowPixel[0] * (255 - alpha)) / 255; //write image data to the pixel via pointer
+				windowPixel[1] = (imagePixel[1] * alpha + windowPixel[1] * (255 - alpha)) / 255;
+				windowPixel[2] = (imagePixel[2] * alpha + windowPixel[2] * (255 - alpha)) / 255;
 			}
 			//ignore pixels with alpha = 0 (fully transparent)
+
+			imagePixel += channels; //increase the index of our image pixel by channels to get to the next pixel
+			windowPixel += 3; //same applies to the window, however we add 3 due to window being RGB not RGBA
 		}
 	}
 }

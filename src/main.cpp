@@ -26,13 +26,9 @@ int main()
         Logger::Error("FPS Tilemap failed to load at filepath: " + fpsTilemapPath);
     }
 
-    Map map;
     std::string mapTilemapPath = "resources/32rogues/tiles.png";
-    if (!map.load(mapTilemapPath))
-    {
-        Logger::Error("Map Tilemap failed to load at filepath: " + mapTilemapPath);
-    }
-    
+    std::string mapPath = "resources/maps/map1.txt";
+    Map map(mapTilemapPath, mapPath);
 
     bool running = true;
 

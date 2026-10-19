@@ -56,6 +56,28 @@ public:
 		delete[] data; //delete (array) data
 	}
 
+
+	//returns reference to type
+	//operator allows us to use it like an array [] 
+	T& operator[](size_t index)
+	{
+		if (index >= size) //if index is bigger than size (>= to since index == size will be out of bounds)
+		{
+			Logger::Error("Index is outside of size"); //assert
+			return data[0]; //safely return something after assert
+		}
+		else
+		{
+			return data[index]; //return data at index
+		}
+
+	}
+
+	//rule of three 
+	// Remove copy constructors
+	Vector(const Vector&) = delete;
+	Vector& operator=(const Vector&) = delete;
+
 	void add(const T& value) //add item 
 	{
 		//if size equals or is larger than capacity
@@ -68,21 +90,6 @@ public:
 		}
 		data[size] = value; //store value into slot
 		size++; //increase in size
-	}
-
-	//returns reference to type
-	//operator allows us to use it like an array [] 
-	T& operator[](size_t index)
-	{
-		if (index >= size) //if index is bigger than size (>= to since index == size will be out of bounds)
-		{
-			Logger::Error("Index is outside of size"); //assert
-		}
-		else
-		{
-			return data[index]; //return data at index
-		}
-
 	}
 
 	void remove(const T& value) //remove value preserving order

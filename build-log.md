@@ -36,6 +36,39 @@ ENTRIES (NEWEST FIRST)
 ==============================================================
 
 --------------------------------------------------------------
+2026-10-19 : Optimisations, Bugfixes, Map building by file
+--------------------------------------------------------------
+WHAT I BUILT / CHANGED:
+  - Vector: operator[] out of bounds bug, made it return a safe value after asserting out of index. Applied the rule of three by looking at Image and seeing how it handles its copy + copy assignment and deleted them.
+  - Graphics: Removed repeated blend writing, dramatically improved rendering performance by fixing bugs and improving drawing.
+  - Map: created loadMap which loads a map from a file
+
+WHAT WENT WRONG AND HOW I FIXED IT:
+  - Vector: Two vectors could have pointed to the same memory if it were copied, which would crash when tried to be deleted. so I used the rule of three to fix that by deleting the copy and copy assignment constructors
+  - Graphics: I had an issue in the semi transparent draw branch of my DrawImage and DrawTilemapImage function. I was taking a pointer of the window pixel and modifying the pixel to do my alpha changes, but then I was also drawing the pixel to the screen after already doing so via the pointer. This then gave me an idea on how to further optimise my drawing by using pointers. Working out the positions of both the window and image pixel by row, I would go across the row by bytes instead of recalculating every pixel. I had issues with the math of the window being RGB and the the image being RGBA but once I understood that was the case it became simple to implement.
+  - Map: I had issues figuring out the width/height of the map just from the data alone, so included 2 numbers at the start on the first line to signify the width and height of the map. 
+
+ALTERNATIVES I CONSIDERED (AND WHY I CHOSE WHAT I DID):
+  - Vector: I could wrote a correct copy assignment constructor, which builds a new vector from an existing one. I chose not to simply because I do not see the need to do so, deleting them to forbid copying is the best and simplest option.
+  -Graphics: The implementation I used forces all images to be RGBA as having fewer than 4 channels will break the alpha check and cause the image to be unrendered. I consider this a fine comprimise however as I can re-export my assets using paint.net to force them into RGBA.
+  - Map: I could have read the raw data from fstream to see when a new line was created to determine the width and height of a map from its data, however i went for a manual input inside the data instead just to make file i/o easier. it allowed me to just use the >> operator to take the first two values from the file, and then read the rest of the data using the same operator in a for loop. this does give me a lot more oppourtunity of error if i input the wrong height and width, which i might change in the future. 
+
+NUMBERS (FPS, ms per frame, entity / tile counts, conditions):
+  - BASELINE: full-screen 32x24 tile map.
+	BEFORE OPTIMISATION
+    FPS = 900-950 (Release), 130 (Debug).
+	AFTER OPTIMISATION
+    FPS = 1800 (Release), 700 (Debug).
+
+REPORT SECTION THIS FEEDS:
+	3.Tile Map, Data driven loading
+
+SCREENSHOT TAKEN?  yes
+
+STILL TO DO NEXT:
+
+
+--------------------------------------------------------------
 2026-10-18 : Maps with tilemaps
 --------------------------------------------------------------
 WHAT I BUILT / CHANGED:
