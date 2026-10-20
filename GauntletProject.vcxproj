@@ -166,8 +166,10 @@
     <ClInclude Include="include\Utilities\Vector.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Graphics.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Map.cpp" />
     <ClCompile Include="src\Player.cpp" />
   </ItemGroup>
   <ItemGroup>

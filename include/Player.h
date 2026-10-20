@@ -1,6 +1,7 @@
 #pragma once
 #include "GamesEngineeringBase.h"
 #include "Camera.h"
+#include "Map.h"
 
 class Player
 {
@@ -20,8 +21,8 @@ private:
 	float playerSpeed = 200.0f; // pixels per second
 
 	//bounding box size
-	int playerWidth = 32;
-	int playerHeight = 32;
+	int hitboxWidth = 32;
+	int hitboxHeight = 32;
 
 	int keyUp = VK_UP;
 	int keyDown = VK_DOWN;
@@ -29,8 +30,8 @@ private:
 	int keyRight = VK_RIGHT;
 
 public:
-	bool load(const std::string& path);
-	void update(GamesEngineeringBase::Window& window, float deltaTime, float worldWidth, float worldHeight);
+	bool loadImage(const std::string& path);
+	void update(GamesEngineeringBase::Window& window, Map& map, float deltaTime);
 	void draw(GamesEngineeringBase::Window& window, Camera& cam);
 
 	float getX() { return worldX; }

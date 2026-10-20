@@ -1,12 +1,12 @@
 #include "Player.h"
 #include "Graphics.h"
 
-bool Player::load(const std::string& path)
+bool Player::loadImage(const std::string& path)
 {
 	return playerImage.load(path);
 }
 
-void Player::update(GamesEngineeringBase::Window& window, float deltaTime, float worldWidth, float worldHeight)
+void Player::update(GamesEngineeringBase::Window& window, Map& map, float deltaTime)
 {
 	//get the direction of movement based on key presses
 	float dirX = 0.0f;
@@ -38,27 +38,46 @@ void Player::update(GamesEngineeringBase::Window& window, float deltaTime, float
 		dirY /= length;
 	}
 
+	//check if the player is trying to move through an impassable wall
+	//if so stop the movement
+
 	//apply the movement to the player's position based on speed and deltaTime
-	worldX += dirX * playerSpeed * deltaTime;
-	worldY += dirY * playerSpeed * deltaTime;
+	//use x/yMove to track how far the player wants to move
+	float xMove = dirX * playerSpeed * deltaTime;
+	float yMove = dirY * playerSpeed * deltaTime;
+
+
+	//test if the player is blocked then move
+	//i could have done move-then-undo but i didnt want my position to enter an illegal state
+	if (!map.isBlockedByWall(worldX + xMove, worldY, hitboxWidth, hitboxHeight))
+	{
+		worldX += xMove;
+	}
+
+	if (!map.isBlockedByWall(worldX, worldY + yMove, hitboxWidth, hitboxHeight))
+	{
+		worldY += yMove;
+	}
+
+
 
 	//clamp the player's position to the world
 	if (worldX < 0.0f)
 	{
 		worldX = 0.0f;
 	}
-	else if (worldX > worldWidth - playerWidth)
+	else if (worldX > map.getMapWidth() - hitboxWidth)
 	{
-		worldX = worldWidth - playerWidth;
+		worldX = map.getMapWidth() - hitboxWidth;
 	}
 
 	if (worldY < 0.0f)
 	{
 		worldY = 0.0f;
 	}
-	else if (worldY > worldHeight - playerHeight)
+	else if (worldY > map.getMapHeight() - hitboxHeight)
 	{
-		worldY = worldHeight - playerHeight;
+		worldY = map.getMapHeight() - hitboxHeight;
 	}
 }
 

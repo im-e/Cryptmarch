@@ -36,24 +36,39 @@ ENTRIES (NEWEST FIRST)
 ==============================================================
 
 --------------------------------------------------------------
-2026-10-20 : Camera and Map changes
+2026-10-20 : Camera and Map changes, tile collision
 --------------------------------------------------------------
 WHAT I BUILT / CHANGED:
   - Camera: built a camera class which has getters, setters and controls the camX and camY values, also has a follow function which follows a target centrally, currently around the player.
  - Map: Built more maps using genAi to make the assets, increased tilemap variety
+ - Tile Collision: Added isBlockedByWall() to Map to check the tiles for collision which overlap with the objects position + width.
 WHAT WENT WRONG AND HOW I FIXED IT:
   - Camera: had issues actually converting screen space to world space and wrapping my head around the differences. I used my camera class to have a function to do so which simplifies the code a little.
+  - Tile Collision: I had an issue with the bound checks of the edges, and converting them to tile grid coordinates. I had to -1 the right and bottom edges because it would otherwise push the index into the next tile which would create very frustrating behaviour when going near walls on those sides and getting blocked even when there was more than enough space to move.
 
 ALTERNATIVES I CONSIDERED (AND WHY I CHOSE WHAT I DID):
-  - Camera: I could have had the camera onto my player, but i decided not to since this would make implementing multiplayer much more difficult, or let the graphics handler control the camera. as a part of my process of understanding, i went to making it its own class first and then decided to instantiate it in main and have it follow the player and pass it to the graphics pipeline 
+  - Camera: I could have had the camera onto my player, but i decided not to since this would make implementing multiplayer much more difficult, or let the graphics handler control the camera. as a part of my process of understanding, i went to making it its own class first and then decided to instantiate it in main and have it follow the player and pass it to the graphics pipeline
+ -Tile Collision: I originally tried to implement it by checking every single and test the player against each time but with n walls that is O(n) per check. with a big map that would be thousands of checks per second which would get much worse with more and more enemies, projectiles etc... Instead I found an O(1) method by using the position and width of an object and converting the edges of the bounding box into tile coordinates. I could then loop through those coordinates to find out only the tiles that the object is colliding with.
 
 NUMBERS (FPS, ms per frame, entity / tile counts, conditions):
-  - No change to fps.
+  - BASELINE: map_arena 48x36 tile map.
+	BEFORE Tile Collision
+    FPS = 1800 (Release), 700 (Debug).
+	AFTER Tile Collision
+    FPS = 1800 (Release), 700 (Debug).
+	No change.
+
 
 REPORT SECTION THIS FEEDS:
-  (e.g. 2.3.1 Tile map)
+  3. Collision and grid systems
+  Impassable terrain blocks
+  tile based method for displaying the background
+  two different terrain types
+  data driven loading
+  fixed boundary
+  Camera follows hero
 
-SCREENSHOT TAKEN?  yes / no   (file name: )
+SCREENSHOT TAKEN?  
 
 STILL TO DO NEXT:
   -

@@ -4,28 +4,31 @@
 #include "Graphics.h"
 #include <fstream>
 #include "Utilities/Logger.h"
-#include "Camera.h"
+
+//forward declaration, tells the compiler camera is a class
+//so we can use camera& without compiler getting stuck in a loop
+class Camera; 
 
 class Map
 {
 private:
-	//tileset image
-	GamesEngineeringBase::Image tilemapImage;
-	bool loadImage(const std::string& path)
-	{
-		if (tilemapImage.load(path)) {
-			return true;
-		}
-		else {
-			Logger::Error("Map Tilemap failed to load at filepath : " + path);
-			return false;
-		}
-	}
+
+	GamesEngineeringBase::Image tilesetImage; //tileset image
+	bool loadImage(const std::string& path); //loads the image
+
+	int* tilemapData = nullptr; //map grid 1d flat array of tile ids
+	int tilemapWidth = 0; //width of tilemap (in tiles)
+	int tilemapHeight = 0; //height of tilemap (in tiles)
+
+	int mapWidth = 0; //width of tilemap (in pixels) (map size)
+	int mapHeight = 0; //height of tilemap (in pixels) (map size)
+
+	int tilePixelSize = 32; //width + height of each tile in pixels
 
 	//tile type definitions
 	inline static TileDefinition tileDefinitions[7]
 	{
-					//name xpos ypos walkable
+		//name xpos ypos walkable
 		TileDefinition("Background", 0, 7, true),
 		TileDefinition("Floor1", 0, 6, true),
 		TileDefinition("Floor2", 1, 6, true),
@@ -35,91 +38,32 @@ private:
 		TileDefinition("RockWallHorizontal", 1, 1, false),
 	};
 
-	//map grid 2d array of tile ids
-	//1d flat array with index y * width + x
-	//map data read from loader
-	int* tilemapData = nullptr;
-	int tilemapWidth = 0;
-	int tilemapHeight = 0;
-	int tilemapTileSize = 32;
-
-	bool loadMap(const std::string& path)
-	{
-		//load values from file
-		std::fstream mapFile(path);
-
-		if (!mapFile.is_open())
-		{
-			Logger::Error("Map Failed to load at: " + path);
-			return false;
-		}
-
-		int width = 0;
-		int height = 0;
-
-		//read and extract width and height from the first line
-		mapFile >> width >> height;
-
-		//update width/height
-		tilemapWidth = width;
-		tilemapHeight = height;
-		//allocate array of new map
-		tilemapData = new int[tilemapWidth * tilemapHeight];
-
-		//read the data from the file and insert it into the array
-		for (int i = 0; i < tilemapWidth * tilemapHeight; i++)
-		{
-			mapFile >> tilemapData[i];
-		}
-
-		mapFile.close();
-		Logger::Info("Successfully loaded map: " + path);
-		return true;
-	}
+	bool loadMap(const std::string& path); //loads map data
 
 public:
 
-	Map(const std::string& imagePath, const std::string& mapPath)
+	Map(const std::string& imagePath, const std::string& mapPath) //constructor
 	{
 		loadImage(imagePath);
 		loadMap(mapPath);
-
 	}
 
-	~Map() {
+	~Map() //destructor
+	{
 		delete[] tilemapData;
 	}
 
-	void draw(GamesEngineeringBase::Window& window, Camera& cam)
-	{
-		//for each tile, draw tile one by one
-		//i = slot in map
-		for (int i = 0; i < tilemapHeight * tilemapWidth; i++)
-		{
-			//get tile number
-			int tileNumber = tilemapData[i];
-			//get the tile definition from the tile number
-			//use a reference to avoid making a full copy
-			const TileDefinition &tile = tileDefinitions[tileNumber];
+	void draw(GamesEngineeringBase::Window& window, Camera& cam); //draw the map relative to the camera position
 
-			//calculate the x and y (in the tilemap) based on the slot position
-			int tilePosX = i % tilemapWidth; //the remainder after dividing is how far along the row you are
-			int tilePosY = i / tilemapWidth; //how many whole rows fit before it
+	int getTilemapWidth() { return tilemapWidth; } //returns the width of the map in tiles
+	int getTilemapHeight() { return tilemapHeight; } //retuns the height of th map in tiles
 
-			//convert tilemap posx and posy to world space
-			int tileWorldX = tilePosX * tilemapTileSize;
-			int tileWorldY = tilePosY * tilemapTileSize;
+	int getMapWidth() { return mapWidth; } //returns the width of the map in pixels
+	int getMapHeight() { return mapHeight; }//returns the height of the map in pixels
 
-			//convert to screen coordinates using the camera
-			int tileScreenX = cam.worldToScreenX(tileWorldX);
-			int tileScreenY = cam.worldToScreenY(tileWorldY);
+	bool isWalkable(float pixelX, float pixelY); //returns if a point in 
 
-			//fill in information to draw
-			Graphics::DrawTilemapImage(window, tilemapImage, tilemapTileSize, tile.tileXOffset, tile.tileYOffset, tileScreenX, tileScreenY);
+	bool isBlockedByWall(float posX, float posY, float width, float height) const;
 
-		}
-	}
 
-	int getTilemapWidth() { return tilemapWidth; }
-	int getTilemapHeight() { return tilemapHeight; }
 };

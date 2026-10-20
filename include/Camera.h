@@ -1,4 +1,8 @@
 #pragma once
+#include "GamesEngineeringBase.h"
+
+class Map;
+
 class Camera
 {
 private:
@@ -15,7 +19,8 @@ public:
 
 	int worldToScreenX(int worldX) const //convert world x to screen x
 	{
-		return worldX - camX;
+		//by subtracting the cameras position from the world position we find out where the object should be drawn on the window
+		return worldX - camX; 
 	}
 
 	int worldToScreenY(int worldY) const //convert world y to screen y
@@ -23,26 +28,6 @@ public:
 		return worldY - camY;
 	}
 
-
-	void follow(int worldX, int worldY, int windowWidth, int windowHeight, bool fixedMap, int mapWidth, int mapHeight)
-	{
-		//centre the camera on the target.
-		camX = worldX - (windowWidth / 2);
-		camY = worldY - (windowHeight / 2);
-
-		//if its a fixed map, clamp the camera
-		if (fixedMap)
-		{
-			//stop the camera from showing past the left/top edges
-			if (camX < 0) camX = 0;
-			if (camY < 0) camY = 0;
-
-			//stop the camera from showing past the right/bottom edges
-			if (camX > mapWidth - windowWidth)
-				camX = mapWidth - windowWidth;
-			if (camY > mapHeight - windowHeight)
-				camY = mapHeight - windowHeight;
-		}
-	}
+	void follow(GamesEngineeringBase::Window& window, Map& map, int followPosX, int followPosY, bool fixedMap);
 
 };

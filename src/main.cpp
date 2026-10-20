@@ -25,7 +25,7 @@ int main()
     //init player
     Player player;
     std::string playerTilemapPath = "resources/32rogues/rogues.png"; //player tilemap path
-    if (!player.load(playerTilemapPath)) { //if load returns false
+    if (!player.loadImage(playerTilemapPath)) { //if load returns false
         Logger::Error("Player Tilemap failed to load at filepath: " + playerTilemapPath); //assert
     }
 
@@ -45,10 +45,6 @@ int main()
     //init camera
     Camera cam;
 
-    //get the world size in pixels by multiplying the map tilemap by pixel size
-    float pixelWorldWidth = map.getTilemapWidth() * tilePixelSize;
-    float pixelWorldHeight = map.getTilemapHeight() * tilePixelSize;
-
     //game loop
     bool running = true;
 
@@ -65,10 +61,10 @@ int main()
 
 
         //update game logic
-		player.update(window, deltaTime, pixelWorldWidth, pixelWorldHeight);
+		player.update(window, map, deltaTime);
 
         //set the camera to follow the player
-        cam.follow(player.getX(), player.getY(), windowWidth, windowHeight, true, pixelWorldWidth, pixelWorldHeight);
+        cam.follow(window, map, player.getX(), player.getY(), true);
 
         //draw
         map.draw(window, cam);
