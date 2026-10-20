@@ -92,7 +92,7 @@ void Graphics::DrawTilemapImage(GamesEngineeringBase::Window& window, GamesEngin
 	//convert image width and height from unsigned int to int for calculations
 	int imageWidth = image.width;
 	int imageHeight = image.height;
-	int windowWidth = window.getTileMapWidth();
+	int windowWidth = window.getWidth();
 	int windowHeight = window.getHeight();
 
 	//check if the image is completely outside the window boundaries
