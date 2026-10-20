@@ -4,6 +4,7 @@
 #include "Graphics.h"
 #include <fstream>
 #include "Utilities/Logger.h"
+#include "Camera.h"
 
 class Map
 {
@@ -22,11 +23,16 @@ private:
 	}
 
 	//tile type definitions
-	inline static TileDefinition tileDefinitions[2]
+	inline static TileDefinition tileDefinitions[7]
 	{
 					//name xpos ypos walkable
-		TileDefinition("Floor", 0, 6, true),
-		TileDefinition("Wall", 0, 1, false),
+		TileDefinition("Background", 0, 7, true),
+		TileDefinition("Floor1", 0, 6, true),
+		TileDefinition("Floor2", 1, 6, true),
+		TileDefinition("Floor3", 2, 6, true),
+		TileDefinition("Floor4", 3, 6, true),
+		TileDefinition("RockWallVertical", 0, 1, false),
+		TileDefinition("RockWallHorizontal", 1, 1, false),
 	};
 
 	//map grid 2d array of tile ids
@@ -84,10 +90,9 @@ public:
 		delete[] tilemapData;
 	}
 
-	void draw(GamesEngineeringBase::Window& window)
+	void draw(GamesEngineeringBase::Window& window, Camera& cam)
 	{
 		//for each tile, draw tile one by one
-
 		//i = slot in map
 		for (int i = 0; i < tilemapHeight * tilemapWidth; i++)
 		{
@@ -97,17 +102,24 @@ public:
 			//use a reference to avoid making a full copy
 			const TileDefinition &tile = tileDefinitions[tileNumber];
 
-			//calculate the x and y (in the tile tilemap) based on the slot position
+			//calculate the x and y (in the tilemap) based on the slot position
 			int tilePosX = i % tilemapWidth; //the remainder after dividing is how far along the row you are
-			int tilePosY = i / tilemapWidth; //integer division counts how many whole rows fit before it
+			int tilePosY = i / tilemapWidth; //how many whole rows fit before it
 
-			//convert tilemap posx and posy to draw space
-			tilePosX *= tilemapTileSize;
-			tilePosY *= tilemapTileSize;
+			//convert tilemap posx and posy to world space
+			int tileWorldX = tilePosX * tilemapTileSize;
+			int tileWorldY = tilePosY * tilemapTileSize;
+
+			//convert to screen coordinates using the camera
+			int tileScreenX = cam.worldToScreenX(tileWorldX);
+			int tileScreenY = cam.worldToScreenY(tileWorldY);
 
 			//fill in information to draw
-			Graphics::DrawTilemapImage(window, tilemapImage, tilemapTileSize, tile.tileXOffset, tile.tileYOffset, tilePosX, tilePosY);
+			Graphics::DrawTilemapImage(window, tilemapImage, tilemapTileSize, tile.tileXOffset, tile.tileYOffset, tileScreenX, tileScreenY);
 
 		}
 	}
+
+	int getTilemapWidth() { return tilemapWidth; }
+	int getTilemapHeight() { return tilemapHeight; }
 };

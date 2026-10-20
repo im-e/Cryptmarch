@@ -6,7 +6,7 @@ bool Player::load(const std::string& path)
 	return playerImage.load(path);
 }
 
-void Player::update(GamesEngineeringBase::Window& window, float deltaTime)
+void Player::update(GamesEngineeringBase::Window& window, float deltaTime, float worldWidth, float worldHeight)
 {
 	//get the direction of movement based on key presses
 	float dirX = 0.0f;
@@ -33,38 +33,40 @@ void Player::update(GamesEngineeringBase::Window& window, float deltaTime)
 	//check if moving diagonally and normalize the direction vector
 	if (dirX != 0.0f && dirY != 0.0f)
 	{
-		
 		float length = sqrt(dirX * dirX + dirY * dirY);
 		dirX /= length;
 		dirY /= length;
 	}
 
 	//apply the movement to the player's position based on speed and deltaTime
-	playerX += dirX * playerSpeed * deltaTime;
-	playerY += dirY * playerSpeed * deltaTime;
+	worldX += dirX * playerSpeed * deltaTime;
+	worldY += dirY * playerSpeed * deltaTime;
 
-	//clamp the player's position to stay within the window boundaries
-	if (playerX < 0.0f)
+	//clamp the player's position to the world
+	if (worldX < 0.0f)
 	{
-		playerX = 0.0f;
+		worldX = 0.0f;
 	}
-	else if (playerX > window.getWidth() - playerWidth)
+	else if (worldX > worldWidth - playerWidth)
 	{
-		playerX = window.getWidth() - playerWidth;
+		worldX = worldWidth - playerWidth;
 	}
 
-	if (playerY < 0.0f)
+	if (worldY < 0.0f)
 	{
-		playerY = 0.0f;
+		worldY = 0.0f;
 	}
-	else if (playerY > window.getHeight() - playerHeight)
+	else if (worldY > worldHeight - playerHeight)
 	{
-		playerY = window.getHeight() - playerHeight;
+		worldY = worldHeight - playerHeight;
 	}
 }
 
-void Player::draw(GamesEngineeringBase::Window& window)
+void Player::draw(GamesEngineeringBase::Window& window, Camera& cam)
 {
-	Graphics::DrawTilemapImage(window, playerImage, playerTileSize, 0, 0,  playerX, playerY);
+	int screenX = cam.worldToScreenX(worldX);
+	int screenY = cam.worldToScreenY(worldY);
+
+	Graphics::DrawTilemapImage(window, playerImage, playerTileSize, tileXOffset, tileYOffset, screenX, screenY);
 
 }
