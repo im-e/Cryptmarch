@@ -1,41 +1,22 @@
 #pragma once
 #include "GamesEngineeringBase.h"
-#include "Camera.h"
-#include "Map.h"
+#include "Entity.h"
 
-class Player
+class Player : public Entity
 {
 
 private:
-	//image
-	GamesEngineeringBase::Image playerImage;
-	int playerTileSize = 32; //tilesize
-	int tileXOffset = 0;
-	int tileYOffset = 0;
-
-	//position
-	float worldX = 50.0f;
-	float worldY = 100.0f;
-
-	//movement
-	float playerSpeed = 200.0f; // pixels per second
-
-	//bounding box size
-	int hitboxWidth = 32;
-	int hitboxHeight = 32;
-
 	int keyUp = VK_UP;
 	int keyDown = VK_DOWN;
 	int keyLeft = VK_LEFT;
 	int keyRight = VK_RIGHT;
 
 public:
-	bool loadImage(const std::string& path);
-	void update(GamesEngineeringBase::Window& window, Map& map, float deltaTime);
-	void draw(GamesEngineeringBase::Window& window, Camera& cam);
+	Player(int _health, int _speed, float _xPos, float _yPos, const std::string& path, int _tileXOffset, int _tileYOffset) : 
+		Entity(_health, _speed, _xPos, _yPos, path, _tileXOffset, _tileYOffset)
+	{
+	}
 
-	float getX() { return worldX; }
-	float getY() { return worldY; }
-
+	void update(GamesEngineeringBase::Window& window, Map& map, float deltaTime) override;
 
 };

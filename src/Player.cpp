@@ -1,10 +1,6 @@
 #include "Player.h"
 #include "Graphics.h"
 
-bool Player::loadImage(const std::string& path)
-{
-	return playerImage.load(path);
-}
 
 void Player::update(GamesEngineeringBase::Window& window, Map& map, float deltaTime)
 {
@@ -43,8 +39,8 @@ void Player::update(GamesEngineeringBase::Window& window, Map& map, float deltaT
 
 	//apply the movement to the player's position based on speed and deltaTime
 	//use x/yMove to track how far the player wants to move
-	float xMove = dirX * playerSpeed * deltaTime;
-	float yMove = dirY * playerSpeed * deltaTime;
+	float xMove = dirX * speed * deltaTime;
+	float yMove = dirY * speed * deltaTime;
 
 
 	//test if the player is blocked then move
@@ -79,13 +75,4 @@ void Player::update(GamesEngineeringBase::Window& window, Map& map, float deltaT
 	{
 		worldY = map.getMapHeight() - hitboxHeight;
 	}
-}
-
-void Player::draw(GamesEngineeringBase::Window& window, Camera& cam)
-{
-	int screenX = cam.worldToScreenX(worldX);
-	int screenY = cam.worldToScreenY(worldY);
-
-	Graphics::DrawTilemapImage(window, playerImage, playerTileSize, tileXOffset, tileYOffset, screenX, screenY);
-
 }
