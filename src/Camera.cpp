@@ -7,7 +7,7 @@ void Camera::follow(GamesEngineeringBase::Window& window, Map& map, int followPo
 	//camX and camY represent the top left corner of the screen view not the center
 	//if camX = followPosX, player would be stuck in the top left of the window
 	camX = followPosX - (window.getWidth() / 2); //so we find the middle of the scren and offset our camera by that amount to keep the player central
-	camY = followPosY - (window.getHeight() / 2);
+	camY = followPosY - (window.getHeight() / 2); 
 
 	//if its a fixed map, clamp the camera
 	if (fixedMap)
