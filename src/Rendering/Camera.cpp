@@ -1,5 +1,5 @@
-#include "Camera.h"
-#include "Map.h"
+#include "Rendering/Camera.h"
+#include "Map/Map.h"
 
 void Camera::follow(GamesEngineeringBase::Window& window, Map& map, int followPosX, int followPosY, bool fixedMap)
 {

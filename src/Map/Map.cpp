@@ -1,16 +1,5 @@
-#include "Map.h"
-#include "Camera.h"
-
-bool Map::loadImage(const std::string& path)
-{
-	if (tilesetImage.load(path)) {
-		return true;
-	}
-	else {
-		Logger::Error("Map Tilemap failed to load at filepath : " + path);
-		return false;
-	}
-}
+#include "Map/Map.h"
+#include "Rendering/Camera.h"
 
 bool Map::loadMap(const std::string& path)
 {
@@ -74,7 +63,7 @@ void Map::draw(GamesEngineeringBase::Window& window, Camera& cam)
 		int tileScreenY = cam.worldToScreenY(tileWorldY);
 
 		//fill in information to draw
-		Graphics::DrawTilemapImage(window, tilesetImage, tilePixelSize, tile.tileXOffset, tile.tileYOffset, tileScreenX, tileScreenY);
+		Graphics::DrawTilemapImage(window, *tilesetImage, tilePixelSize, tile.tileXOffset, tile.tileYOffset, tileScreenX, tileScreenY);
 	}
 }
 

@@ -1,4 +1,4 @@
-#include "Graphics.h"
+#include "Rendering/Graphics.h"
 #include "Utilities/Logger.h"
 void Graphics::DrawImage(GamesEngineeringBase::Window& window, GamesEngineeringBase::Image& image, int startX, int startY)
 {

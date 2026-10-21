@@ -34,12 +34,36 @@ STILL TO DO NEXT:
 ==============================================================
 ENTRIES (NEWEST FIRST)
 ==============================================================
+--------------------------------------------------------------
+YYYY-MM-DD : Enemies, Entity and Asset Managing
+--------------------------------------------------------------
+WHAT I BUILT / CHANGED:
+  - Entity: Created a base entity class which players and enemies inherit
+  - Enemies: enemies spawn and follow the player based on the players position
+  - Entity Manager: handles all entities and their update and draw calls
+  - Asset Manager: handles assets now to hold images that all classes will use
 
+WHAT WENT WRONG AND HOW I FIXED IT:
+  - Enemies: Enemies originally had an image for each enemy, which would reuse the tilesheet. Wasted a lot of memory. Instead I made an asset manager which holds all the assets in one place and used pointers to point every enemy to the same singular image
+
+ALTERNATIVES I CONSIDERED (AND WHY I CHOSE WHAT I DID):
+  - Entity Manager: I could have all the entities in my game managed within main and using spawners for enemies, but that makes a lot of all the data fragmented. I wanted a singlar place to control all the entities as they are going to be removed and spawned frequently, so i want to make all the data be easily managed in one location
+
+NUMBERS (FPS, ms per frame, entity / tile counts, conditions):
+  - N/A
+
+REPORT SECTION THIS FEEDS:
+  2.2 at least 3 mobile entity types
+
+SCREENSHOT TAKEN?  yes / no   (file name: )
+
+STILL TO DO NEXT:
+  -
 --------------------------------------------------------------
 2026-10-20 : Camera and Map changes, tile collision
 --------------------------------------------------------------
 WHAT I BUILT / CHANGED:
-  - Camera: built a camera class which has getters, setters and controls the camX and camY values, also has a follow function which follows a target centrally, currently around the player.
+ - Camera: built a camera class which has getters, setters and controls the camX and camY values, also has a follow function which follows a target centrally, currently around the player.
  - Map: Built more maps using genAi to make the assets, increased tilemap variety
  - Tile Collision: Added isBlockedByWall() to Map to check the tiles for collision which overlap with the objects position + width.
 WHAT WENT WRONG AND HOW I FIXED IT:
@@ -48,7 +72,7 @@ WHAT WENT WRONG AND HOW I FIXED IT:
 
 ALTERNATIVES I CONSIDERED (AND WHY I CHOSE WHAT I DID):
   - Camera: I could have had the camera onto my player, but i decided not to since this would make implementing multiplayer much more difficult, or let the graphics handler control the camera. as a part of my process of understanding, i went to making it its own class first and then decided to instantiate it in main and have it follow the player and pass it to the graphics pipeline
- -Tile Collision: I originally tried to implement it by checking every single and test the player against each time but with n walls that is O(n) per check. with a big map that would be thousands of checks per second which would get much worse with more and more enemies, projectiles etc... Instead I found an O(1) method by using the position and width of an object and converting the edges of the bounding box into tile coordinates. I could then loop through those coordinates to find out only the tiles that the object is colliding with.
+  - Tile Collision: I originally tried to implement it by checking every single and test the player against each time but with n walls that is O(n) per check. with a big map that would be thousands of checks per second which would get much worse with more and more enemies, projectiles etc... Instead I found an O(1) method by using the position and width of an object and converting the edges of the bounding box into tile coordinates. I could then loop through those coordinates to find out only the tiles that the object is colliding with.
 
 NUMBERS (FPS, ms per frame, entity / tile counts, conditions):
   - BASELINE: map_arena 48x36 tile map.

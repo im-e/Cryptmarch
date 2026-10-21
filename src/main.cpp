@@ -1,13 +1,19 @@
 #include "GamesEngineeringBase.h"
 
+#include "Utilities/AssetManager.h"
 #include "Utilities/FPS.h"
 #include "Utilities/Logger.h"
 #include "Utilities/Vector.h"
-#include "Player.h"
-#include "Graphics.h"
-#include "Enemy.h"
-#include "Map.h"
-#include "Camera.h"
+
+#include "Entities/Player.h"
+#include "Entities/Enemy.h"
+#include "Entities/EntityManager.h"
+
+#include "Rendering/Graphics.h"
+#include "Rendering/Camera.h"
+
+#include "Map/Map.h"
+
 
 int main()
 {
@@ -24,38 +30,34 @@ int main()
     //create a timer
     GamesEngineeringBase::Timer timer;
 
-    //init player
-    std::string playerTilemapPath = "resources/32rogues/rogues.png"; //player tilemap path
-    Player player(100, 200, 400, 400, playerTilemapPath, 0, 0);
+    //create the asset and entity managers
+    AssetManager assetManager;
+    EntityManager entityManager;
 
-    //init enemy
-    std::string enemyTilemapPath = "resources/32rogues/monsters.png";
-    Vector<Enemy*> enemies;
+    //create the player
+    Player player(100, 200, 400, 400, &assetManager.playerImage, 0, 0);
+    //add the player to the entity list
+    entityManager.addPlayer(&player);
 
-    Enemy enemy1(100, 50, 100, 200, enemyTilemapPath, 0, 2, &player);
-    Enemy enemy2(100, 100, 600, 500, enemyTilemapPath, 1, 2, &player);
-    Enemy enemy3(100, 150, 300, 100, enemyTilemapPath, 1, 4, &player);
-    Enemy enemy4(100, 200, 150, 300, enemyTilemapPath, 0, 4, &player);
+    //create enemies (will be created by spawners soon)
+    Enemy enemy1(100, 50, 100, 200, &assetManager.enemyImage, 0, 2, &player);
+    Enemy enemy2(100, 100, 600, 500, &assetManager.enemyImage, 1, 2, &player);
+    Enemy enemy3(100, 150, 300, 100, &assetManager.enemyImage, 1, 4, &player);
+    Enemy enemy4(100, 200, 150, 300, &assetManager.enemyImage, 0, 4, &player);
    
-    enemies.add(&enemy1);
-    enemies.add(&enemy2);
-    enemies.add(&enemy3);
-    enemies.add(&enemy4);
 
-   
+    //add enemies to entity list
+    entityManager.addEnemy(&enemy1);
+    entityManager.addEnemy(&enemy2);
+    entityManager.addEnemy(&enemy3);
+    entityManager.addEnemy(&enemy4);
 
     //init fps
-    FPS fps; 
-    std::string fpsTilemapPath = "resources/ShooterPack/PNG/Interface/Tilemap/tilemap_packed.png";
-    if (!fps.load(fpsTilemapPath))
-    {
-        Logger::Error("FPS Tilemap failed to load at filepath: " + fpsTilemapPath);
-    }
+    FPS fps(&assetManager.hudImage);
 
     //init map
-    std::string mapTilemapPath = "resources/32rogues/tiles.png";
     std::string mapPath = "resources/maps/map_arena.txt";
-    Map map(mapTilemapPath, mapPath);
+    Map map(&assetManager.mapImage, mapPath);
 
     //init camera
     Camera cam;
@@ -75,27 +77,17 @@ int main()
         window.clear();
 
 
-        //update game logic
-		player.update(window, map, deltaTime);
+        //------------------------------ UPDATE -------------------
 
-        for (int i = 0; i < enemies.getSize(); i++)
-        {
-            enemies[i]->update(window, map, deltaTime);
-        }
-
+        entityManager.update(window, map, deltaTime);
 
         //set the camera to follow the player
         cam.follow(window, map, player.getX(), player.getY(), true);
 
-        //draw
+        //------------------------------ DRAW ----------------------
         map.draw(window, cam);
 
-        for (int i = 0; i < enemies.getSize(); i++)
-        {
-            enemies[i]->draw(window, cam);
-        }
-
-        player.draw(window, cam);
+        entityManager.draw(window, cam);
 
         fps.draw(window, deltaTime); //draw fps
          

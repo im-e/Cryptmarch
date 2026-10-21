@@ -1,7 +1,7 @@
 #pragma once
 #include "GamesEngineeringBase.h"
 #include "TileDefinition.h"
-#include "Graphics.h"
+#include "Rendering/Graphics.h"
 #include <fstream>
 #include "Utilities/Logger.h"
 
@@ -13,7 +13,7 @@ class Map
 {
 private:
 
-	GamesEngineeringBase::Image tilesetImage; //tileset image
+	GamesEngineeringBase::Image* tilesetImage; //tileset image
 	bool loadImage(const std::string& path); //loads the image
 
 	int* tilemapData = nullptr; //map grid 1d flat array of tile ids
@@ -42,9 +42,9 @@ private:
 
 public:
 
-	Map(const std::string& imagePath, const std::string& mapPath) //constructor
+	Map(GamesEngineeringBase::Image* _image, const std::string& mapPath) //constructor
 	{
-		loadImage(imagePath);
+		tilesetImage = _image;
 		loadMap(mapPath);
 	}
 

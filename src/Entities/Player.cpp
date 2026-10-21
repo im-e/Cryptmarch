@@ -1,5 +1,5 @@
-#include "Player.h"
-#include "Graphics.h"
+#include "Entities/Player.h"
+#include "Rendering/Graphics.h"
 
 
 void Player::update(GamesEngineeringBase::Window& window, Map& map, float deltaTime)

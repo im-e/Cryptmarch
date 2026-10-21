@@ -10,8 +10,8 @@ private:
 
 public:
 
-	Enemy(int _health, float _speed, int _x, int _y, const std::string& path, int _tileXOffset, int _tileYOffset, Entity* _target) :
-		Entity(_health, _speed, _x, _y, path, _tileXOffset, _tileYOffset)
+	Enemy(int _health, float _speed, int _x, int _y, GamesEngineeringBase::Image* _image, int _tileXOffset, int _tileYOffset, Entity* _target) :
+		Entity(_health, _speed, _x, _y, _image, _tileXOffset, _tileYOffset)
 	{
 		target = _target;
 	}

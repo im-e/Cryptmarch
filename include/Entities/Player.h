@@ -12,10 +12,11 @@ private:
 	int keyRight = VK_RIGHT;
 
 public:
-	Player(int _health, int _speed, float _xPos, float _yPos, const std::string& path, int _tileXOffset, int _tileYOffset) : 
-		Entity(_health, _speed, _xPos, _yPos, path, _tileXOffset, _tileYOffset)
+	Player(int _health, int _speed, float _xPos, float _yPos, GamesEngineeringBase::Image* _image, int _tileXOffset, int _tileYOffset) : 
+		Entity(_health, _speed, _xPos, _yPos, _image, _tileXOffset, _tileYOffset)
 	{
 	}
+
 
 	void update(GamesEngineeringBase::Window& window, Map& map, float deltaTime) override;
 

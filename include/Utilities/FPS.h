@@ -1,6 +1,6 @@
 #pragma once
 #include "GamesEngineeringBase.h"
-#include "Graphics.h"
+#include "Rendering/Graphics.h"
 #include <iostream>
 
 
@@ -14,7 +14,7 @@ private:
 	double fps = 0.0;
 
 	//image
-	GamesEngineeringBase::Image image;
+	GamesEngineeringBase::Image* image;
 	int tileSize = 16;
 	int numTileOffsets[2][10] = {
 		//x positions
@@ -31,6 +31,11 @@ private:
 	};
 
 public:
+
+	FPS(GamesEngineeringBase::Image* _image)
+	{
+		image = _image;
+	}
 
 	double calculate(float dt)
 	{
@@ -59,7 +64,7 @@ public:
 		int labelStartPos = 0;
 		for (int i = 0; i < 3; i++) //for each character
 		{
-			Graphics::DrawTilemapImage(window, image, tileSize, textTileOffsets[0][i], textTileOffsets[1][i], labelStartPos, fpsYPos); //draw character on screen
+			Graphics::DrawTilemapImage(window, *image, tileSize, textTileOffsets[0][i], textTileOffsets[1][i], labelStartPos, fpsYPos); //draw character on screen
 			labelStartPos += tileSize; //increase offset pos for next character
 
 		}
@@ -74,23 +79,18 @@ public:
 
 		if (value == 0) //if value equal to zeo
 		{
-			Graphics::DrawTilemapImage(window, image, tileSize, numTileOffsets[0][0], numTileOffsets[1][0], finalDigitXPos, fpsYPos); //draw zeo
+			Graphics::DrawTilemapImage(window, *image, tileSize, numTileOffsets[0][0], numTileOffsets[1][0], finalDigitXPos, fpsYPos); //draw zeo
 		}
 		
 		while (value > 0)
 		{
 			int digit = value % 10; //get the final digit of the number
 			value /= 10; // divide value by 10
-			Graphics::DrawTilemapImage(window, image, tileSize, numTileOffsets[0][digit], numTileOffsets[1][digit], finalDigitXPos, fpsYPos); //draw digit on screen
+			Graphics::DrawTilemapImage(window, *image, tileSize, numTileOffsets[0][digit], numTileOffsets[1][digit], finalDigitXPos, fpsYPos); //draw digit on screen
 
 			finalDigitXPos -= tileSize; // step left for the next digit
 		}
 
-	}
-
-	bool load(const std::string& path)
-	{
-		return image.load(path);
 	}
 	
 	double get() const 
