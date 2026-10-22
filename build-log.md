@@ -39,25 +39,31 @@ ENTRIES (NEWEST FIRST)
 2026-10-22 : Collisions, Entity Management Improvements
 --------------------------------------------------------------
 WHAT I BUILT / CHANGED:
-  - Entity: added checks for isDead, takeDamage, heal and set and get hitbox size
+  - Entity: added checks for isDead, takeDamage, heal and set and get hitbox size, player takes damage when touched
   - Collisions: added a check collision between another entities inside the entity class
 
 WHAT WENT WRONG AND HOW I FIXED IT:
-  -
+  - Collisions: I had an issue where I was only checking for one axis overlap rather than both, which meant that if the entities overlapped on the same x or y level but not the other, (ie: one entity in the same x pos but not the same y pos) then a collision would be detected. So i made it so that i check for both x and y axis overlaps.
 
 ALTERNATIVES I CONSIDERED (AND WHY I CHOSE WHAT I DID):
-  -
+  - Collisions: I could have given the the entity a dedicated hitbox member variable that updates its position when the entity moves. Instead i calculated the hitbox coordinates dynamically inside a function using the current world pos, tile size and padding. This means that i dont have to constantly update a hitbox member variable any time any entity moves, which can be helpful if i want to add diffrerent forms of movement like teleportation which could cause desyncs.
+  - Entity Management: I could have deleted enemies at the end of the frame by using a bool to set them as dead, and then sweep a single pass to clean up all dead entities. Instead I used a backwards loop with removeSwap() to instantly delete and swap the elements during the cleanup phase. I did this to save a bit more memory to not keep dead entities around until the end of the frame
 
 NUMBERS (FPS, ms per frame, entity / tile counts, conditions):
-  -
-
+ - BASELINE: map_arena 48x36 tile map.
+	BEFORE Entity Management and Collision
+    FPS = 1800 (Release), 700 (Debug).
+	AFTER Entity Management and Collision
+    FPS = 1800 (no collisions)(Release), 700 (no collisions) (Debug).
+	I lose around 100fps during collisions.
 REPORT SECTION THIS FEEDS:
   (e.g. 2.3.1 Tile map)
 
 SCREENSHOT TAKEN?  yes / no   (file name: )
 
 STILL TO DO NEXT:
-  -
+  - Hero attacks, melee, projectile, magic.
+  - Enemy Spawners 
 
 
 
