@@ -7,15 +7,24 @@ void Entity::draw(GamesEngineeringBase::Window& window, Camera& cam)
 
 	Graphics::DrawTilemapImage(window, *image, tileSize, tileXOffset, tileYOffset, screenX, screenY);
 
+#ifdef _DEBUG
+
+	float entityX, entityY;
+	int entityWidth, entityHeight;
+	getHitbox(entityX, entityY, entityWidth, entityHeight);
+
+	Graphics::DrawRectOutline(window, (entityX - cam.getX()), (entityY - cam.getY()), entityWidth, entityHeight, 0, 255, 0);                          
+
+#endif
 }
 
 void Entity::takeDamage(int damage) {
 	//only take damage if iFrames <= 0;
-	if (iFrames <= 0)
+	if (iFrameTimer <= 0)
 	{
 		health -= damage; //take damage
 		if (health < 0) health = 0; //dont let health go below 0
-		iFrames = 0.5f; //reset iFrames counter
+		iFrameTimer = iFrameValue; //reset iFrameTimer to iFrameValue
 	}
 }
 
@@ -64,4 +73,10 @@ bool Entity::checkCollision(const Entity* collider) const
 	//so its importatnt that there is a 'collision' on both axis
 	return xOverlap && yOverlap;
 
+}
+
+void Entity::updateTimers(float deltaTime)
+{
+	iFrameTimer -= deltaTime;
+	if (iFrameTimer < 0) iFrameTimer = 0;
 }

@@ -177,4 +177,99 @@ void Graphics::DrawTilemapImage(GamesEngineeringBase::Window& window, GamesEngin
 			windowPixel += 3; //same applies to the window, however we add 3 due to window being RGB not RGBA
 		}
 	}
+
+}
+
+void Graphics::DrawRectOutline(GamesEngineeringBase::Window& window, int left, int top, int width, int height, unsigned char r, unsigned char g, unsigned char b)
+{
+	if (width <= 0 || height <= 0) return; //nothing to draw
+
+	//get window height and width
+	int windowWidth = window.getWidth();
+	int windowHeight = window.getHeight();
+	//get right of the rect
+	int right = left + width - 1;   //-1 for pixel index
+	int bottom = top + height - 1; 
+
+	//completely outside the window
+	if (right < 0 || 
+		bottom < 0 ||
+		left >= windowWidth || 
+		top >= windowHeight)
+		return;
+
+	//clamp the span of each edge to the window
+	int drawStartX;
+	if (left < 0) //if the left edge is off the left of the screen
+	{
+		drawStartX = 0; //start drawing from the edge of the window instead
+	}
+	else
+	{
+		drawStartX = left;
+	}
+
+	int drawEndX;
+	if (right >= windowWidth) //if the right edge is off the right of the screen
+	{
+		drawEndX = windowWidth - 1; //stop drawing at the last pixel of the window
+	}
+	else
+	{
+		drawEndX = right;
+	}
+
+	int drawStartY;
+	if (top < 0) //if the top edge is off the top of the screen
+	{
+		drawStartY = 0;
+	}
+	else
+	{
+		drawStartY = top;
+	}
+
+	int drawEndY;
+	if (bottom >= windowHeight) //if the bottom edge is off the bottom of the screen
+	{
+		drawEndY = windowHeight - 1;
+	}
+	else
+	{
+		drawEndY = bottom;
+	}
+
+	//only draw an edge if that edge's line is actually on screen,
+	//otherwise clamping would draw a fake edge along the window border
+	if (top >= 0) //top line
+	{
+		for (int x = drawStartX; x <= drawEndX; x++)
+		{
+			window.draw(x, top, r, g, b);
+		}
+	}
+
+	if (bottom < windowHeight) //bottom line
+	{
+		for (int x = drawStartX; x <= drawEndX; x++)
+		{
+			window.draw(x, bottom, r, g, b);
+		}
+	}
+
+	if (left >= 0) //left line
+	{
+		for (int y = drawStartY; y <= drawEndY; y++)
+		{
+			window.draw(left, y, r, g, b);
+		}
+	}
+
+	if (right < windowWidth) //right line
+	{
+		for (int y = drawStartY; y <= drawEndY; y++)
+		{
+			window.draw(right, y, r, g, b);
+		}
+	}
 }

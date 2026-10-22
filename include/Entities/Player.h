@@ -12,8 +12,8 @@ private:
 	int keyRight = VK_RIGHT;
 
 public:
-	Player(int _health, int _speed, float _xPos, float _yPos, GamesEngineeringBase::Image* _image, int _tileXOffset, int _tileYOffset) : 
-		Entity(_health, _speed, _xPos, _yPos, _image, _tileXOffset, _tileYOffset)
+	Player(int _health, float _iFrames, int _speed, float _xPos, float _yPos, GamesEngineeringBase::Image* _image, int _tileXOffset, int _tileYOffset) : 
+		Entity(_health,  _iFrames, _speed, _xPos, _yPos, _image, _tileXOffset, _tileYOffset)
 	{
 	}
 

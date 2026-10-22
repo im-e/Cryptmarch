@@ -45,6 +45,7 @@ void Player::update(GamesEngineeringBase::Window& window, Map& map, float deltaT
 
 
 	//pull hitbox origin instead of worldX/Y
+	//h for hitbox, had to use this naming convention because of private variables of the same name
 	float hX, hY;
 	int hWidth, hHeight;
 	getHitbox(hX, hY, hWidth, hHeight);
@@ -57,31 +58,33 @@ void Player::update(GamesEngineeringBase::Window& window, Map& map, float deltaT
 		worldX += xMove;
 	}
 
+	getHitbox(hX, hY, hWidth, hHeight); //update hitbox after move
+
 	if (!map.isBlockedByWall(hX, hY + yMove, hWidth, hHeight))
 	{
 		worldY += yMove;
 	}
 
-	//clamp the player's position to the world
-	if (worldX < 0.0f)
+	getHitbox(hX, hY, hWidth, hHeight); //update hitbox after move again
+
+	//clamp the player's position to the world using hitbox
+	if (hX < 0.0f) //left
 	{
 		worldX = 0.0f;
 	}
-	else if (worldX > map.getMapWidth() - hitboxWidth)
+	else if (hX > map.getMapWidth() - hWidth) //right
 	{
-		worldX = map.getMapWidth() - hitboxWidth;
+		worldX = map.getMapWidth() - hWidth;
 	}
-
-	if (worldY < 0.0f)
+	if (hY < 0.0f) //top
 	{
 		worldY = 0.0f;
 	}
-	else if (worldY > map.getMapHeight() - hitboxHeight)
+	else if (hY > map.getMapHeight() - hHeight) //bottom
 	{
-		worldY = map.getMapHeight() - hitboxHeight;
+		worldY = map.getMapHeight() - hHeight;
 	}
 
-	//Damage----------------------
-
-	iFrames -= deltaTime;
+	//iFrame Timer
+	updateTimers(deltaTime);
 }

@@ -158,13 +158,14 @@
     <ClInclude Include="include\Entities\Enemy.h" />
     <ClInclude Include="include\Entities\Entity.h" />
     <ClInclude Include="include\GamesEngineeringBase.h" />
+    <ClInclude Include="include\HUD\Status.h" />
     <ClInclude Include="include\Rendering\Graphics.h" />
     <ClInclude Include="include\Map\Map.h" />
     <ClInclude Include="include\Entities\Player.h" />
     <ClInclude Include="include\Rendering\Camera.h" />
     <ClInclude Include="include\Utilities\AssetManager.h" />
     <ClInclude Include="include\Entities\EntityManager.h" />
-    <ClInclude Include="include\Utilities\FPS.h" />
+    <ClInclude Include="include\HUD\FPS.h" />
     <ClInclude Include="include\Utilities\Logger.h" />
     <ClInclude Include="include\Map\TileDefinition.h" />
     <ClInclude Include="include\Utilities\Vector.h" />

@@ -8,22 +8,25 @@ class FPS
 {
 
 private:
+
+	//image
+	GamesEngineeringBase::Image* image;
+	int tileSize = 16;
+
 	//fps calculation
 	int frames = 0;
 	double timeElapsed = 0.0;
 	double fps = 0.0;
 
-	//image
-	GamesEngineeringBase::Image* image;
-	int tileSize = 16;
-	int numTileOffsets[2][10] = {
+	//fps tile offsets
+	int fpsNumTileOffsets[2][10] = {
 		//x positions
 		{ 3,4,5,6,7,8,9,10,11,12 },
 		{ 5,5,5,5,5,5,5,5,5,5 }
 		//y positions
 	};
 
-	int textTileOffsets[2][3] = {
+	int fpsTextTileOffsets[2][3] = {
 		//x positions
 		{ 5,2,5 },
 		{ 6,7,10 }
@@ -64,7 +67,7 @@ public:
 		int labelStartPos = 0;
 		for (int i = 0; i < 3; i++) //for each character
 		{
-			Graphics::DrawTilemapImage(window, *image, tileSize, textTileOffsets[0][i], textTileOffsets[1][i], labelStartPos, fpsYPos); //draw character on screen
+			Graphics::DrawTilemapImage(window, *image, tileSize, fpsTextTileOffsets[0][i], fpsTextTileOffsets[1][i], labelStartPos, fpsYPos); //draw character on screen
 			labelStartPos += tileSize; //increase offset pos for next character
 
 		}
@@ -79,14 +82,14 @@ public:
 
 		if (value == 0) //if value equal to zeo
 		{
-			Graphics::DrawTilemapImage(window, *image, tileSize, numTileOffsets[0][0], numTileOffsets[1][0], finalDigitXPos, fpsYPos); //draw zeo
+			Graphics::DrawTilemapImage(window, *image, tileSize, fpsNumTileOffsets[0][0], fpsNumTileOffsets[1][0], finalDigitXPos, fpsYPos); //draw zeo
 		}
 		
 		while (value > 0)
 		{
 			int digit = value % 10; //get the final digit of the number
 			value /= 10; // divide value by 10
-			Graphics::DrawTilemapImage(window, *image, tileSize, numTileOffsets[0][digit], numTileOffsets[1][digit], finalDigitXPos, fpsYPos); //draw digit on screen
+			Graphics::DrawTilemapImage(window, *image, tileSize, fpsNumTileOffsets[0][digit], fpsNumTileOffsets[1][digit], finalDigitXPos, fpsYPos); //draw digit on screen
 
 			finalDigitXPos -= tileSize; // step left for the next digit
 		}

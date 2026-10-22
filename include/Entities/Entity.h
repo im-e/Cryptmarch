@@ -21,7 +21,8 @@ protected:
 	bool isAlive = true;
 
 	//invincibility frames
-	float iFrames = .5f;
+	float iFrameTimer;
+	float iFrameValue;
 
 	//image tile settings
 	int tileSize = 32; //tilesize
@@ -37,13 +38,15 @@ protected:
 
 
 public:
-	Entity(int _health, float _speed, float _x, float _y, GamesEngineeringBase::Image* _image, int _tileXOffset, int _tileYOffset)
+	Entity(int _health, float _iFrames, float _speed, float _x, float _y, GamesEngineeringBase::Image* _image, int _tileXOffset, int _tileYOffset)
 	{
-		image = _image;
 		health = _health;
+		iFrameValue = _iFrames;
+		iFrameTimer = _iFrames;
 		speed = _speed;
 		worldX = _x;
 		worldY = _y;
+		image = _image;
 		tileXOffset = _tileXOffset;
 		tileYOffset = _tileYOffset;
 	}
@@ -53,13 +56,13 @@ public:
 	virtual void update(GamesEngineeringBase::Window& window, Map& map, float deltaTime) = 0;
 	void draw(GamesEngineeringBase::Window& window, Camera& cam);
 
-	float getX() { return worldX; }
+	void updateTimers(float deltaTime);
+
+	float getX() { return worldX; } 
 	float getY() { return worldY; }
 
 	int getHealth() { return health; }
-
 	bool isDead() const;
-
 	void takeDamage(int damage);
 	void heal(int amount) { health += amount; }
 

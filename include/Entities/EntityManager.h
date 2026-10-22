@@ -5,8 +5,8 @@
 class EntityManager {
 
 private:
-	Vector<Entity*> players;
-	Vector<Entity*> enemies;
+	Vector<Player*> players;
+	Vector<Enemy*> enemies;
 
 public:
 	~EntityManager()
@@ -24,24 +24,25 @@ public:
 		}
 	}
 
-	void addPlayer(Entity* player)
+	void addPlayer(Player* player)
 	{
 		players.add(player);
 	}
 
-	void addEnemy(Entity* enemy)
+	void addEnemy(Enemy* enemy)
 	{
 		enemies.add(enemy);
 	}
 
-	void deleteEnemy(Entity* enemy)
-	{
-		enemies.removeSwap(enemy);
-	}
-
-	void deletePlayer(Entity* player)
+	void deletePlayer(Player* player)
 	{
 		players.removeSwap(player);
+
+	}
+
+	void deleteEnemy(Enemy* enemy)
+	{
+		enemies.removeSwap(enemy);
 	}
 
 	void update(GamesEngineeringBase::Window& window, Map& map, float deltaTime) 
@@ -66,7 +67,7 @@ public:
 				if (players[i]->checkCollision(enemies[j]))
 				{
 					Logger::Debug("Collision Detected");
-					players[i]->takeDamage(20);
+					(players[i]->takeDamage(enemies[j]->getDamage()));
 					Logger::Debug(std::to_string(players[i]->getHealth()));
 				}
 			}

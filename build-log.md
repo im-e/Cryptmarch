@@ -39,8 +39,11 @@ ENTRIES (NEWEST FIRST)
 2026-10-22 : Collisions, Entity Management Improvements
 --------------------------------------------------------------
 WHAT I BUILT / CHANGED:
-  - Entity: added checks for isDead, takeDamage, heal and set and get hitbox size, player takes damage when touched
-  - Collisions: added a check collision between another entities inside the entity class
+  - Entity: added checks for isDead, takeDamage, heal and set and get hitbox size, player takes damage when touched, moved iframe countdown into entity and capped delta time
+  - Collisions: added a check collision between another entities inside the entity class, made wall collision and entity collision use the same hitbox origin
+  - Enemy: moved contact damage onto enemy 
+  - Graphics: Debug-only hitbox outlines
+  - Status: Hero health bar
 
 WHAT WENT WRONG AND HOW I FIXED IT:
   - Collisions: I had an issue where I was only checking for one axis overlap rather than both, which meant that if the entities overlapped on the same x or y level but not the other, (ie: one entity in the same x pos but not the same y pos) then a collision would be detected. So i made it so that i check for both x and y axis overlaps.
