@@ -35,22 +35,17 @@ int main()
     EntityManager entityManager;
 
     //create the player
-    Player player(100, 200, 400, 400, &assetManager.playerImage, 0, 0);
+    Player* player = new Player(100, 200, 400, 400, &assetManager.playerImage, 0, 0);
     //add the player to the entity list
-    entityManager.addPlayer(&player);
+    entityManager.addPlayer(player);
 
     //create enemies (will be created by spawners soon)
-    Enemy enemy1(100, 50, 100, 200, &assetManager.enemyImage, 0, 2, &player);
-    Enemy enemy2(100, 100, 600, 500, &assetManager.enemyImage, 1, 2, &player);
-    Enemy enemy3(100, 150, 300, 100, &assetManager.enemyImage, 1, 4, &player);
-    Enemy enemy4(100, 200, 150, 300, &assetManager.enemyImage, 0, 4, &player);
-   
-
+              //health, speed x y image, offsets
     //add enemies to entity list
-    entityManager.addEnemy(&enemy1);
-    entityManager.addEnemy(&enemy2);
-    entityManager.addEnemy(&enemy3);
-    entityManager.addEnemy(&enemy4);
+    entityManager.addEnemy(new Enemy(100, 50, 100, 200,  &assetManager.enemyImage, 0, 2, player));
+    entityManager.addEnemy(new Enemy(100, 100, 600, 500, &assetManager.enemyImage, 1, 2, player));
+    entityManager.addEnemy(new Enemy(100, 150, 300, 100, &assetManager.enemyImage, 1, 4, player));
+    entityManager.addEnemy(new Enemy(100, 150, 150, 300, &assetManager.enemyImage, 0, 4, player));
 
     //init fps
     FPS fps(&assetManager.hudImage);
@@ -80,9 +75,10 @@ int main()
         //------------------------------ UPDATE -------------------
 
         entityManager.update(window, map, deltaTime);
+        entityManager.cleanup();
 
         //set the camera to follow the player
-        cam.follow(window, map, player.getX(), player.getY(), true);
+        cam.follow(window, map, player->getX(), player->getY(), true);
 
         //------------------------------ DRAW ----------------------
         map.draw(window, cam);

@@ -20,14 +20,17 @@ protected:
 	//state
 	bool isAlive = true;
 
+	//invincibility frames
+	float iFrames = .5f;
+
 	//image tile settings
 	int tileSize = 32; //tilesize
 	int tileXOffset;
 	int tileYOffset;
 
 	//hitbox settings
-	int hitboxWidth = 32;
-	int hitboxHeight = 32;
+	int hitboxWidth = 20;
+	int hitboxHeight = 20;
 
 	//image
 	GamesEngineeringBase::Image* image;
@@ -45,18 +48,24 @@ public:
 		tileYOffset = _tileYOffset;
 	}
 
+	virtual ~Entity() = default;
+
 	virtual void update(GamesEngineeringBase::Window& window, Map& map, float deltaTime) = 0;
 	void draw(GamesEngineeringBase::Window& window, Camera& cam);
-
-	bool isDead() const {
-		if (health <= 0) return true;
-		return false;
-	}
-
 
 	float getX() { return worldX; }
 	float getY() { return worldY; }
 
 	int getHealth() { return health; }
 
+	bool isDead() const;
+
+	void takeDamage(int damage);
+	void heal(int amount) { health += amount; }
+
+	void setHitboxSize(int width, int height);
+
+	void getHitbox(float& x, float& y, int& width, int& height) const;
+
+	bool checkCollision(const Entity* collider) const;
 };

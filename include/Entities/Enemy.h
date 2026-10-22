@@ -74,6 +74,10 @@ public:
 			worldY = map.getMapHeight() - hitboxHeight;
 		}
 
+		//Damage----------------------
+
+		iFrames -= deltaTime;
+
 	}
 
 };

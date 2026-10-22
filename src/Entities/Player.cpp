@@ -4,6 +4,7 @@
 
 void Player::update(GamesEngineeringBase::Window& window, Map& map, float deltaTime)
 {
+	//MOVEMENT ------------------
 	//get the direction of movement based on key presses
 	float dirX = 0.0f;
 	float dirY = 0.0f;
@@ -43,19 +44,23 @@ void Player::update(GamesEngineeringBase::Window& window, Map& map, float deltaT
 	float yMove = dirY * speed * deltaTime;
 
 
+	//pull hitbox origin instead of worldX/Y
+	float hX, hY;
+	int hWidth, hHeight;
+	getHitbox(hX, hY, hWidth, hHeight);
+
+
 	//test if the player is blocked then move
 	//i could have done move-then-undo but i didnt want my position to enter an illegal state
-	if (!map.isBlockedByWall(worldX + xMove, worldY, hitboxWidth, hitboxHeight))
+	if (!map.isBlockedByWall(hX + xMove, hY, hWidth, hHeight))
 	{
 		worldX += xMove;
 	}
 
-	if (!map.isBlockedByWall(worldX, worldY + yMove, hitboxWidth, hitboxHeight))
+	if (!map.isBlockedByWall(hX, hY + yMove, hWidth, hHeight))
 	{
 		worldY += yMove;
 	}
-
-
 
 	//clamp the player's position to the world
 	if (worldX < 0.0f)
@@ -75,4 +80,8 @@ void Player::update(GamesEngineeringBase::Window& window, Map& map, float deltaT
 	{
 		worldY = map.getMapHeight() - hitboxHeight;
 	}
+
+	//Damage----------------------
+
+	iFrames -= deltaTime;
 }

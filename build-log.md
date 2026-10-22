@@ -34,8 +34,35 @@ STILL TO DO NEXT:
 ==============================================================
 ENTRIES (NEWEST FIRST)
 ==============================================================
+
 --------------------------------------------------------------
-YYYY-MM-DD : Enemies, Entity and Asset Managing
+2026-10-22 : Collisions, Entity Management Improvements
+--------------------------------------------------------------
+WHAT I BUILT / CHANGED:
+  - Entity: added checks for isDead, takeDamage, heal and set and get hitbox size
+  - Collisions: added a check collision between another entities inside the entity class
+
+WHAT WENT WRONG AND HOW I FIXED IT:
+  -
+
+ALTERNATIVES I CONSIDERED (AND WHY I CHOSE WHAT I DID):
+  -
+
+NUMBERS (FPS, ms per frame, entity / tile counts, conditions):
+  -
+
+REPORT SECTION THIS FEEDS:
+  (e.g. 2.3.1 Tile map)
+
+SCREENSHOT TAKEN?  yes / no   (file name: )
+
+STILL TO DO NEXT:
+  -
+
+
+
+--------------------------------------------------------------
+2026-10-21 : Enemies, Entity and Asset Managing
 --------------------------------------------------------------
 WHAT I BUILT / CHANGED:
   - Entity: Created a base entity class which players and enemies inherit
