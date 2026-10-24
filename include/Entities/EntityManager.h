@@ -7,43 +7,38 @@ class EntityManager {
 private:
 	Vector<Player*> players;
 	Vector<Enemy*> enemies;
+	bool allPlayersDead = false;
+
 
 public:
 	~EntityManager()
 	{
-		//update all players
-		for (int i = 0; i < players.getSize(); i++)
-		{
-			delete players[i];
-		}
-
-		//update all enemies
-		for (int i = 0; i < enemies.getSize(); i++)
-		{
-			delete enemies[i];
-		}
+		clear();
 	}
 
-	void addPlayer(Player* player)
+	void clear()
 	{
-		players.add(player);
+		for (int i = 0; i < players.getSize(); i++) delete players[i];
+		for (int i = 0; i < enemies.getSize(); i++) delete enemies[i];
+		players.clear(); 
+		enemies.clear();
+		allPlayersDead = false;
 	}
 
-	void addEnemy(Enemy* enemy)
+	Player* getFirstPlayer() 
 	{
-		enemies.add(enemy);
+		if (players.getSize() == 0) return nullptr;
+		return players[0]; 
 	}
+	
+	bool getAllPlayersDead() { return allPlayersDead; }
+	void addPlayer(Player* player) { players.add(player); }
 
-	void deletePlayer(Player* player)
-	{
-		players.removeSwap(player);
+	void addEnemy(Enemy* enemy) { enemies.add(enemy); }
 
-	}
+	void deletePlayer(Player* player) { players.removeSwap(player);	}
 
-	void deleteEnemy(Enemy* enemy)
-	{
-		enemies.removeSwap(enemy);
-	}
+	void deleteEnemy(Enemy* enemy) { enemies.removeSwap(enemy);	}
 
 	void update(GamesEngineeringBase::Window& window, Map& map, float deltaTime) 
 	{
@@ -66,26 +61,43 @@ public:
 			{
 				if (players[i]->checkCollision(enemies[j]))
 				{
-					Logger::Debug("Collision Detected");
 					(players[i]->takeDamage(enemies[j]->getDamage()));
-					Logger::Debug(std::to_string(players[i]->getHealth()));
 				}
 			}
 		}
 
 	}
 
-	void cleanup()
+	int cleanupKills()
 	{
+		int killed = 0;
+
 		//update all enemies by using a backwards loop to prevent skipping elements
-		for (int i = (int)enemies.getSize() - 1; i >= 0; i--)
+		for (int i = enemies.getSize() - 1; i >= 0; i--)
 		{
 			if (enemies[i]->isDead())
 			{
 				delete enemies[i];
 				enemies.removeSwap(i);
+				killed++;
 			}
 		}
+
+		//update all enemies by using a backwards loop to prevent skipping elements
+		for (int i = players.getSize() - 1; i >= 0; i--)
+		{
+			if (players[i]->isDead())
+			{
+				delete players[i];
+				players.removeSwap(i);
+			}
+		}
+
+		if (players.getSize() == 0)
+		{
+			allPlayersDead = true;
+		}
+		return killed;
 	}
 
 	void draw(GamesEngineeringBase::Window& window, Camera& cam)

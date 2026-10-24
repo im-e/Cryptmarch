@@ -57,6 +57,9 @@
     <ClInclude Include="include\HUD\Status.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\GameController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">

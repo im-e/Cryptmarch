@@ -11,7 +11,7 @@ private:
 
 	//image
 	GamesEngineeringBase::Image* image;
-	int tileSize = 16;
+	int tileSize = 32;
 
 	//fps tile offsets
 	int healthTileOffsets[2][5] = {

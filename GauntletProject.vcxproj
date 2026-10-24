@@ -157,6 +157,7 @@
   <ItemGroup>
     <ClInclude Include="include\Entities\Enemy.h" />
     <ClInclude Include="include\Entities\Entity.h" />
+    <ClInclude Include="include\GameController.h" />
     <ClInclude Include="include\GamesEngineeringBase.h" />
     <ClInclude Include="include\HUD\Status.h" />
     <ClInclude Include="include\Rendering\Graphics.h" />

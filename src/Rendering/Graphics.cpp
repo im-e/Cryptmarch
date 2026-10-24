@@ -273,3 +273,56 @@ void Graphics::DrawRectOutline(GamesEngineeringBase::Window& window, int left, i
 		}
 	}
 }
+
+void Graphics::DrawLetter(GamesEngineeringBase::Window& window, GamesEngineeringBase::Image& image, char letter, int posX, int posY)
+{
+	//based on the resources\ShooterPack\PNG\Interface\Tilemap
+
+	//set to -1 so that only valid characters will get assigned a value
+	int tileX = -1; //column on the sheet
+	int tileY = -1; //row on the sheet
+
+	//convert lowercase to uppercase as the sheet only has capitals
+	if (letter >= 'a' && letter <= 'z')
+	{
+		letter = letter - 'a' + 'A'; //work out the letter offset and add the capital to convert to uppercase
+	}
+
+	if (letter >= 'A' && letter <= 'M') //first letter row in tilesheet
+	{
+		tileX = letter - 'A'; //A is 0, B is 1...
+		tileY = 6;
+	}
+	else if (letter >= 'N' && letter <= 'Z') //second letter row in tilesheet
+	{
+		tileX = letter - 'N';
+		tileY = 7;
+	}
+	else if (letter >= '0' && letter <= '9') //digits start 3 tiles in on the symbol row
+	{
+		tileX = (letter - '0') + 3;
+		tileY = 5;
+	}
+	else if (letter == '%') { tileX = 0; tileY = 5; } //special characters, probably wont use them but still support them
+	else if (letter == '+') { tileX = 1; tileY = 5; }
+	else if (letter == '-') { tileX = 2; tileY = 5; }
+
+	if (tileX == -1) return; //space or unsupported character, draw nothing
+
+	DrawTilemapImage(window, image, tileSize, tileX, tileY, posX, posY);
+}
+
+void Graphics::DrawNumber(GamesEngineeringBase::Window& window, GamesEngineeringBase::Image& image, int value, int posX, int posY)
+{
+	std::string text = std::to_string(value); //120 becomes 120, -5 becomes -5 but we have special characters supported so nothing bad will happen i hope
+	DrawString(window, image, text.c_str(), posX, posY); 
+}
+
+void Graphics::DrawString(GamesEngineeringBase::Window& window, GamesEngineeringBase::Image& image, const char* text, int posX, int posY)
+{
+	for (int i = 0; text[i] != '\0'; i++) //end of a const char* is a '\0'
+	{
+		DrawLetter(window, image, text[i], posX, posY);
+		posX += tileSize; //spaces currently count as nothing so game over will be gameover
+	}
+}

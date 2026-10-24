@@ -11,7 +11,7 @@ private:
 
 	//image
 	GamesEngineeringBase::Image* image;
-	int tileSize = 16;
+	int tileSize = 32;
 
 	//fps calculation
 	int frames = 0;
@@ -28,8 +28,8 @@ private:
 
 	int fpsTextTileOffsets[2][3] = {
 		//x positions
-		{ 5,2,5 },
-		{ 6,7,10 }
+		{ 5,2, 5 },
+		{ 9,10,10 }
 		//y positions
 	};
 
@@ -77,8 +77,8 @@ public:
 		int value = static_cast<int>(calculate(dt)); //use static cast for c++ explicit conversion
 	
 		//visually displayed like - FPS3000
-		//16 px per tile 16 * 7 = 112
-		int finalDigitXPos = 112; //set position for final digit pos
+		//32 px per tile 32f * 7 = 224
+		int finalDigitXPos = 224; //set position for final digit pos
 
 		if (value == 0) //if value equal to zeo
 		{
