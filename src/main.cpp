@@ -125,6 +125,7 @@ int main()
             case TallyState: {
                 //draw tally image
                 GameStats& s = gameController.getStats();
+                Graphics::DrawImage(window,  assetManager.tallyImage, 0, 0);
                 Graphics::DrawString(window, assetManager.hudImage, "TIME  -", 300, 300);
                 Graphics::DrawNumber(window, assetManager.hudImage, (int)s.timeSurvived, 550, 300);
                 Graphics::DrawString(window, assetManager.hudImage, "KILLS -", 300, 350);

@@ -22,7 +22,7 @@
     <VCProjectVersion>18.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{ead32e28-290d-4224-8109-da073717d59e}</ProjectGuid>
-    <RootNamespace>GauntletProject</RootNamespace>
+    <RootNamespace>Cryptmarch</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -180,10 +180,7 @@
     <ClCompile Include="src\Entities\Player.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="GauntletProject.slnx" />
-    <None Include="UpgradeLog.htm">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
+    <None Include="Cryptmarch.slnx" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
