@@ -37,7 +37,7 @@ public:
 		image = _image;
 	}
 
-	void draw(GamesEngineeringBase::Window& window, int health)
+	void draw(GamesEngineeringBase::Window& window, int health, int maxHealth)
 	{
 		//position for what y level the status will sit on
 		int healthYPos = 0;
@@ -45,7 +45,8 @@ public:
 
 		//draw health right to left
 
-		int healthCounter = 100;
+		int healthCounter = maxHealth;
+		int percentageHP = maxHealth / 5;
 
 		for (int i = 4; i >= 0; i--) //for each character
 		{
@@ -59,7 +60,7 @@ public:
 
 			}
 			
-			healthCounter -= 20; //decrease health counter by 20, which is 1/5 as health is split into 5 segments
+			healthCounter -= percentageHP; //decrease health counter by maxhp / 5 , which is 1/5 as health is split into 5 segments
 			healthStartXPos -= tileSize; //decrease offset pos for next character
 
 		}

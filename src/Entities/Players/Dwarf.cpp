@@ -124,7 +124,7 @@ void Dwarf::processAttack(Vector<Enemy*>& enemies) {
 			enemy->takeDamage(meleeDamage); //make enemy take the damage
 
 			//apply knockback
-			enemy->applyKnockback(facingDirX, facingDirY, attackKnockbackForce, attackKnockbackDuration);
+			enemy->applyKnockback(attackDirX, attackDirY, attackKnockbackForce, attackKnockbackDuration);
 
 			swingEnemies.add(enemy); //record that we hit this enemy
 		}

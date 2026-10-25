@@ -77,6 +77,7 @@ public:
 	float getY() { return worldY; }
 
 	int getHealth() { return health; }
+	int getMaxHealth() { return maxHealth; }
 	bool isDead() const;
 	void takeDamage(int damage);
 	void heal(int amount) { health += amount; }

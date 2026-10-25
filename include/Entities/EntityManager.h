@@ -82,7 +82,7 @@ public:
 					}
 
 					//apply knockback
-					players[i]->applyKnockback(dirX, dirY, enemies[i]->getKnockbackForce(), enemies[i]->getKnockbackDuration());
+					players[i]->applyKnockback(dirX, dirY, enemies[j]->getKnockbackForce(), enemies[j]->getKnockbackDuration());
 
 
 				}
