@@ -14,6 +14,7 @@ public:
 	GamesEngineeringBase::Image mapImage;
 	GamesEngineeringBase::Image mainMenuImage;
 	GamesEngineeringBase::Image tallyImage;
+	GamesEngineeringBase::Image itemsImage;
 	AssetManager()
 	{
 		//load in filepaths for images
@@ -23,6 +24,7 @@ public:
 		if (!mapImage.load("resources/32rogues/tiles.png"))	Logger::Error("Map Image failed to load.");
 		if (!mainMenuImage.load("resources/MainMenu.png"))	Logger::Error("MainMenu Image failed to load.");
 		if (!tallyImage.load("resources/Tally.png"))	Logger::Error("Tally Image failed to load.");
+		if (!itemsImage.load("resources/32rogues/items.png")) Logger::Error("Items image failed to load.");
 
 	}
 };

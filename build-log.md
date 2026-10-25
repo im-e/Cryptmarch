@@ -34,6 +34,62 @@ STILL TO DO NEXT:
 ==============================================================
 ENTRIES (NEWEST FIRST)
 ==============================================================
+--------------------------------------------------------------
+2026-10-25 : Melee attacks, AABB definition, knockback
+--------------------------------------------------------------
+WHAT I BUILT / CHANGED:
+  - Melee: Added a melee attack onto the player which knocks back enemies
+  - AABB: added Collision.h for an AABB definition and a checker for reduced repeated code
+  - Knockback: added knockback to my player when enemies hit them for better game-feel
+
+WHAT WENT WRONG AND HOW I FIXED IT:
+  - AABB: I had a lot of overlapping code/repeated code for AABB tests, which im gonna have even more of when i do projectiles, so i made a class to cover collisions and then implemented that into my already existing classes
+  - Knockback: game felt really bad, just straight up felt really not fun with no knocback it was hard to tell when you actually hit enemies, so i added some extra feedback by giving them knocback
+ 
+ALTERNATIVES I CONSIDERED (AND WHY I CHOSE WHAT I DID):
+  - Knockback: I was considering adding a hue change to enemies and the player as they took damage but this seemed much harder to implement and keep track of than knockback as feedback for the player.
+
+NUMBERS (FPS, ms per frame, entity / tile counts, conditions):
+ - BASELINE: map_arena 48x36 tile map.
+	BEFORE This patch
+    FPS = 1800 (Release), 700 (Debug).
+	AFTER 
+    FPS = 1800 (no collisions)(Release), 700 (no collisions) (Debug).
+
+REPORT SECTION THIS FEEDS:
+1.1 Player Controlled Hero with a functioning weapon and health
+
+SCREENSHOT TAKEN?  yes / no   (file name: )
+
+STILL TO DO NEXT:
+  -
+
+
+--------------------------------------------------------------
+2026-10-24 : Cryptmarch, State Machine and Text Drawing
+--------------------------------------------------------------
+WHAT I BUILT / CHANGED:
+  - Came up with a name for the game: Cryptmarch.
+  - State machine: added a GameController which manages the games state, added a tally screen, main menu
+  - Graphics: added text drawing from my ui tilesheet which allows for me to dynamically draw any text onscreen.
+
+WHAT WENT WRONG AND HOW I FIXED IT:
+  - State Machine: I originally had my state machine controlled in main with if statements but it got really messy and confusing, switching to a state class which handles everything worked much better and using a switch statement to change between states worked best
+
+ALTERNATIVES I CONSIDERED (AND WHY I CHOSE WHAT I DID):
+  - I could have made my own ui images to draw to the screen but i didnt exactly know what i wanted just yet, so i wanted to make it so i could dynamically change my ui by having a way to easily display any text and number to the screen.
+
+NUMBERS (FPS, ms per frame, entity / tile counts, conditions):
+  -
+
+REPORT SECTION THIS FEEDS:
+    1. 5 Game Flow Features Intro, Menu, Gameplay and Tally Screens in a Loop
+	1. 7 Score, gameplay stats shown on Tally Screen 
+
+SCREENSHOT TAKEN?  yes / no   (file name: )
+
+STILL TO DO NEXT:
+
 
 --------------------------------------------------------------
 2026-10-22 : Collisions, Entity Management Improvements
@@ -60,7 +116,7 @@ NUMBERS (FPS, ms per frame, entity / tile counts, conditions):
     FPS = 1800 (no collisions)(Release), 700 (no collisions) (Debug).
 	I lose around 100fps during collisions.
 REPORT SECTION THIS FEEDS:
-  (e.g. 2.3.1 Tile map)
+3.1 NPCs damage Heroes on Contact
 
 SCREENSHOT TAKEN?  yes / no   (file name: )
 

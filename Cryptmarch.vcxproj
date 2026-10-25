@@ -167,11 +167,13 @@
     <ClInclude Include="include\Utilities\AssetManager.h" />
     <ClInclude Include="include\Entities\EntityManager.h" />
     <ClInclude Include="include\HUD\FPS.h" />
+    <ClInclude Include="include\Utilities\Collisions.h" />
     <ClInclude Include="include\Utilities\Logger.h" />
     <ClInclude Include="include\Map\TileDefinition.h" />
     <ClInclude Include="include\Utilities\Vector.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Entities\Enemy.cpp" />
     <ClCompile Include="src\Rendering\Camera.cpp" />
     <ClCompile Include="src\Entities\Entity.cpp" />
     <ClCompile Include="src\Rendering\Graphics.cpp" />

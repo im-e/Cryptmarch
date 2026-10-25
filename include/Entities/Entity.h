@@ -3,6 +3,7 @@
 #include "Rendering/Camera.h"
 #include "Map/Map.h"
 #include "Utilities/Logger.h"
+#include "Utilities/Collisions.h"
 
 
 class Entity {
@@ -54,7 +55,7 @@ public:
 	virtual ~Entity() = default;
 
 	virtual void update(GamesEngineeringBase::Window& window, Map& map, float deltaTime) = 0;
-	void draw(GamesEngineeringBase::Window& window, Camera& cam);
+	virtual void draw(GamesEngineeringBase::Window& window, Camera& cam) = 0;
 
 	void updateTimers(float deltaTime);
 
@@ -67,8 +68,7 @@ public:
 	void heal(int amount) { health += amount; }
 
 	void setHitboxSize(int width, int height);
+	AABB getHitbox() const;
 
-	void getHitbox(float& x, float& y, int& width, int& height) const;
-
-	bool checkCollision(const Entity* collider) const;
+	bool checkEntityCollision(const Entity* collider) const;
 };

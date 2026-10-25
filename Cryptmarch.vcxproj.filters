@@ -60,6 +60,9 @@
     <ClInclude Include="include\GameController.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Utilities\Collisions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -80,9 +83,11 @@
     <ClCompile Include="src\Entities\Player.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Entities\Enemy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="GauntletProject.slnx" />
-    <None Include="UpgradeLog.htm" />
+    <None Include="Cryptmarch.slnx" />
   </ItemGroup>
 </Project>

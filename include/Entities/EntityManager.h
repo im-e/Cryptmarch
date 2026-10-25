@@ -46,6 +46,8 @@ public:
 		for (int i = 0; i < players.getSize(); i++)
 		{
 			players[i]->update(window, map, deltaTime);
+
+			players[i]->processMelee(enemies);
 		}
 
 		//update all enemies
@@ -59,9 +61,27 @@ public:
 		{
 			for (int j = 0; j < enemies.getSize(); j++)
 			{
-				if (players[i]->checkCollision(enemies[j]))
+				if (players[i]->checkEntityCollision(enemies[j]))
 				{
-					(players[i]->takeDamage(enemies[j]->getDamage()));
+					players[i]->takeDamage(enemies[j]->getDamage());
+
+					//for knockback calculation
+					AABB player = players[i]->getHitbox();
+					AABB enemy = enemies[j]->getHitbox();
+					//calcualate the direction away from the enemy
+					float dirX = player.x - enemy.x;
+					float dirY = player.y - enemy.y;
+					float length = sqrt(dirX * dirX + dirY * dirY);
+					if (length > 0.0f)
+					{
+						dirX /= length; //normalise
+						dirY /= length;
+					}
+
+					//apply knockback
+					players[i]->applyKnockback(dirX, dirY, enemies[i]->getKnockbackForce(), enemies[i]->getKnockbackDuration());
+
+
 				}
 			}
 		}

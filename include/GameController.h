@@ -28,7 +28,7 @@ private:
         stats.reset(); //reset stats
         
         //create the player
-        Player* player = new Player(100, .5f, 200, 400, 400, &am.playerImage, 0, 0);
+        Player* player = new Player(100, .5f, 200, 400, 400, &am.playerImage, 0, 0, &am.itemsImage, 6, 1);
         //add the player to the entity list
         em.addPlayer(player);
 
