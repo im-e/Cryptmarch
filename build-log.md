@@ -41,13 +41,21 @@ WHAT I BUILT / CHANGED:
   - Melee: Added a melee attack onto the player which knocks back enemies
   - AABB: added Collision.h for an AABB definition and a checker for reduced repeated code
   - Knockback: added knockback to my player when enemies hit them for better game-feel
+  
+  - Players: Added polymorphic player classes like Dwarf to represent playable characters, gave the dwarf the melee behaviour with a secondary stat boost and heal, added controls per player
+  - Entity: changed entity structure to use EntityStats for easy creation of entities
+  - Projectiles: started working on projectiles, created a projectile class and an update function for them in entity manager
 
 WHAT WENT WRONG AND HOW I FIXED IT:
+  - Melee: My player could change direction of the melee attack in the middle of an attack which is unintended. i had to add another variable to lock the direction in place rather than use facing direction as that changes when the player moves.
   - AABB: I had a lot of overlapping code/repeated code for AABB tests, which im gonna have even more of when i do projectiles, so i made a class to cover collisions and then implemented that into my already existing classes
   - Knockback: game felt really bad, just straight up felt really not fun with no knocback it was hard to tell when you actually hit enemies, so i added some extra feedback by giving them knocback
+  
+  - Dwarf Buff: had an issue where pressing the secondary attack (buff) button would end up activating multiple times in one input which drained all the mana of the player immediately, i had to instead create a press/release check to stop this happening
  
 ALTERNATIVES I CONSIDERED (AND WHY I CHOSE WHAT I DID):
   - Knockback: I was considering adding a hue change to enemies and the player as they took damage but this seemed much harder to implement and keep track of than knockback as feedback for the player.
+  - Polymorphism: I could have decided to keep each player a single class and have them initialised differently and segmented code wise using if statements, however since different players would have different behaviours it was the perfect time to use oop and polymorphism 
 
 NUMBERS (FPS, ms per frame, entity / tile counts, conditions):
  - BASELINE: map_arena 48x36 tile map.
@@ -58,11 +66,17 @@ NUMBERS (FPS, ms per frame, entity / tile counts, conditions):
 
 REPORT SECTION THIS FEEDS:
 1.1 Player Controlled Hero with a functioning weapon and health
+Choices from Multiple Heroes each with their own visuals, strengths and weakness
+Each hero variant has unique choice of attack and has a secondary skill
+Hero projectiles damage Entities on Contact
+A projectile attack
+Faster Movement Skill
+Stronger Defence Skill
 
 SCREENSHOT TAKEN?  yes / no   (file name: )
 
 STILL TO DO NEXT:
-  -
+  - fully implement projectiles, using projectile archer class, then magic class
 
 
 --------------------------------------------------------------

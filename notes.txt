@@ -1,0 +1,59 @@
+Critera - action
+!Choices from Multiple Heroes each with their own visuals, strengths and weakness
+!Each hero variant has unique choice of attack and has a secondary skill
+!Hero projectiles damage Entities on Contact
+!A projectile attack
+!A magic attack
+!Faster Movement Skill
+!Stronger Defence Skill
+!Magic Spell Skill (Is selective, affecting N enemies with the highest health only)
+
+
+	- Dwarf 
+		Melee attack primary
+		speed boost and heal secondary (costs mana) (Faster Movement Skill  & Stronger Defence Skill ?? )
+	- Wizard
+		Magic Attack Primary (Magic Spell Skill (Is selective, affecting N enemies with the highest health only))
+		Alternate Magic attack secondary (costs mana)
+	- Archer
+		Projectile Attack Primary (projectile attack)
+		Dash evade secondary (costs mana)
+	
+
+
+Game level runs for at least two minutes
+	- Need a big level with multiple spawners, key exit etc...
+	
+Show at least two levels with different maps (one infinite, one fixed)
+A version of the world which is unbounded (with repeating tiles)
+	- need to implement infinite level
+	
+	
+Visible Static Entities that spawn mobile entities (NPCs).
+When static entities are sufficiently damaged, they stop spawning mobile entities
+	- Need to create spawners that spawn enemies until destroyed
+		
+
+Collectable Health & Mana Potion Entities. 
+Locked Impassible Door Entity. Collectable Key Opens Door.
+	- need to make drops from enemies and collectibles which you can pickup
+	- mana potion, healing potion
+	- key to pick up at the end of the level
+
+
+Entity launches Projectiles which Damage Player on Contact
+At least 3 different mobile entity types (Differing in appearance, health and speed)
+	-Slime
+		Melee only, gives knockback low hp low dmg (fast)
+	-Skeleton
+		Projectile only, gives high dmg but is low hp (medium speed)
+	-Ogre
+		Melee Only, high hp, lots of knockback high hp (slow)
+
+
+
+Multiple Players can play simultaneously.
+	-multiplayer...
+
+The ability to save (to a file) the current state of the game at any point and reload it to the same exact point.
+	-saving....

@@ -5,59 +5,58 @@
 #include "Utilities/Collisions.h"
 #include "Enemy.h"
 
-enum class AttackState { Ready, Active, Cooldown};
+struct Controls
+{
+	int up;
+	int down;
+	int left;
+	int right;
+	int primary;
+	int secondary;
+};
 
 class Player : public Entity
 {
 
-private:
-	AttackState attackState = AttackState::Ready;
-	float attackActiveTimer = 0.0f;
-	float cooldownTimer = 0.0f;
+protected:
+	int mana;
+	int maxMana;
 
-	const float attackDuration = 0.15f;
-	const float attackCooldown = 0.35f;
-	const float attackReach = 32.0f;
+	//knockback
+	float knockbackVelX = 0.0f; //player knockback velocity x 
+	float knockbackVelY = 0.0f; //player knockback velocity y
+	float knockbackTimer = 0.0f; //duration of knockback in time
 
-	const float attackKnockbackForce = 250.0f;
-	const float attackKnockbackDuration = 0.12f;
-
-	float knockbackVelX = 0.0f;
-	float knockbackVelY = 0.0f;
-	float knockbackTimer = 0.0f;
-
-	int meleeDamage = 35;
-
-	Vector<Enemy*> swingEnemies;
-
-	GamesEngineeringBase::Image* weaponImage;
-	int weaponImageXOffset;
-	int weaponImageYOffset;
-
-	int keyUp = VK_UP;
-	int keyDown = VK_DOWN;
-	int keyLeft = VK_LEFT;
-	int keyRight = VK_RIGHT;
-	int keyAttack = VK_SPACE;
-
-	int facingDirX = 0;
-	int facingDirY = 0;
+	//movement
+	int keyUp; //player movement keys
+	int keyDown;
+	int keyLeft;
+	int keyRight;
+	int keyPrimaryAttack; //player attack key
+	int keySecondaryAttack; //player attack key
+	int facingDirX = 0; //facing direction for when an attack is made
+	int facingDirY = 0; //facing direction for when an attack is made
 
 public:
-	Player(int _health, float _iFrames, int _speed, float _xPos, float _yPos, GamesEngineeringBase::Image* _image, int _tileXOffset, int _tileYOffset, GamesEngineeringBase::Image* _weaponImage, int _weaponXOffset, int _weaponYOffset) :
-		Entity(_health,  _iFrames, _speed, _xPos, _yPos, _image, _tileXOffset, _tileYOffset)
+	Player(EntityStats stats, GamesEngineeringBase::Image* _image, Controls controls) :
+		Entity(stats, _image)
 	{
-		weaponImage = _weaponImage;
-		weaponImageXOffset = _weaponXOffset;
-		weaponImageYOffset = _weaponYOffset;
+		mana = 100;
+		maxMana = 100;
+		keyUp = controls.up;
+		keyDown = controls.down;
+		keyLeft = controls.left;
+		keyRight = controls.right;
+		keyPrimaryAttack = controls.primary;
+		keySecondaryAttack = controls.secondary;
 	}
-
+	virtual ~Player() = default;
 	void applyKnockback(float dirX, float dirY, float force, float duration);
+	void update(GamesEngineeringBase::Window& window, Map& map, float deltaTime) override = 0;
 
-	void update(GamesEngineeringBase::Window& window, Map& map, float deltaTime) override;
-	void draw(GamesEngineeringBase::Window& window, Camera& cam) override;
+	virtual void processAttack(Vector<Enemy*>& enemies) = 0; 
+	void draw(GamesEngineeringBase::Window& window, Camera& cam) override = 0;
 
-	AABB getMeleeHitbox() const;
-	bool checkMeleeCollision(Enemy* enemy) const;
-	void processMelee(Vector<Enemy*>& enemies); 
+	void move(GamesEngineeringBase::Window& window, Map& map, float deltaTime);
+
 };

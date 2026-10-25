@@ -89,7 +89,7 @@ bool Map::isWalkable(float pixelX, float pixelY)
 }
 
 
-bool Map::isBlockedByWall(float posX, float posY, float width, float height) const
+bool Map::isBlockedByWall(float posX, float posY, int width, int height) const
 {
 	//find the edges of the object in world space
 	//-1 since 32 wide box from x=0 is 0-31, pixel 32 is the next tile.

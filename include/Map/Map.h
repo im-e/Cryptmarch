@@ -63,7 +63,7 @@ public:
 
 	bool isWalkable(float pixelX, float pixelY); //returns if a point in 
 
-	bool isBlockedByWall(float posX, float posY, float width, float height) const;
+	bool isBlockedByWall(float posX, float posY, int width, int height) const;
 
 
 };

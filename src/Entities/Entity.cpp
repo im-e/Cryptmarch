@@ -26,9 +26,10 @@ AABB Entity::getHitbox() const
 {
 	int width = hitboxWidth; //set width and height to hitbox height
 	int height = hitboxHeight;
-	//worldx/y are the top left coordinates of the entity, to find the middle
-	//we have to add the tile size (32) - hitbox size to find the leftover space
-	//split it in half, and then apply it to the x and y offset to keep it central 
+	//worldx/y are the top left coordinates of the entity's sprite, to find the middle of our hitbox
+	//we have to add the tile size (32) - hitbox size to find the leftover space 
+	//split it in half, and then apply it to the x and y offset to keep it central
+	//this still returns the top/left coordinates, but the hitbox is central.
 	float x = worldX + (tileSize - hitboxWidth) / 2;
 	float y = worldY + (tileSize - hitboxHeight) / 2;
 

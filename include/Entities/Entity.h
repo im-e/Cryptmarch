@@ -5,11 +5,23 @@
 #include "Utilities/Logger.h"
 #include "Utilities/Collisions.h"
 
+struct EntityStats {
+	int health;
+	int maxHealth;
+	float iFrames;
+	float speed;
+	float spawnX;
+	float spawnY;
+	int imageXOffset;
+	int imageYOffset;
+};
+
 
 class Entity {
 protected:
 	//entity data
 	int health; //health
+	int maxHealth;
 
 	//position
 	float worldX;
@@ -31,7 +43,8 @@ protected:
 	int tileYOffset;
 
 	//hitbox settings
-	int hitboxWidth = 20;
+	int hitboxWidth = 20
+		;
 	int hitboxHeight = 20;
 
 	//image
@@ -39,17 +52,18 @@ protected:
 
 
 public:
-	Entity(int _health, float _iFrames, float _speed, float _x, float _y, GamesEngineeringBase::Image* _image, int _tileXOffset, int _tileYOffset)
+	Entity(EntityStats stats, GamesEngineeringBase::Image* _image)
 	{
-		health = _health;
-		iFrameValue = _iFrames;
-		iFrameTimer = _iFrames;
-		speed = _speed;
-		worldX = _x;
-		worldY = _y;
+		health = stats.maxHealth;
+		maxHealth = stats.maxHealth;
+		iFrameValue = stats.iFrames;
+		iFrameTimer = stats.iFrames;
+		speed = stats.speed;
+		worldX = stats.spawnX;
+		worldY = stats.spawnY;
 		image = _image;
-		tileXOffset = _tileXOffset;
-		tileYOffset = _tileYOffset;
+		tileXOffset = stats.imageXOffset;
+		tileYOffset = stats.imageYOffset;
 	}
 
 	virtual ~Entity() = default;

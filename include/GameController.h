@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Entities/Players/Dwarf.h"
+
 enum GameState
 {
     MenuState, PlayState, TallyState
@@ -28,17 +30,25 @@ private:
         stats.reset(); //reset stats
         
         //create the player
-        Player* player = new Player(100, .5f, 200, 400, 400, &am.playerImage, 0, 0, &am.itemsImage, 6, 1);
+        //                        health maxhp iframes speed x y imX, imY
+        EntityStats playerStats = { 100, 100, .5f, 200, 400, 400, 0, 0 };
+        Controls playerControls = { VK_UP, VK_DOWN, VK_LEFT, VK_RIGHT, VK_SPACE, VK_SHIFT };
+
+        Dwarf* dwarf = new Dwarf(playerStats, &am.playerImage, playerControls, &am.itemsImage, 3, 3);
         //add the player to the entity list
-        em.addPlayer(player);
+        em.addPlayer(dwarf);
 
         //create enemies (will be created by spawners soon)
-                  //health, speed x y image, offsets
-        //add enemies to entity list
-        em.addEnemy(new Enemy(100, 20, .25f, 50, 100, 200, &am.enemyImage, 0, 2, player));
-        em.addEnemy(new Enemy(100, 20, .25f, 100, 600, 500, &am.enemyImage, 1, 2, player));
-        em.addEnemy(new Enemy(100, 20, .25f, 150, 300, 100, &am.enemyImage, 1, 4, player));
-        em.addEnemy(new Enemy(100, 20, .25f, 150, 150, 300, &am.enemyImage, 0, 4, player));
+        //               health maxhp iframes speed x y imX, imY
+        EntityStats e1 = { 100, 100, .25f, 50, 100, 200, 0, 2 };
+        EntityStats e2 = { 100, 100, .25f, 100, 600, 500, 1, 2 };
+        EntityStats e3 = { 100, 100, .25f, 150, 300, 100, 1, 4 };
+        EntityStats e4 = { 100, 100, .25f, 150, 150, 300, 0, 2 };
+
+        em.addEnemy(new Enemy(e1,&am.enemyImage, dwarf, 20));
+        em.addEnemy(new Enemy(e2,&am.enemyImage, dwarf, 20));
+        em.addEnemy(new Enemy(e3,&am.enemyImage, dwarf, 20));
+        em.addEnemy(new Enemy(e4,&am.enemyImage, dwarf, 20));
     }
 
 public:

@@ -1,34 +1,13 @@
 #include "Entities/Player.h"
 #include "Rendering/Graphics.h"
 
-void Player::draw(GamesEngineeringBase::Window& window, Camera& cam)
+void Player::applyKnockback(float dirX, float dirY, float force, float duration)
 {
-	int screenX = cam.worldToScreenX(worldX);
-	int screenY = cam.worldToScreenY(worldY);
-
-	Graphics::DrawTilemapImage(window, *image, tileSize, tileXOffset, tileYOffset, screenX, screenY);
-
-	if (attackState == AttackState::Active)
-	{
-		AABB attackBox = getMeleeHitbox();
-
-		// Convert world coordinates to screen coordinates using the camera
-		int screenX = static_cast<int>(attackBox.x - cam.getX());
-		int screenY = static_cast<int>(attackBox.y - cam.getY());
-
-		Graphics::DrawTilemapImage(window, *weaponImage, tileSize, weaponImageXOffset, weaponImageYOffset, screenX, screenY);
-	}
-
-#ifdef _DEBUG
-
-	AABB hitbox = getHitbox();
-
-	Graphics::DrawRectOutline(window, hitbox.x - cam.getX() , hitbox.y - cam.getY(), hitboxWidth, hitboxHeight, 0, 255, 0);
-
-#endif
+	knockbackVelX = dirX * force;
+	knockbackVelY = dirY * force;
+	knockbackTimer = duration;
 }
-
-void Player::update(GamesEngineeringBase::Window& window, Map& map, float deltaTime)
+void Player::move(GamesEngineeringBase::Window& window, Map& map, float deltaTime)
 {
 	//MOVEMENT ------------------------------------
 	float xMove = 0.0f;
@@ -93,104 +72,5 @@ void Player::update(GamesEngineeringBase::Window& window, Map& map, float deltaT
 		worldY += yMove;
 	}
 
-	//dont need to clamp player positions to the world anymore
-
-
-	//------------------- ATTACK ----------------------
-
-	//iFrame Timer
 	updateTimers(deltaTime);
-
-	if (attackState == AttackState::Ready) //if attack is ready
-	{
-		if (window.keyPressed(keyAttack)) //if attack pressed
-		{
-			attackState = AttackState::Active; //set attack state to active
-			attackActiveTimer = attackDuration; //set the timer to the duration
-			swingEnemies.clear(); // Reset hit history for new swing
-		}
-	}
-	else if (attackState == AttackState::Active)
-	{
-		attackActiveTimer -= deltaTime; //reduce the attack hitbox duration
-		if (attackActiveTimer <= 0.0f) //if its less than/equal to 0
-		{
-			attackState = AttackState::Cooldown; //attack is on cooldown
-			cooldownTimer = attackCooldown; //attack timer is equal to the cooldown
-		}
-	}
-	else if (attackState == AttackState::Cooldown) //if in cooldown
-	{
-		cooldownTimer -= deltaTime; //reduce the (now) cooldown timer
-		if (cooldownTimer <= 0.0f) //if cooldown is over
-		{
-			attackState = AttackState::Ready; //attack is now ready
-		}
-	}
-
 }
-AABB Player::getMeleeHitbox() const
-{
-	//get the players normal hitbox
-	AABB playerBox = getHitbox();
-	//offset it forward using facing direction and reach distance
-	float attackX = playerBox.x + (facingDirX * attackReach); 
-	float attackY = playerBox.y + (facingDirY * attackReach);
-
-	//return an AABB struct
-	return { attackX, attackY, playerBox.width, playerBox.height };
-}
-
-bool Player::checkMeleeCollision(Enemy* enemy) const
-{
-	//get the player's melee hitbox
-	AABB attackBox = getMeleeHitbox();
-
-	//get the enemy's hitbox
-	AABB enemyBox = enemy->getHitbox();
-
-	//AABB overlap test
-	return Collisions::checkAABBCollision(attackBox, enemyBox);
-}
-
-void Player::processMelee(Vector<Enemy*>& enemies) {
-
-	if (attackState != AttackState::Active) return;
-
-	for (int i = 0; i < enemies.getSize(); i++) //for every enemy in enemies 
-	{
-		Enemy* enemy = enemies[i]; 
-
-		//check if this enemy was already hit during this swing
-		bool alreadyHit = false;
-		for (int k = 0; k < swingEnemies.getSize(); k++)
-		{
-			if (swingEnemies[k] == enemy) //i dont have a comparison operator this might not work
-			{
-				alreadyHit = true;
-				break;
-			}
-		}
-
-		if (alreadyHit) continue; //skip if already hit
-
-		//check collision
-		if (checkMeleeCollision(enemy))
-		{
-			enemy->takeDamage(meleeDamage); //make enemy take the damage
-
-			//apply knockback
-			enemy->applyKnockback(facingDirX, facingDirY, attackKnockbackForce, attackKnockbackDuration);
-
-			swingEnemies.add(enemy); //record that we hit this enemy
-		}
-	}
-}
-
-void Player::applyKnockback(float dirX, float dirY, float force, float duration)
-{
-	knockbackVelX = dirX * force;
-	knockbackVelY = dirY * force;
-	knockbackTimer = duration;
-}
-
