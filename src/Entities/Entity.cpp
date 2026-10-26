@@ -4,9 +4,12 @@ void Entity::takeDamage(int damage) {
 	//only take damage if iFrames <= 0;
 	if (iFrameTimer <= 0)
 	{
-		health -= damage; //take damage
+		int endDamage = (int)(damage * damageTakenMultiplier); //multiply damage by the modifier
+
+		health -= endDamage; //take damage
 		if (health < 0) health = 0; //dont let health go below 0
 		iFrameTimer = iFrameValue; //reset iFrameTimer to iFrameValue
+		hitFlashTimer = hitFlashDuration; //set flash timer to duration
 	}
 }
 
@@ -52,4 +55,23 @@ void Entity::updateTimers(float deltaTime)
 {
 	iFrameTimer -= deltaTime;
 	if (iFrameTimer < 0) iFrameTimer = 0;
+
+	hitFlashTimer -= deltaTime;
+	if (hitFlashTimer < 0) hitFlashTimer = 0;
+}
+
+void Entity::drawSprite(GamesEngineeringBase::Window& window, Camera& cam, unsigned char tintR, unsigned char tintG, unsigned char tintB, unsigned char tintStrength)
+{
+	int screenX = cam.worldToScreenX(worldX); //convert worldx to screenx via cam transform
+	int screenY = cam.worldToScreenY(worldY);
+
+	if (isFlashing()) //if hit and is flashing - overrides any other tint
+	{
+		tintR = 255; //red tint
+		tintG = 40; 
+		tintB = 40; 
+		tintStrength = 200; //by changing the input values
+	}
+
+	Graphics::DrawTilemapImage(window, *image, tileSize, tileXOffset, tileYOffset, screenX, screenY, tintR, tintG, tintB, tintStrength);
 }

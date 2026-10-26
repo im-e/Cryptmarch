@@ -1,9 +1,10 @@
 #pragma once
 #include "GamesEngineeringBase.h"
-#include "Entity.h"
+#include "Entities/Entity.h"
 #include "Utilities/Vector.h"
 #include "Utilities/Collisions.h"
-#include "Enemy.h"
+#include "Entities/Projectile.h"
+#include "Entities/Enemy.h"
 
 struct Controls
 {
@@ -15,17 +16,24 @@ struct Controls
 	int secondary;
 };
 
+struct AttackContext{
+	Vector<Enemy*>& enemies; //who you can hit
+	Vector<Projectile>& projectiles; //where new projectiles go
+};
+
+
+
 class Player : public Entity
 {
-
 protected:
-	int mana;
-	int maxMana;
+	//mana
+	int mana; //current mana
+	int maxMana; //maximum mana
 
 	//knockback
-	float knockbackVelX = 0.0f; //player knockback velocity x 
-	float knockbackVelY = 0.0f; //player knockback velocity y
-	float knockbackTimer = 0.0f; //duration of knockback in time
+	float impulseVelX = 0.0f; //player knockback velocity x 
+	float impulseVelY = 0.0f; //player knockback velocity y
+	float impulseTimer = 0.0f; //duration of knockback in time
 
 	//movement
 	int keyUp; //player movement keys
@@ -34,8 +42,8 @@ protected:
 	int keyRight;
 	int keyPrimaryAttack; //player attack key
 	int keySecondaryAttack; //player attack key
-	int facingDirX = 0; //facing direction for when an attack is made
-	int facingDirY = 0; //facing direction for when an attack is made
+	float facingDirX = 0; //facing direction for when an attack is made
+	float facingDirY = 0; //facing direction for when an attack is made
 
 public:
 	Player(EntityStats stats, GamesEngineeringBase::Image* _image, Controls controls) :
@@ -51,12 +59,15 @@ public:
 		keySecondaryAttack = controls.secondary;
 	}
 	virtual ~Player() = default;
-	void applyKnockback(float dirX, float dirY, float force, float duration);
+	void applyImpulse(float dirX, float dirY, float force, float duration);
 	void update(GamesEngineeringBase::Window& window, Map& map, float deltaTime) override = 0;
 
-	virtual void processAttack(Vector<Enemy*>& enemies) = 0; 
+	virtual void processAttack(AttackContext& attackContext) = 0; 
 	void draw(GamesEngineeringBase::Window& window, Camera& cam) override = 0;
 
 	void move(GamesEngineeringBase::Window& window, Map& map, float deltaTime);
+
+	int getMana() { return mana; }
+	int getMaxMana() { return maxMana; }
 
 };

@@ -25,6 +25,7 @@ public:
 		for (int i = 0; i < enemies.getSize(); i++) delete enemies[i];
 		players.clear(); 
 		enemies.clear();
+		projectiles.clear();
 		allPlayersDead = false;
 	}
 
@@ -35,6 +36,7 @@ public:
 	}
 	
 	bool getAllPlayersDead() { return allPlayersDead; }
+
 	void addPlayer(Player* player) { players.add(player); }
 
 	void addEnemy(Enemy* enemy) { enemies.add(enemy); }
@@ -45,12 +47,14 @@ public:
 
 	void update(GamesEngineeringBase::Window& window, Map& map, float deltaTime) 
 	{
+		AttackContext attack = { enemies, projectiles };
+
 		//update all players
 		for (int i = 0; i < players.getSize(); i++)
 		{
 			players[i]->update(window, map, deltaTime);
 
-			players[i]->processAttack(enemies);
+			players[i]->processAttack(attack);
 		}
 
 		//update all enemies
@@ -82,13 +86,14 @@ public:
 					}
 
 					//apply knockback
-					players[i]->applyKnockback(dirX, dirY, enemies[j]->getKnockbackForce(), enemies[j]->getKnockbackDuration());
+					players[i]->applyImpulse(dirX, dirY, enemies[j]->getKnockbackForce(), enemies[j]->getKnockbackDuration());
 
 
 				}
 			}
 		}
 
+		updateProjectiles(map, deltaTime);
 	}
 
 	void updateProjectiles(Map& map, float deltaTime)
@@ -126,8 +131,8 @@ public:
 					if (Collisions::checkAABBCollision(projectile.getAABB(), enemies[j]->getHitbox())) //projectile + enemy hitbox
 					{
 						enemies[j]->takeDamage(projectile.damage); //enemy take damage from projectile
+						enemies[j]->applyKnockback(projectile.dirX, projectile.dirY, projectile.knockbackForce, projectile.knockbackDuration);
 						projectile.dead = true; //mark projectile is dead
-						//apply knockback
 						break; //hit an enemy so we should stop checking other enemies for this projectile
 					}
 				}
@@ -198,6 +203,35 @@ public:
 		for (int i = 0; i < enemies.getSize(); i++)
 		{
 			enemies[i]->draw(window, cam);
+		}
+
+		drawProjectiles(window, cam);
+	}
+
+	void drawProjectiles(GamesEngineeringBase::Window& window, Camera& cam)
+	{
+		for (int i = 0; i < projectiles.getSize(); i++)
+		{
+			Projectile& p = projectiles[i]; //get projectile
+			if (p.image == nullptr) continue; //if projectile is null go to next element
+
+			//hitbox centre in world space
+			float centreX = p.x + p.width / 2.0f; // width/2 finds the centre in world space
+			float centreY = p.y + p.height / 2.0f;
+
+			//move the X/Y back half a tile so the 32x32 sprite is centred on the hitbox
+			const int halfTile = p.tileSize / 2; // 16
+			int worldX = centreX - halfTile;
+			int worldY = centreY - halfTile;
+
+			int screenX = cam.worldToScreenX(worldX);
+			int screenY = cam.worldToScreenY(worldY);
+
+			Graphics::DrawTilemapImage(window, *p.image, p.tileSize, p.tileX, p.tileY, screenX, screenY);
+
+#ifdef _DEBUG
+			Graphics::DrawRectOutline(window, cam.worldToScreenX(p.x), cam.worldToScreenY(p.y),	p.width, p.height, 255, 0, 255);
+#endif
 		}
 	}
 

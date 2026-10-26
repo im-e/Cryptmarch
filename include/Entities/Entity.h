@@ -22,6 +22,10 @@ protected:
 	//entity data
 	int health; //health
 	int maxHealth;
+	float damageTakenMultiplier = 1.0f; //damage multiplier
+
+	float hitFlashTimer = 0.0f;
+	const float hitFlashDuration = 0.1f;
 
 	//position
 	float worldX;
@@ -71,16 +75,21 @@ public:
 	virtual void update(GamesEngineeringBase::Window& window, Map& map, float deltaTime) = 0;
 	virtual void draw(GamesEngineeringBase::Window& window, Camera& cam) = 0;
 
-	void updateTimers(float deltaTime);
+	void drawSprite(GamesEngineeringBase::Window& window, Camera& cam, unsigned char tintR = 0, unsigned char tintG = 0, unsigned char tintB = 0, unsigned char tintStrength = 0);
 
-	float getX() { return worldX; } 
-	float getY() { return worldY; }
+	float getX() const { return worldX; }
+	float getY() const { return worldY; }
 
-	int getHealth() { return health; }
-	int getMaxHealth() { return maxHealth; }
+	int getHealth() const { return health; }
+	int getMaxHealth() const { return maxHealth; }
+
+	bool isFlashing() const { return hitFlashTimer > 0.0f; }
+
 	bool isDead() const;
 	void takeDamage(int damage);
 	void heal(int amount) { health += amount; }
+
+	void updateTimers(float deltaTime);
 
 	void setHitboxSize(int width, int height);
 	AABB getHitbox() const;

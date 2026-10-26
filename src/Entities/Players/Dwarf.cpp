@@ -2,19 +2,23 @@
 
 void Dwarf::draw(GamesEngineeringBase::Window& window, Camera& cam)
 {
-	int screenX = cam.worldToScreenX(worldX);
-	int screenY = cam.worldToScreenY(worldY);
-
-	Graphics::DrawTilemapImage(window, *image, tileSize, tileXOffset, tileYOffset, screenX, screenY);
-
-	if (attackState == AttackState::Active)
+	if (skillTimer > 0.0f) //if skill active
 	{
-		AABB attackBox = getMeleeHitbox();
+		drawSprite(window, cam, 80, 140, 255, 100); //draw with a blue tint 40% strength while defending
+	}
+	else //if skill not active
+	{
+		drawSprite(window, cam); //draw normally
+	}
 
-		// Convert world coordinates to screen coordinates using the camera
-		int screenX = static_cast<int>(attackBox.x - cam.getX());
-		int screenY = static_cast<int>(attackBox.y - cam.getY());
+	if (attackState == AttackState::Active) //if the attack is active
+	{
+		AABB attackBox = getMeleeHitbox(); //get the hitbox
 
+		//convert world coordinates to screen coordinates using the camera
+		int screenX = cam.worldToScreenX(attackBox.x);
+		int screenY = cam.worldToScreenY(attackBox.y);
+		//draw weapon attack to screen
 		Graphics::DrawTilemapImage(window, *weaponImage, tileSize, weaponImageXOffset, weaponImageYOffset, screenX, screenY);
 	}
 
@@ -22,7 +26,7 @@ void Dwarf::draw(GamesEngineeringBase::Window& window, Camera& cam)
 
 	AABB hitbox = getHitbox();
 
-	Graphics::DrawRectOutline(window, hitbox.x - cam.getX(), hitbox.y - cam.getY(), hitboxWidth, hitboxHeight, 0, 255, 0);
+	Graphics::DrawRectOutline(window, cam.worldToScreenX(hitbox.x), cam.worldToScreenY(hitbox.y), hitboxWidth, hitboxHeight, 0, 255, 0);
 
 #endif
 }
@@ -39,7 +43,7 @@ void Dwarf::update(GamesEngineeringBase::Window& window, Map& map, float deltaTi
 			attackActiveTimer = attackDuration; //set the timer to the duration
 			swingEnemies.clear(); // Reset hit history for new swing
 
-			attackDirX = facingDirX;
+			attackDirX = facingDirX; //lock the attack direction to current facing direction
 			attackDirY = facingDirY;
 		}
 	}
@@ -62,10 +66,10 @@ void Dwarf::update(GamesEngineeringBase::Window& window, Map& map, float deltaTi
 	}
 
 	//SECONDARY ATTACK -- SPEED BOOST AND HEALTH BOOST
-	if (speedBoostTimer > 0.0f) //if speedboost is active
+	if (skillTimer > 0.0f) //if speedboost is active
 	{
-		speedBoostTimer -= deltaTime; //reduce time
-		if (speedBoostTimer <= 0.0f) //if time has run out
+		skillTimer -= deltaTime; //reduce time
+		if (skillTimer <= 0.0f) //if time has run out
 		{
 			speed = normalSpeed; //set to normal speed
 		}
@@ -78,13 +82,10 @@ void Dwarf::update(GamesEngineeringBase::Window& window, Map& map, float deltaTi
 		{
 			mana -= manaCost; //reduce mana by the cost
 
-			//activate faster movement skill
-			speed = boostedSpeed;
-			speedBoostTimer = speedBoostDuration; //set the timer to the duration
-
-			//stronger defence / heal
-			health += 30.0f; //heal 
-			if (health > maxHealth) health = maxHealth; //cap health
+		
+			speed = boostedSpeed; //activate faster movement skill
+			damageTakenMultiplier = defenceMultiplier; //activate defence skill
+			skillTimer = skillDuration; //set the timer to the duration
 			keyWasReleased = false; //set keywasreleased to false
 		}
 	}
@@ -97,13 +98,13 @@ void Dwarf::update(GamesEngineeringBase::Window& window, Map& map, float deltaTi
 	move(window, map, deltaTime);
 
 }
-void Dwarf::processAttack(Vector<Enemy*>& enemies) {
+void Dwarf::processAttack(AttackContext& attackContext) {
 
 	if (attackState != AttackState::Active) return;
 
-	for (int i = 0; i < enemies.getSize(); i++) //for every enemy in enemies 
+	for (int i = 0; i < attackContext.enemies.getSize(); i++) //for every enemy in enemies 
 	{
-		Enemy* enemy = enemies[i];
+		Enemy* enemy = attackContext.enemies[i];
 
 		//check if this enemy was already hit during this swing
 		bool alreadyHit = false;

@@ -31,13 +31,13 @@ private:
 	int weaponImageYOffset;
 	
 	bool keyWasReleased = true; //check to see if key has been released so multiple activations dont happen on the same frame
-	float speedBoostTimer = 0.0f;
-	float speedBoostDuration = 3.0f;
-	float normalSpeed = 200.0f;
-	float boostedSpeed = 330.0f;
+	float skillTimer = 0.0f; //timer for speed boost
+	float skillDuration = 3.0f; //speed boost duration
+	const float defenceMultiplier = 0.5f;
+	float normalSpeed = 200.0f; //nomral movement speed
+	float boostedSpeed = 330.0f; //boosted movement speed
 
-	int maxMana = 100;
-	int manaCost = 25;
+	int manaCost; //mana cost for secondary skill
 public:
 
 	Dwarf(EntityStats _stats, GamesEngineeringBase::Image* _image, Controls _controls, GamesEngineeringBase::Image* _weaponImage, int _weaponXOffset, int _weaponYOffset) :
@@ -50,6 +50,7 @@ public:
 		speed = normalSpeed;
 		maxHealth = 150;
 		maxMana = 100;
+		manaCost = 25; 
 		health = maxHealth;
 		mana = maxMana;
 	}
@@ -57,7 +58,7 @@ public:
 	void update(GamesEngineeringBase::Window& window, Map& map, float deltaTime) override;
 
 	void draw(GamesEngineeringBase::Window& window, Camera& cam) override;
-	void processAttack(Vector<Enemy*>& enemies) override;
+	void processAttack(AttackContext& attack) override;
 
 	AABB getMeleeHitbox() const;
 	bool checkMeleeCollision(Enemy* enemy) const;

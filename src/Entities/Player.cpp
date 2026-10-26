@@ -1,11 +1,11 @@
 #include "Entities/Player.h"
 #include "Rendering/Graphics.h"
 
-void Player::applyKnockback(float dirX, float dirY, float force, float duration)
+void Player::applyImpulse(float dirX, float dirY, float force, float duration)
 {
-	knockbackVelX = dirX * force;
-	knockbackVelY = dirY * force;
-	knockbackTimer = duration;
+	impulseVelX = dirX * force;
+	impulseVelY = dirY * force;
+	impulseTimer = duration;
 }
 void Player::move(GamesEngineeringBase::Window& window, Map& map, float deltaTime)
 {
@@ -13,11 +13,11 @@ void Player::move(GamesEngineeringBase::Window& window, Map& map, float deltaTim
 	float xMove = 0.0f;
 	float yMove = 0.0f;
 
-	if (knockbackTimer > 0.0f) //if player is getting knocked back
+	if (impulseTimer > 0.0f) //if player is getting knocked back
 	{
-		knockbackTimer -= deltaTime;
-		xMove = knockbackVelX * deltaTime;
-		yMove = knockbackVelY * deltaTime;
+		impulseTimer -= deltaTime;
+		xMove = impulseVelX * deltaTime;
+		yMove = impulseVelY * deltaTime;
 	}
 	else { //player moves normally
 		//get the direction of movement based on key presses

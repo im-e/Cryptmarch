@@ -69,6 +69,9 @@
     <ClInclude Include="include\Entities\Players\Dwarf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Entities\Players\Archer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -93,6 +96,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Entities\Players\Dwarf.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Entities\Players\Archer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

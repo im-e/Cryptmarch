@@ -117,7 +117,8 @@ int main()
                 entityManager.draw(window, cam);
                 fps.draw(window, trueDelta); //draw fps using true delta to enforce true fps readings
 
-                status.draw(window, entityManager.getFirstPlayer()->getHealth(), entityManager.getFirstPlayer()->getMaxHealth());
+                Player* player = entityManager.getFirstPlayer();
+                status.draw(window, player->getHealth(), player->getMaxHealth(), player->getMana(), player->getMaxMana());
 
                 
                 break;

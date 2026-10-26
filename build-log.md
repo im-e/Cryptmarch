@@ -34,6 +34,35 @@ STILL TO DO NEXT:
 ==============================================================
 ENTRIES (NEWEST FIRST)
 ==============================================================
+
+--------------------------------------------------------------
+2026-10-26 : Mana, Archer, Hit tint
+--------------------------------------------------------------
+WHAT I BUILT / CHANGED:
+  - Mana: built a mana pool under player and added a mana bar
+  - Health: increased the size of the mana and health bars and made the calculations for them better
+  - Archer: implemented the archer class which has a primary attack of arrows and a secondary skill of a dash
+  - Tint: added the ability to tint the sprites rendered to give effects, which ive applied as hit effects, and secondary powerup effects.
+  - Projectiles: added projectile knockback, image and more data
+
+WHAT WENT WRONG AND HOW I FIXED IT:
+  -
+
+ALTERNATIVES I CONSIDERED (AND WHY I CHOSE WHAT I DID):
+  -
+
+NUMBERS (FPS, ms per frame, entity / tile counts, conditions):
+  -
+
+REPORT SECTION THIS FEEDS:
+  (e.g. 2.3.1 Tile map)
+
+SCREENSHOT TAKEN?  yes / no   (file name: )
+
+STILL TO DO NEXT:
+  -
+
+
 --------------------------------------------------------------
 2026-10-25 : Melee attacks, AABB definition, knockback
 --------------------------------------------------------------

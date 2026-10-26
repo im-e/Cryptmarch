@@ -157,6 +157,7 @@
   <ItemGroup>
     <ClInclude Include="include\Entities\Enemy.h" />
     <ClInclude Include="include\Entities\Entity.h" />
+    <ClInclude Include="include\Entities\Players\Archer.h" />
     <ClInclude Include="include\Entities\Players\Dwarf.h" />
     <ClInclude Include="include\Entities\Projectile.h" />
     <ClInclude Include="include\GameController.h" />
@@ -176,6 +177,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Entities\Enemy.cpp" />
+    <ClCompile Include="src\Entities\Players\Archer.cpp" />
     <ClCompile Include="src\Entities\Players\Dwarf.cpp" />
     <ClCompile Include="src\Rendering\Camera.cpp" />
     <ClCompile Include="src\Entities\Entity.cpp" />

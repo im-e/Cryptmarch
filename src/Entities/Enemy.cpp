@@ -3,16 +3,13 @@
 
 void Enemy::draw(GamesEngineeringBase::Window& window, Camera& cam)
 {
-	int screenX = cam.worldToScreenX(worldX);
-	int screenY = cam.worldToScreenY(worldY);
-
-	Graphics::DrawTilemapImage(window, *image, tileSize, tileXOffset, tileYOffset, screenX, screenY);
+	drawSprite(window, cam);
 
 #ifdef _DEBUG
 
 	AABB hitbox = getHitbox();
 
-	Graphics::DrawRectOutline(window, hitbox.x - cam.getX(), hitbox.y - cam.getY(), hitboxWidth, hitboxHeight, 255, 0, 0);
+	Graphics::DrawRectOutline(window, cam.worldToScreenX(hitbox.x), cam.worldToScreenY(hitbox.y), hitboxWidth, hitboxHeight, 255, 0, 0);
 
 #endif
 

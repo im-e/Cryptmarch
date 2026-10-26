@@ -1,6 +1,7 @@
 #include "Rendering/Graphics.h"
 #include "Utilities/Logger.h"
-void Graphics::DrawImage(GamesEngineeringBase::Window& window, GamesEngineeringBase::Image& image, int startX, int startY)
+void Graphics::DrawImage(GamesEngineeringBase::Window& window, GamesEngineeringBase::Image& image, int startX, int startY,
+	unsigned char tintR, unsigned char tintG, unsigned char tintB, unsigned char tintStrength)
 {
 	//convert image width and height from unsigned int to int for calculations
 	int imageWidth = image.width;
@@ -68,26 +69,42 @@ void Graphics::DrawImage(GamesEngineeringBase::Window& window, GamesEngineeringB
 		{
 			unsigned char alpha = imagePixel[3]; //get the alpha value (A)
 
-			if (alpha == 255) //if max alpha (opaque)
+			if (alpha > 0) //if alpha is greater than 0
 			{
-				windowPixel[0] = imagePixel[0]; //write the image data directly to the pixel via pointer
-				windowPixel[1] = imagePixel[1];
-				windowPixel[2] = imagePixel[2];
+				int r = imagePixel[0]; //split the image pixels into rgb for tint
+				int g = imagePixel[1];
+				int b = imagePixel[2];
+
+				if (tintStrength > 0) //if we have applied a tint
+				{
+					//newColour = original + (tintColour - original) * strength
+					r = r + ((tintR - r) * tintStrength) / 255; //add the tint 
+					g = g + ((tintG - g) * tintStrength) / 255; //a red channel of 200 with a blue tint of 80 at 40% → 200 + (80 − 200) × 0.4 = 200 − 48 = 152.
+					b = b + ((tintB - b) * tintStrength) / 255;
+				}
+
+				if (alpha == 255) //if max alpha (opaque)
+				{
+					windowPixel[0] = r; //write the image data directly to the pixel via pointer
+					windowPixel[1] = g; //using rgb now for applied tint
+					windowPixel[2] = b;
+				}
+				else if (alpha > 0) //partly transparent
+				{	//apply pixel blending formula
+					windowPixel[0] = (r * alpha + windowPixel[0] * (255 - alpha)) / 255; //write image data to the pixel via pointer
+					windowPixel[1] = (g * alpha + windowPixel[1] * (255 - alpha)) / 255;
+					windowPixel[2] = (b * alpha + windowPixel[2] * (255 - alpha)) / 255;
+				}
+				//ignore pixels with alpha = 0 (fully transparent)
 			}
-			else if (alpha > 0) //partly transparent
-			{	//apply pixel blending formula
-				windowPixel[0] = (imagePixel[0] * alpha + windowPixel[0] * (255 - alpha)) / 255; //write image data to the pixel via pointer
-				windowPixel[1] = (imagePixel[1] * alpha + windowPixel[1] * (255 - alpha)) / 255;
-				windowPixel[2] = (imagePixel[2] * alpha + windowPixel[2] * (255 - alpha)) / 255;
-			}
-			//ignore pixels with alpha = 0 (fully transparent)
 
 			imagePixel += channels; //increase the index of our image pixel by channels to get to the next pixel
 			windowPixel += 3; //same applies to the window, however we add 3 due to window being RGB not RGBA
 		}
 	}
 }
-void Graphics::DrawTilemapImage(GamesEngineeringBase::Window& window, GamesEngineeringBase::Image& image, int tileSize, int tilemapOffsetX, int tilemapOffsetY, int startX, int startY)
+void Graphics::DrawTilemapImage(GamesEngineeringBase::Window& window, GamesEngineeringBase::Image& image, int tileSize, int tilemapOffsetX, int tilemapOffsetY, int startX, int startY,
+	unsigned char tintR, unsigned char tintG, unsigned char tintB, unsigned char tintStrength)
 {
 	//convert image width and height from unsigned int to int for calculations
 	int imageWidth = image.width;
@@ -159,19 +176,34 @@ void Graphics::DrawTilemapImage(GamesEngineeringBase::Window& window, GamesEngin
 		{
 			unsigned char alpha = imagePixel[3]; //get the alpha value (A)
 
-			if (alpha == 255) //if max alpha (opaque)
+			if (alpha > 0) //if alpha is greater than 0
 			{
-				windowPixel[0] = imagePixel[0]; //write the image data directly to the pixel via pointer
-				windowPixel[1] = imagePixel[1];
-				windowPixel[2] = imagePixel[2];
+				int r = imagePixel[0]; //split the image pixels into rgb for tint
+				int g = imagePixel[1];
+				int b = imagePixel[2];
+
+				if (tintStrength > 0) //if we have applied a tint
+				{
+					//newColour = original + (tintColour - original) * strength
+					r = r + ((tintR - r) * tintStrength) / 255; //add the tint 
+					g = g + ((tintG - g) * tintStrength) / 255; //a red channel of 200 with a blue tint of 80 at 40% → 200 + (80 − 200) × 0.4 = 200 − 48 = 152.
+					b = b + ((tintB - b) * tintStrength) / 255;
+				}
+
+				if (alpha == 255) //if max alpha (opaque)
+				{
+					windowPixel[0] = r; //write the image data directly to the pixel via pointer
+					windowPixel[1] = g; //using rgb now for applied tint
+					windowPixel[2] = b;
+				}
+				else if (alpha > 0) //partly transparent
+				{	//apply pixel blending formula
+					windowPixel[0] = (r * alpha + windowPixel[0] * (255 - alpha)) / 255; //write image data to the pixel via pointer
+					windowPixel[1] = (g * alpha + windowPixel[1] * (255 - alpha)) / 255;
+					windowPixel[2] = (b * alpha + windowPixel[2] * (255 - alpha)) / 255;
+				}
+				//ignore pixels with alpha = 0 (fully transparent)
 			}
-			else if (alpha > 0) //partly transparent
-			{	//apply pixel blending formula
-				windowPixel[0] = (imagePixel[0] * alpha + windowPixel[0] * (255 - alpha)) / 255; //write image data to the pixel via pointer
-				windowPixel[1] = (imagePixel[1] * alpha + windowPixel[1] * (255 - alpha)) / 255;
-				windowPixel[2] = (imagePixel[2] * alpha + windowPixel[2] * (255 - alpha)) / 255;
-			}
-			//ignore pixels with alpha = 0 (fully transparent)
 
 			imagePixel += channels; //increase the index of our image pixel by channels to get to the next pixel
 			windowPixel += 3; //same applies to the window, however we add 3 due to window being RGB not RGBA
