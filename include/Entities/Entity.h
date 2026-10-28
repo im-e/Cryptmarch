@@ -4,6 +4,7 @@
 #include "Map/Map.h"
 #include "Utilities/Logger.h"
 #include "Utilities/Collisions.h"
+#include "Utilities/Vector2f.h"
 
 struct EntityStats {
 	int health;
@@ -93,6 +94,8 @@ public:
 
 	void setHitboxSize(int width, int height);
 	AABB getHitbox() const;
+
+	Vector2f getCentrePoint() const;
 
 	bool checkEntityCollision(const Entity* collider) const;
 };

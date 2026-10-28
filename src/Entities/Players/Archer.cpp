@@ -91,8 +91,8 @@ Projectile Archer::fireProjectile()
     proj.damage = arrowDamage;
     proj.owner = ProjectileOwner::Player;
 
-    proj.knockbackDuration = attackKnockbackDuration;
-    proj.knockbackForce = attackKnockbackForce;
+    proj.knockbackDuration = arrowKnockbackDuration;
+    proj.knockbackForce = arrowKnockbackForce;
 
     proj.image = projectileImage;
     proj.tileX = projectileTileX;

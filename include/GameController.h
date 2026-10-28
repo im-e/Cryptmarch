@@ -2,6 +2,7 @@
 
 #include "Entities/Players/Dwarf.h"
 #include "Entities/Players/Archer.h"
+#include "Entities/Players/Wizard.h"
 
 enum GameState
 {
@@ -34,12 +35,14 @@ private:
         //                      health maxhp iframes speed x y imX, imY
         EntityStats dwarfStats = { 100, 100, .5f, 200, 400, 400, 0, 0 };
         EntityStats archerStats = { 100, 100, .5f, 200, 400, 400, 2, 0 };
+        EntityStats wizardStats = { 100, 100, .5f, 200, 400, 400, 1, 4 };
         Controls playerControls = { VK_UP, VK_DOWN, VK_LEFT, VK_RIGHT, VK_SPACE, VK_SHIFT };
 
-        //Dwarf* dwarf = new Dwarf(dwarfStats, &am.playerImage, playerControls, &am.itemsImage, 3, 3);
+        Dwarf* dwarf = new Dwarf(dwarfStats, &am.playerImage, playerControls, &am.itemsImage, 3, 3);
         Archer* archer = new Archer(archerStats, &am.playerImage, playerControls, &am.itemsImage, 0, 23);
+        Wizard* wizard = new Wizard(wizardStats, &am.playerImage, playerControls, &am.itemsImage, 0, 25);
         //add the player to the entity list
-        em.addPlayer(archer);
+        em.addPlayer(wizard);
 
         //create enemies (will be created by spawners soon)
         //               health maxhp iframes speed x y imX, imY

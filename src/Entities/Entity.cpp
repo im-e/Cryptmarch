@@ -39,6 +39,14 @@ AABB Entity::getHitbox() const
 	return { x, y, width, height };
 }
 
+Vector2f Entity::getCentrePoint() const
+{
+	float x = worldX + (tileSize / 2.0f);
+	float y = worldY + (tileSize / 2.0f);
+
+	return { x, y };
+}
+
 bool Entity::checkEntityCollision(const Entity* collider) const
 {
 	//get the bounding box coordinates for this entity

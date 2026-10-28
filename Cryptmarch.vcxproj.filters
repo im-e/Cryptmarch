@@ -72,6 +72,12 @@
     <ClInclude Include="include\Entities\Players\Archer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Entities\Players\Wizard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Utilities\Vector2f.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -99,6 +105,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Entities\Players\Archer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Entities\Players\Wizard.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

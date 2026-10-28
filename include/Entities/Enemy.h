@@ -8,7 +8,7 @@ private:
 	Entity* target;
 	int contactDamage;
 
-	float attackKnockbackForce = 300.f;
+	float arrowKnockbackForce = 300.f;
 	float attackKnockbackDuration = 0.15f;
 
 	float shootCooldown = 0.0f;
@@ -28,7 +28,7 @@ public:
 
 	int getDamage() const { return contactDamage; }
 	float getKnockbackDuration() const { return attackKnockbackDuration; }
-	float getKnockbackForce() const { return attackKnockbackForce; }
+	float getKnockbackForce() const { return arrowKnockbackForce; }
 
 	void applyKnockback(float dirX, float dirY, float force, float duration);
 

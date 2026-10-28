@@ -10,10 +10,7 @@ void Graphics::DrawImage(GamesEngineeringBase::Window& window, GamesEngineeringB
 	int windowHeight = window.getHeight();
 
 	//check if the image is completely outside the window boundaries
-	if (startX >= windowWidth ||
-		startY >= windowHeight ||
-		startX + imageWidth <= 0 ||
-		startY + imageHeight <= 0)
+	if (startX >= windowWidth || startY >= windowHeight || startX + imageWidth <= 0 || startY + imageHeight <= 0)
 	{
 		return; // image is completely outside the window, no need to render
 	}
@@ -113,10 +110,7 @@ void Graphics::DrawTilemapImage(GamesEngineeringBase::Window& window, GamesEngin
 	int windowHeight = window.getHeight();
 
 	//check if the image is completely outside the window boundaries
-	if (startX >= windowWidth ||
-		startY >= windowHeight ||
-		startX + tileSize <= 0 ||
-		startY + tileSize <= 0)
+	if (startX >= windowWidth || startY >= windowHeight || startX + tileSize <= 0 || startY + tileSize <= 0)
 	{
 		return; // image is completely outside the window, no need to render
 	}
@@ -224,10 +218,7 @@ void Graphics::DrawRectOutline(GamesEngineeringBase::Window& window, int left, i
 	int bottom = top + height - 1; 
 
 	//completely outside the window
-	if (right < 0 || 
-		bottom < 0 ||
-		left >= windowWidth || 
-		top >= windowHeight)
+	if (right < 0 || bottom < 0 || left >= windowWidth || top >= windowHeight)
 		return;
 
 	//clamp the span of each edge to the window
@@ -303,6 +294,48 @@ void Graphics::DrawRectOutline(GamesEngineeringBase::Window& window, int left, i
 		{
 			window.draw(right, y, r, g, b);
 		}
+	}
+}
+
+void Graphics::DrawCircleOutline(GamesEngineeringBase::Window& window, float middleX, float middleY, float radius, unsigned char r, unsigned char g, unsigned char b)
+{
+
+	//nothing to draw
+	if (radius <= 0) return;
+
+	//get window height and width
+	int windowWidth = window.getWidth();
+	int windowHeight = window.getHeight();
+
+	//check what the four edge points equal
+	float left = middleX - radius; 
+	float right = middleX + radius;
+	float top = middleY - radius;
+	float bottom = middleY + radius;
+
+	//check if edges are completely outside the window
+	if (right < 0 ||
+		bottom < 0 ||
+		left >= windowWidth ||
+		top >= windowHeight)
+		return;
+	
+	//work out how far to turn each step
+	float step = 1 / radius;
+	const float pi = 3.14159265f;
+
+	//go once around the circle
+	for (float angle = 0; angle < 2 * pi; angle += step)
+	{
+		int x = middleX + cos(angle) * radius;
+		int y = middleY + sin(angle) * radius;
+
+		//skip pixels that are offscreen
+		if (x < 0 || x >= windowWidth || y < 0 || y >= windowHeight)
+			continue;
+
+		//else draw the pixel
+		window.draw(x, y, r, g, b);
 	}
 }
 

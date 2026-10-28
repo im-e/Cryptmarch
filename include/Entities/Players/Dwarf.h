@@ -16,7 +16,7 @@ private:
 	const float attackCooldown = 0.35f; //cooldown duration of the melee attack
 	const float attackReach = 32.0f; //reach of the melee attack
 
-	const float attackKnockbackForce = 250.0f; //force for knockback of the melee attack
+	const float arrowKnockbackForce = 250.0f; //force for knockback of the melee attack
 	const float attackKnockbackDuration = 0.12f; //duration of knockback for the melee attack
 	
 	int meleeDamage = 35; //damage of melee attack
