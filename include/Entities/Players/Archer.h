@@ -17,8 +17,8 @@ private:
 	float fireCooldown = 0.4f; //cooldown to fire again
 	float fireCooldownTimer = 0.0f; //cooldown tracker
 	bool fireRequested = false; //tracks if fire has been activated
-	float attackKnockbackForce = 150.0f; //force for knockback of the melee attack
-	float attackKnockbackDuration = 0.10f; //duration of knockback for the melee attack
+	float arrowKnockbackForce = 150.0f; //force for knockback of the ranged attack
+	float arrowKnockbackDuration = 0.10f; //duration of knockback for the ranged attack
 
 	//dash (secondary skill)
 	float dashSpeed = 600.0f; //pixels per second while dashing

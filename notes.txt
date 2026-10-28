@@ -9,15 +9,9 @@ Critera - action
 !Magic Spell Skill (Is selective, affecting N enemies with the highest health only)
 
 
-	- Dwarf 
-		Melee attack primary
-		speed boost and DAMAGE REDUCE secondary (costs mana) (Faster Movement Skill  & Stronger Defence Skill ?? )
 	- Wizard
 		Magic Attack Primary (Magic Spell Skill (Is selective, affecting N enemies with the highest health only))
 		Alternate Magic attack secondary (costs mana)
-	- Archer
-		Projectile Attack Primary (projectile attack)
-		Dash evade secondary (costs mana)
 	
 
 
