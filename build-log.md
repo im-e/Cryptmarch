@@ -46,21 +46,25 @@ WHAT I BUILT / CHANGED:
   - Projectiles: added projectile knockback, image and more data
 
 WHAT WENT WRONG AND HOW I FIXED IT:
-  -
+  - Health was split into 5 tiles, which made figuring out how much health you actually had quite hard since a health pool of 150 would be split up into large chunks, so i increased the size of the health bar to fix that
+  
 
 ALTERNATIVES I CONSIDERED (AND WHY I CHOSE WHAT I DID):
-  -
+  - Projectiles were quite difficult to figure out how to implement, i went with the implementation of having the archer create the projectile and then changing player handleAttacks() to include an attack context which takes in the vector of enemies and the projectiles to be able to handle melee and ranged attacks from the player.
 
 NUMBERS (FPS, ms per frame, entity / tile counts, conditions):
   -
 
-REPORT SECTION THIS FEEDS:
-  (e.g. 2.3.1 Tile map)
+REPORT SECTION THIS FEEDS
+**Hero projectiles damage Entities on Contact**
+Choices from Multiple Heroes each with their own visuals, strengths and weakness
+Each hero variant has unique choice of attack and has a secondary skill
+A projectile attack
 
 SCREENSHOT TAKEN?  yes / no   (file name: )
 
 STILL TO DO NEXT:
-  -
+  - magic attacks and the wizard player character
 
 
 --------------------------------------------------------------
