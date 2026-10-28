@@ -5,8 +5,8 @@
 #include "Utilities/Logger.h"
 #include "Utilities/Vector.h"
 
-#include "Entities/Player.h"
-#include "Entities/Enemy.h"
+#include "Entities/Players/Player.h"
+#include "Entities/Enemies/Enemy.h"
 #include "Entities/EntityManager.h"
 
 #include "Rendering/Graphics.h"
@@ -38,7 +38,7 @@ int main()
 
     //create the asset and entity managers
     AssetManager assetManager;
-    EntityManager entityManager;
+    EntityManager entityManager(assetManager);
 
     //init hud
     FPS fps(&assetManager.hudImage);

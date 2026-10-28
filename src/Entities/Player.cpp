@@ -1,4 +1,4 @@
-#include "Entities/Player.h"
+#include "Entities/Players/Player.h"
 #include "Rendering/Graphics.h"
 
 void Player::applyImpulse(float dirX, float dirY, float force, float duration)

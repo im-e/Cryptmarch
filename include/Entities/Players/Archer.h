@@ -1,5 +1,5 @@
 #pragma once
-#include "Entities/Player.h"
+#include "Entities/Players/Player.h"
 #include "Entities/Projectile.h"
 
 class Archer : public Player

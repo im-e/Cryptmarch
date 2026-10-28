@@ -1,5 +1,6 @@
 #pragma once
-#include "Entities/Player.h"
+#include "Entities/Players/Player.h"
+
 
 
 enum class AttackState { Ready, Active, Cooldown };

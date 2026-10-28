@@ -7,9 +7,7 @@
 #include "Utilities/Vector2f.h"
 
 struct EntityStats {
-	int health;
 	int maxHealth;
-	float iFrames;
 	float speed;
 	float spawnX;
 	float spawnY;
@@ -25,8 +23,8 @@ protected:
 	int maxHealth;
 	float damageTakenMultiplier = 1.0f; //damage multiplier
 
-	float hitFlashTimer = 0.0f;
-	const float hitFlashDuration = 0.1f;
+	float hitFlashTimer = 0.0f; //timer for the hit flash
+	const float hitFlashDuration = 0.1f; //how long the flash lasts
 
 	//position
 	float worldX;
@@ -40,7 +38,7 @@ protected:
 
 	//invincibility frames
 	float iFrameTimer;
-	float iFrameValue;
+	float iFrameValue = .25f;
 
 	//image tile settings
 	int tileSize = 32; //tilesize
@@ -48,8 +46,7 @@ protected:
 	int tileYOffset;
 
 	//hitbox settings
-	int hitboxWidth = 20
-		;
+	int hitboxWidth = 20;
 	int hitboxHeight = 20;
 
 	//image
@@ -61,8 +58,7 @@ public:
 	{
 		health = stats.maxHealth;
 		maxHealth = stats.maxHealth;
-		iFrameValue = stats.iFrames;
-		iFrameTimer = stats.iFrames;
+		iFrameTimer = iFrameValue;
 		speed = stats.speed;
 		worldX = stats.spawnX;
 		worldY = stats.spawnY;

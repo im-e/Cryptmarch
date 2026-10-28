@@ -1,8 +1,10 @@
 #pragma once
-
 #include "Entities/Players/Dwarf.h"
 #include "Entities/Players/Archer.h"
 #include "Entities/Players/Wizard.h"
+#include "Entities/Enemies/EnemyTypes.h"
+#include "Entities/Enemies/Enemy.h"
+#include "Entities/Enemies/EnemyFactory.h"
 
 enum GameState
 {
@@ -28,14 +30,14 @@ private:
     GameStats stats;
     void startGame(AssetManager& am, EntityManager& em)
     {
-        em.clear(); //wipe anything from the last rign
+        em.clear(); //wipe anything from the last run
         stats.reset(); //reset stats
         
         //create the player
-        //                      health maxhp iframes speed x y imX, imY
-        EntityStats dwarfStats = { 100, 100, .5f, 200, 400, 400, 0, 0 };
-        EntityStats archerStats = { 100, 100, .5f, 200, 400, 400, 2, 0 };
-        EntityStats wizardStats = { 100, 100, .5f, 200, 400, 400, 1, 4 };
+        //                       maxhp speed x y imX, imY
+        EntityStats dwarfStats = { 100, 200, 400, 400, 0, 0 };
+        EntityStats archerStats = { 100,  200, 400, 400, 2, 0 };
+        EntityStats wizardStats = { 100,  200, 400, 400, 1, 4 };
         Controls playerControls = { VK_UP, VK_DOWN, VK_LEFT, VK_RIGHT, VK_SPACE, VK_SHIFT };
 
         Dwarf* dwarf = new Dwarf(dwarfStats, &am.playerImage, playerControls, &am.itemsImage, 3, 3);
@@ -44,17 +46,9 @@ private:
         //add the player to the entity list
         em.addPlayer(wizard);
 
-        //create enemies (will be created by spawners soon)
-        //               health maxhp iframes speed x y imX, imY
-        EntityStats e1 = { 100, 100, .25f, 50, 100, 200, 0, 2 };
-        EntityStats e2 = { 100, 100, .25f, 100, 600, 500, 1, 2 };
-        EntityStats e3 = { 100, 100, .25f, 150, 300, 100, 1, 4 };
-        EntityStats e4 = { 100, 100, .25f, 150, 150, 300, 0, 2 };
-
-        em.addEnemy(new Enemy(e1,&am.enemyImage, em.getFirstPlayer(), 20));
-        em.addEnemy(new Enemy(e2,&am.enemyImage, em.getFirstPlayer(), 20));
-        em.addEnemy(new Enemy(e3,&am.enemyImage, em.getFirstPlayer(), 20));
-        em.addEnemy(new Enemy(e4,&am.enemyImage, em.getFirstPlayer(), 20));
+        EntityStats spawnerStats = { 100, 0, 600, 200, 2, 23 };
+        Spawner* spawner = new Spawner(spawnerStats, &am.mapImage);
+        em.addSpawner(spawner);
     }
 
 public:

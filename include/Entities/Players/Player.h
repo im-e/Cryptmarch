@@ -4,7 +4,7 @@
 #include "Utilities/Vector.h"
 #include "Utilities/Collisions.h"
 #include "Entities/Projectile.h"
-#include "Entities/Enemy.h"
+#include "Entities/Enemies/Enemy.h"
 
 struct Controls
 {

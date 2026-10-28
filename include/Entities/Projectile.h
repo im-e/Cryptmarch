@@ -20,8 +20,8 @@ struct Projectile {
     ProjectileOwner owner; //who owns this projectile
     bool dead = false; //flag for deletion
 
-    int width = 8.0f;  //hitbox
-    int height = 8.0f;
+    int width = 8;  //hitbox
+    int height = 8;
 
     int tileSize = 32;
     GamesEngineeringBase::Image* image = nullptr; //image for projectile

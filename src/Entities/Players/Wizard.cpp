@@ -1,4 +1,6 @@
 #include "Entities/Players/Wizard.h"
+#include "Utilities/Targeting.h"
+#include <cmath>
 
 void Wizard::draw(GamesEngineeringBase::Window& window, Camera& cam)
 {
@@ -13,10 +15,17 @@ void Wizard::draw(GamesEngineeringBase::Window& window, Camera& cam)
         
         Graphics::DrawCircleOutline(window, cam.worldToScreenX(middle.x), cam.worldToScreenY(middle.y), radius, 255, 255, 0);
     }
+
+    if (secondaryVisualTimer > 0.0f)
+    {
+        Vector2f middle = getCentrePoint();
+        
+        Graphics::DrawCircleOutline(window, cam.worldToScreenX(middle.x), cam.worldToScreenY(middle.y), selectRange, 0, 255, 255);
+    }
   
 #ifdef _DEBUG
     AABB hitbox = getHitbox();
-    Graphics::DrawRectOutline(window, hitbox.x - cam.getX(), hitbox.y - cam.getY(), hitboxWidth, hitboxHeight, 0, 255, 0);
+    Graphics::DrawRectOutline(window, cam.worldToScreenX(hitbox.x), cam.worldToScreenY(hitbox.y), hitboxWidth, hitboxHeight, 0, 255, 0);
 #endif
 }
 
@@ -26,12 +35,14 @@ void Wizard::update(GamesEngineeringBase::Window& window, Map& map, float deltaT
     //PRIMARY ATTACK --- wave nova
     if (novaCooldownTimer > 0.0f) novaCooldownTimer -= deltaTime; //decrease the cooldown timer
     if (novaVisualTimer > 0.0f) novaVisualTimer -= deltaTime; //decrease the visual duration
-
-    if (window.keyPressed(keyPrimaryAttack) && novaCooldownTimer <= 0.0f) //if fire timer is up and key is pressed
+    if (secondaryVisualTimer > 0.0f) secondaryVisualTimer -= deltaTime; //decrease the visual duration
+    
+    //if nova is off cooldown and key is pressed
+    if (window.keyPressed(keyPrimaryAttack) && novaCooldownTimer <= 0.0f) 
     {
-        novaRequested = true;      //toggle fire projectile
-        novaVisualTimer = novaVisualDuration;
-        novaCooldownTimer = novaCooldown;  //fire timer = cooldown
+        novaRequested = true; //request the nova
+        novaVisualTimer = novaVisualDuration; //set the visual timer to the visual duration
+        novaCooldownTimer = novaCooldown;  //put nova on cooldown
     }
 
     //SECONDARY 
@@ -41,17 +52,16 @@ void Wizard::update(GamesEngineeringBase::Window& window, Map& map, float deltaT
 
     if (secondaryPressed && keyWasReleased) //if it was pressed and key was released
     {
+        keyWasReleased = false; //this press is used
+
         if (secondaryCooldownTimer <= 0.0f) //off cooldown
         {
             if (mana >= manaCost) //we have the mana to cast
             {
+               selectRequested = true; //select spell requested
                mana -= manaCost; //take away the mana cost
-
-               secondaryCooldownTimer = secondaryCooldown; //put it on cooldown
-               //do the thing
-
-               keyWasReleased = false;
-                
+               secondaryCooldownTimer = secondaryCooldown; //put it on cooldown  
+               secondaryVisualTimer = secondaryVisualDuration;
             }
         }
     }
@@ -68,8 +78,9 @@ void Wizard::update(GamesEngineeringBase::Window& window, Map& map, float deltaT
 
 void Wizard::processAttack(AttackContext& attackContext) {
 
-    if (!novaRequested) return; //if nova not requested return
-    else if (novaRequested)
+    if (!novaRequested && !selectRequested) return; //if nova or select not requested return
+    
+    if (novaRequested)
     {
         Vector2f centre = getCentrePoint(); //find wizard centre
         float radSq = novaRadius * novaRadius; //work out rad squared
@@ -77,6 +88,7 @@ void Wizard::processAttack(AttackContext& attackContext) {
 
         for (int i = 0; i < attackContext.enemies.getSize(); i++)
         {
+            if (attackContext.enemies[i]->isDead()) continue; //skip dead enemy
             Vector2f enemyCentre = attackContext.enemies[i]->getCentrePoint(); //find centre of enemy
             float distanceX = enemyCentre.x - centre.x; //find the difference of the two points
             float distanceY = enemyCentre.y - centre.y; 
@@ -99,6 +111,27 @@ void Wizard::processAttack(AttackContext& attackContext) {
         }
         novaRequested = false;
     }
+
+    if (selectRequested)
+    {
+        const int selectTargets = 3; //amount of targets the selection spell will hit
+
+        Enemy* targets[selectTargets]; //create the array thats passed to targeting
+
+        Vector2f centre = getCentrePoint(); //get the centre point
+
+        int found = Targeting::findHighestHPEnemies(attackContext.enemies, centre, selectRange, targets, selectTargets); //returns count 
+
+        if (found == 0) mana += manaCost; //nothing to hit, refund mana
+
+        for (int i = 0; i < found; i++) //for enemies in the count
+        {
+            targets[i]->takeDamage(selectDamage); //take damage
+        }
+
+        selectRequested = false;
+    }
+    
 
 
 }

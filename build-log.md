@@ -36,6 +36,31 @@ ENTRIES (NEWEST FIRST)
 ==============================================================
 
 --------------------------------------------------------------
+2026-10-28 : The Wizard and Spawners
+--------------------------------------------------------------
+WHAT I BUILT / CHANGED:
+  - Wizard: has a primary and secondary spell, the primary being a wave nova that is a short range basic attack that hits all enemies within a circle around the wizard. The secondary is similar, it gets all the enemies in a circular range and then damages the 3 highest health enemies within that range. 
+  - Targeting: used a helper class for targeting
+  - Spawners: created a spawner class which is an entity which spawns enemies
+  - EnemyTypes, EnemyFactory: Created an enemytypes enum along with enemyDefinitions along with a factory to easily create enemies
+  - Multiple enemy types: created 5 different enemies.
+
+ALTERNATIVES I CONSIDERED (AND WHY I CHOSE WHAT I DID):
+  - I considered using a new vector instead of an array for my targeting class, i chose not to do so to save memory
+  - I could have used just raw creations of enemies inside the spawners, but i didnt want anything other than entitymanager to own entities, so instead i made spawners just flag that they want to spawn and then let entitymanager spawn them
+
+REPORT SECTION THIS FEEDS:
+3 different enemy types
+static npcs which spawn enemies
+2.  A magic attack
+Magic Spell Skill (Is selective, affecting N enemies with the highest health only)
+
+STILL TO DO NEXT:
+implement random spawning of enemies
+make spawners be damageable
+spawn spawners via tilemap
+
+--------------------------------------------------------------
 2026-10-26 : Mana, Archer, Hit tint
 --------------------------------------------------------------
 WHAT I BUILT / CHANGED:

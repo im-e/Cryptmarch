@@ -155,18 +155,22 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="include\Entities\Enemy.h" />
+    <ClInclude Include="include\Entities\Enemies\Enemy.h" />
+    <ClInclude Include="include\Entities\Enemies\EnemyFactory.h" />
+    <ClInclude Include="include\Entities\Enemies\EnemyDefinition.h" />
+    <ClInclude Include="include\Entities\Enemies\EnemyTypes.h" />
     <ClInclude Include="include\Entities\Entity.h" />
     <ClInclude Include="include\Entities\Players\Archer.h" />
     <ClInclude Include="include\Entities\Players\Dwarf.h" />
     <ClInclude Include="include\Entities\Players\Wizard.h" />
     <ClInclude Include="include\Entities\Projectile.h" />
+    <ClInclude Include="include\Entities\Spawner.h" />
     <ClInclude Include="include\GameController.h" />
     <ClInclude Include="include\GamesEngineeringBase.h" />
     <ClInclude Include="include\HUD\Status.h" />
     <ClInclude Include="include\Rendering\Graphics.h" />
     <ClInclude Include="include\Map\Map.h" />
-    <ClInclude Include="include\Entities\Player.h" />
+    <ClInclude Include="include\Entities\Players\Player.h" />
     <ClInclude Include="include\Rendering\Camera.h" />
     <ClInclude Include="include\Utilities\AssetManager.h" />
     <ClInclude Include="include\Entities\EntityManager.h" />
@@ -174,14 +178,16 @@
     <ClInclude Include="include\Utilities\Collisions.h" />
     <ClInclude Include="include\Utilities\Logger.h" />
     <ClInclude Include="include\Map\TileDefinition.h" />
+    <ClInclude Include="include\Utilities\Targeting.h" />
     <ClInclude Include="include\Utilities\Vector.h" />
     <ClInclude Include="include\Utilities\Vector2f.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Entities\Enemy.cpp" />
+    <ClCompile Include="src\Entities\Enemies\Enemy.cpp" />
     <ClCompile Include="src\Entities\Players\Archer.cpp" />
     <ClCompile Include="src\Entities\Players\Dwarf.cpp" />
     <ClCompile Include="src\Entities\Players\Wizard.cpp" />
+    <ClCompile Include="src\Entities\Spawner.cpp" />
     <ClCompile Include="src\Rendering\Camera.cpp" />
     <ClCompile Include="src\Entities\Entity.cpp" />
     <ClCompile Include="src\Rendering\Graphics.cpp" />

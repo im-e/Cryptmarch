@@ -1,19 +1,28 @@
 #pragma once
 #include "Entity.h"
-#include "../Utilities/Vector.h"
+#include "Utilities/Vector.h"
+#include "Spawner.h"
 #include "Projectile.h"
+#include "Enemies/EnemyFactory.h"
 
 class EntityManager {
 
 private:
 	Vector<Player*> players;
 	Vector<Enemy*> enemies;
+	Vector<Spawner*> spawners;
 	Vector<Projectile> projectiles;
 
 	bool allPlayersDead = false;
 
+	EnemyFactory factory;
 
 public:
+	EntityManager(AssetManager& am)
+	{
+		factory.init(&am.enemyImage, &am.itemsImage);
+	}
+
 	~EntityManager()
 	{
 		clear();
@@ -26,6 +35,7 @@ public:
 		players.clear(); 
 		enemies.clear();
 		projectiles.clear();
+		spawners.clear();
 		allPlayersDead = false;
 	}
 
@@ -45,6 +55,12 @@ public:
 
 	void deleteEnemy(Enemy* enemy) { enemies.removeSwap(enemy);	}
 
+	void addProjectile(const Projectile& projectile) { projectiles.add(projectile);	}
+
+	void addSpawner(Spawner* spawner) { spawners.add(spawner); }
+	
+	void deleteSpawner(Spawner* spawner) { spawners.removeSwap(spawner); }
+
 	void update(GamesEngineeringBase::Window& window, Map& map, float deltaTime) 
 	{
 		AttackContext attack = { enemies, projectiles };
@@ -62,6 +78,18 @@ public:
 		{
 			enemies[i]->update(window, map, deltaTime);
 		}
+
+		//update all spawners
+		for (int i = 0; i < spawners.getSize(); i++)
+		{
+			spawners[i]->update(window, map, deltaTime); //update spawners
+			if (spawners[i]->getReadyToSpawn()) //if they are ready to spawn
+			{
+				spawnEnemy(EnemyType::Slime, { spawners[i]->getX(), spawners[i]->getY() }); //spawn enemy
+				spawners[i]->setReadyToSpawn(false); //set ready to spawn to false
+			}
+		}
+	
 
 		//check for collisions between players and enemies
 		for (int i = 0; i < players.getSize(); i++)
@@ -94,6 +122,11 @@ public:
 		}
 
 		updateProjectiles(map, deltaTime);
+	}
+
+	void spawnEnemy(EnemyType type, Vector2f pos)
+	{
+		enemies.add(factory.createEnemy(type, pos, getFirstPlayer()));
 	}
 
 	void updateProjectiles(Map& map, float deltaTime)
@@ -160,7 +193,6 @@ public:
 		}
 	}
 
-
 	int cleanupKills()
 	{
 		int killed = 0;
@@ -205,6 +237,12 @@ public:
 			enemies[i]->draw(window, cam);
 		}
 
+		for (int i = 0; i < spawners.getSize(); i++)
+		{
+			spawners[i]->draw(window, cam);
+		}
+
+
 		drawProjectiles(window, cam);
 	}
 
@@ -235,9 +273,5 @@ public:
 		}
 	}
 
-	void addProjectile(const Projectile& projectile)
-	{
-		projectiles.add(projectile);
-	}
 	
 };

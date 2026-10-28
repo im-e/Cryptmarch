@@ -27,7 +27,7 @@
     <ClInclude Include="include\Utilities\Logger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Entities\Enemy.h">
+    <ClInclude Include="include\Entities\Enemies\Enemy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Entities\Entity.h">
@@ -39,7 +39,7 @@
     <ClInclude Include="include\Map\Map.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Entities\Player.h">
+    <ClInclude Include="include\Entities\Players\Player.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Rendering\Camera.h">
@@ -78,6 +78,21 @@
     <ClInclude Include="include\Utilities\Vector2f.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Utilities\Targeting.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Entities\Enemies\EnemyDefinition.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Entities\Enemies\EnemyFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Entities\Enemies\EnemyTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Entities\Spawner.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -98,7 +113,7 @@
     <ClCompile Include="src\Entities\Player.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Entities\Enemy.cpp">
+    <ClCompile Include="src\Entities\Enemies\Enemy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Entities\Players\Dwarf.cpp">
@@ -108,6 +123,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Entities\Players\Wizard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Entities\Spawner.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

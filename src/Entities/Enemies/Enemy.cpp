@@ -1,4 +1,4 @@
-#include "Entities/Enemy.h"
+#include "Entities/Enemies/Enemy.h"
 
 
 void Enemy::draw(GamesEngineeringBase::Window& window, Camera& cam)
