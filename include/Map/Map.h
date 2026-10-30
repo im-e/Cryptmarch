@@ -7,10 +7,10 @@
 #include "Utilities/Vector.h"
 #include "Utilities/Vector2f.h"
 
-//objects placed by tags in the map file, GameController turns these into entities
+//objects from tags in the map file, which are then created into game entities
 enum class MapObjectType { Key, Exit, Door, Plate, FakePlate, Trap };
 
-struct MapObject
+struct MapObject //definition of map objects
 {
 	MapObjectType type = MapObjectType::Key;
 	Vector2f pos = { 0.0f, 0.0f }; //world position in pixels
@@ -38,7 +38,7 @@ private:
 	int tilePixelSize = 32; //width + height of each tile in pixels
 
 	Vector<Vector2f> spawnerPositions; //world positions of spawners read from the file
-	Vector2f playerStart = { 64.0f, 64.0f }; //fallback if the file has no PLAYER line
+	Vector2f playerStart = { 64.0f, 64.0f }; //start position of player read from the file, has a fallback just incase
 	Vector<MapObject> mapObjects; //key, exit, doors, plates and traps read from the file
 
 	//one bool per tile, true = blocked by something that isnt part of the tilemap (a closed door)
@@ -49,15 +49,12 @@ private:
 
 
 	//tile type definitions for resources/32rogues/tiles.png
-	//ordered the same way as the tileset: row by row, left to right (see resources/32rogues/tile_ids.png)
 	//the number in /* */ is the tile ID you type in a map file
-	//changing the order renumbers every tile, so any existing map files would need regenerating
-	//tileCount must match the number of entries, the compiler errors if it doesnt
 	static const int tileCount = 128;
 	inline static TileDefinition tileDefinitions[tileCount]
 	{
-		//         name  xpos(column)  ypos(row)  walkable  baseTile(optional)
-		//WALLS - Top = solid block seen from above, Side = wall face (put it directly above a floor tile)
+		//			name  xpos(column)  ypos(row)  walkable  baseTile(optional)
+		//WALLS 
 		/*  0*/ TileDefinition("DirtWallTop", 0, 0, false),
 		/*  1*/ TileDefinition("DirtWallSide", 1, 0, false),
 		/*  2*/ TileDefinition("RoughStoneWallTop", 0, 1, false),
@@ -71,7 +68,7 @@ private:
 		/* 10*/ TileDefinition("LargeStoneWallSide", 1, 4, false),
 		/* 11*/ TileDefinition("CatacombWallTop", 0, 5, false),
 		/* 12*/ TileDefinition("CatacombWallSide", 1, 5, false),
-		//FLOORS - Blank / 1-3 have a background, Overlay versions are transparent and drawn on GreyFloorBlank
+		//FLOORS - Overlay versions are transparent and drawn on GreyFloorBlank
 		/* 13*/ TileDefinition("GreyFloorBlank", 0, 6, true),
 		/* 14*/ TileDefinition("FloorStone1", 1, 6, true),
 		/* 15*/ TileDefinition("FloorStone2", 2, 6, true),
@@ -126,7 +123,7 @@ private:
 		/* 64*/ TileDefinition("BrownBones1", 1, 15, true),
 		/* 65*/ TileDefinition("BrownBones2", 2, 15, true),
 		/* 66*/ TileDefinition("BrownBones3", 3, 15, true),
-		//DOORS AND DUNGEON FEATURES - decoration only for now
+		//DOORS AND DUNGEON FEATURES - decoration not for entity creation
 		/* 67*/ TileDefinition("Door1", 0, 16, false, 13),
 		/* 68*/ TileDefinition("Door2", 1, 16, false, 13),
 		/* 69*/ TileDefinition("FramedDoor1Shut", 2, 16, false, 13),
@@ -144,7 +141,7 @@ private:
 		/* 81*/ TileDefinition("Pentagram", 14, 16, true, 13),
 		/* 82*/ TileDefinition("SpikesDown", 15, 16, true, 13),
 		/* 83*/ TileDefinition("SpikesUp", 16, 16, true, 13),
-		//PROPS
+		//PROPS - block the player
 		/* 84*/ TileDefinition("ChestClosed", 0, 17, false, 13),
 		/* 85*/ TileDefinition("ChestOpen", 1, 17, false, 13),
 		/* 86*/ TileDefinition("JarClosed", 2, 17, false, 13),
@@ -154,7 +151,7 @@ private:
 		/* 90*/ TileDefinition("LogPile", 6, 17, false, 13),
 		/* 91*/ TileDefinition("LargeRock1", 0, 18, false, 13),
 		/* 92*/ TileDefinition("LargeRock2", 1, 18, false, 13),
-		//PLANTS
+		//PLANTS - are walkable
 		/* 93*/ TileDefinition("Buckwheat", 0, 19, true, 13),
 		/* 94*/ TileDefinition("Flax", 1, 19, true, 13),
 		/* 95*/ TileDefinition("PapyrusSedge", 2, 19, true, 13),
@@ -171,18 +168,18 @@ private:
 		/*106*/ TileDefinition("RedSpinach", 13, 19, true, 13),
 		/*107*/ TileDefinition("Cotton", 14, 19, true, 13),
 		/*108*/ TileDefinition("Alfalfa", 15, 19, true, 13),
-		//MUSHROOMS
+		//MUSHROOMS - walkable
 		/*109*/ TileDefinition("SmallMushrooms", 0, 20, true, 13),
-		/*110*/ TileDefinition("LargeMushroom", 1, 20, false, 13),
-		//CORPSES
+		/*110*/ TileDefinition("LargeMushroom", 1, 20, true, 13),
+		//CORPSES - walkable
 		/*111*/ TileDefinition("Corpse1", 0, 21, true, 13),
 		/*112*/ TileDefinition("Corpse2", 1, 21, true, 13),
-		//BLOOD AND SLIME
+		//BLOOD AND SLIME - walkable
 		/*113*/ TileDefinition("BloodSpatter1", 0, 22, true, 13),
 		/*114*/ TileDefinition("BloodSpatter2", 1, 22, true, 13),
 		/*115*/ TileDefinition("SlimeSmall", 2, 22, true, 13),
 		/*116*/ TileDefinition("SlimeLarge", 3, 22, true, 13),
-		//COFFINS
+		//COFFINS - block the player
 		/*117*/ TileDefinition("CoffinClosed", 0, 23, false, 13),
 		/*118*/ TileDefinition("CoffinAjar", 1, 23, false, 13),
 		/*119*/ TileDefinition("CoffinOpen", 2, 23, false, 13),

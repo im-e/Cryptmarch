@@ -5,14 +5,12 @@ class TileDefinition
 {
 public:
 
-	std::string name;
-	int tileXOffset;
-	int tileYOffset;
-	bool walkable;
-	int baseTile; //tile ID drawn underneath this one (for tiles with a transparent background), -1 = none
-
-	//_baseTile has a default value, so old 4 argument definitions still compile
-	TileDefinition(std::string tileName, int xOffset, int yOffset, bool isWalkable, int _baseTile = -1)
+	std::string name; //name of tile - not used but used for designing
+	int tileXOffset; //x offset of tile
+	int tileYOffset; //y offset of tile
+	bool walkable; //if the tile is walkable or not
+	int baseTile; //the tile ID drawn to be drawn underneath this one (for transparent tiles) -1 = none
+	TileDefinition(std::string tileName, int xOffset, int yOffset, bool isWalkable, int _baseTile = -1) //base tile set to default -1 
 	{
 		name = tileName;
 		tileXOffset = xOffset;

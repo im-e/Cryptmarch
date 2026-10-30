@@ -1,7 +1,7 @@
 #pragma once
 #include "Entity.h"
 
-//what the pickup gives the player
+//what type of pickup it is
 enum class PickupType { Health, Mana, Key };
 
 class Pickup : public Entity

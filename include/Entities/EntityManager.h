@@ -49,7 +49,7 @@ private:
 	void openDoorsWithId(int id, Map& map); //opens every door linked to a pressure plate
 	void fireArrowTrap(Vector2f target, Map& map); //fake plate: shoot arrows at the target from 4 directions
 
-	void drawProjectiles(GamesEngineeringBase::Window& window, Camera& cam);
+	void drawProjectiles(GamesEngineeringBase::Window& window, Camera& cam); 
 
 public:
 	EntityManager(AssetManager& am, float* _gameTime);

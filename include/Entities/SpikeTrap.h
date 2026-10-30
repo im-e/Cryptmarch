@@ -1,7 +1,7 @@
 #pragma once
 #include "Entity.h"
 
-//spikes that go up and down on a timer, and hurt the player if they are standing on them while they are up
+
 class SpikeTrap : public Entity
 {
 private:
