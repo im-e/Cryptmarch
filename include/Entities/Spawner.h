@@ -6,9 +6,9 @@ class Spawner : public Entity
 private:
 
 	float spawnTimer = 0; //timer for spawns 
-	float spawnInterval = 5.0f; //interval of enemies spawning
+	float spawnInterval = 7.5f; //interval of enemies spawning
 
-	int spawnerRange = 2000; //range of if spawner should spawn
+	int spawnerRange = 600; //range of if spawner should spawn
 
 	bool readyToSpawn = false; //if the spawner is ready to spawn
 

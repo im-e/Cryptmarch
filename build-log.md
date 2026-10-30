@@ -36,6 +36,41 @@ ENTRIES (NEWEST FIRST)
 ==============================================================
 
 --------------------------------------------------------------
+2026-10-28-30 : Big big changes
+--------------------------------------------------------------
+WHAT I BUILT / CHANGED:
+  - EntityManager: split into a .cpp
+  - Map: expanded the tileset into all the tiles, added a baseTile for transparent tiles
+  - Map loading: map files now have tags after the grid for map objects, added load level/unload so a new map can be loaded, also made it so that tiles can be blocked/unblocked dynamically
+  - Maps: replaced old maps with 2 new ones.
+  - Pickups: enemies have a 30% chance to drop a potion when they die.
+  - Key and exit: each level has a key, picking it up opens the exit door
+  - Doors and pressure plates: stepping on a plate opens the corresponding door with the same ID.
+  - Fake pressure plates: look the same as real ones but are a trap which fires arrows in all four directions.
+  - Spike traps: go up for 1s and down for 1.5s hurting the player if stepped on while up.
+  - Level progression: game controller has a list of levels, the tally screen will show level complete, you escaped or game over, and continues to the next level.
+  - Enemy Weighting: made enemy weighting which spawns enemies based on their strength and how long the level has gone on for.
+  - Hero balance: balanced some heroes
+
+WHAT WENT WRONG AND HOW I FIXED IT:
+  -
+
+ALTERNATIVES I CONSIDERED (AND WHY I CHOSE WHAT I DID):
+  -
+
+NUMBERS (FPS, ms per frame, entity / tile counts, conditions):
+  -
+
+REPORT SECTION THIS FEEDS:
+  (e.g. 2.3.1 Tile map)
+
+SCREENSHOT TAKEN?  yes / no   (file name: )
+
+STILL TO DO NEXT:
+  -
+
+
+--------------------------------------------------------------
 2026-10-28 : The Wizard and Spawners
 --------------------------------------------------------------
 WHAT I BUILT / CHANGED:

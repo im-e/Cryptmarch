@@ -13,13 +13,14 @@ private:
 	GamesEngineeringBase::Image* projectileImage;
 	inline static EnemyDefinition enemyTypes[6]
 	{
-		    //name, health, speed, damage, x y knockback isRanged
-		EnemyDefinition(150, 125, 15, { 0, 2 }, 150, false, 35, 0), //slime - healthy slow low dmg 
-		EnemyDefinition(100, 200, 15, { 4, 6 }, 200, false, 25, 15), //ant - healthy, fast, low dmg
-		EnemyDefinition(50, 250, 20, { 0, 5 }, 50, false, 15, 30), //ghost - very weak but fast and med dmg 
-		EnemyDefinition(75, 130, 25, { 1, 4 }, 200, true, 12, 45), //skeleton - weak but fast ranged 
-		EnemyDefinition(250, 80, 45, { 0, 1 }, 500, false, 8, 60), //ogre - high health high dmg but slow
-		EnemyDefinition(300, 50, 35, { 9, 7 }, 350, true, 5, 90), //medusa - high health, slow, high dmg ranged
+		//health, speed, damage, {sprite x, y}, knockback, isRanged, weight, unlock time (seconds)
+		//weights are a share of 100 once everything is unlocked: slime 20%, ant 20%, ghost 18%, skeleton 16%, ogre 14%, medusa 12%
+		EnemyDefinition(150, 125, 15, { 0, 2 }, 150, false, 20, 0), //slime - healthy slow low dmg 
+		EnemyDefinition(100, 200, 15, { 4, 6 }, 200, false, 20, 0), //ant - healthy, fast, low dmg 
+		EnemyDefinition(50, 250, 20, { 0, 5 }, 50, false, 18, 20), //ghost - very weak but fast and med dmg 
+		EnemyDefinition(75, 130, 25, { 1, 4 }, 200, true, 16, 40), //skeleton - weak but fast ranged 
+		EnemyDefinition(250, 80, 45, { 0, 1 }, 500, false, 14, 60), //ogre - high health high dmg but slow
+		EnemyDefinition(300, 50, 35, { 9, 7 }, 350, true, 12, 90), //medusa - high health, slow, high dmg ranged
 	};
 
 public:

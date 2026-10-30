@@ -11,7 +11,7 @@ private:
 
 	//primary attack wave nova
 	float novaRadius = 96.0f; //how far the blast reaches in pixels
-	int novaDamage = 20; //damage of the spell
+	int novaDamage = 50; //damage of the spell
 	bool novaRequested = false; //tracks if spell has been activated from player input
 	float novaVisualDuration = 0.18f; //how long the cirlce stays on screen
 	float novaVisualTimer = 0.0f; //timer for the screen display
@@ -37,8 +37,9 @@ public:
 	Wizard(EntityStats _stats, GamesEngineeringBase::Image* _image, Controls _controls, GamesEngineeringBase::Image* _magicImage, int _magicXOffset, int _magicYOffset) :
 		Player(_stats, _image, _controls)
 	{
-		maxHealth = 100; //wizard is a normal healht is less tanky than other heros
+		maxHealth = 100; //wizard is a normal health, is less tanky than other heros
 		maxMana = 150; //has more mana than other heroes
+		speed = 200; //slower speed
 		health = maxHealth;
 		mana = maxMana;
 

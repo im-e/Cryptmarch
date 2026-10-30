@@ -1,4 +1,5 @@
 #include "GamesEngineeringBase.h"
+#include <cstring> //strlen
 
 #include "Utilities/AssetManager.h"
 
@@ -46,9 +47,8 @@ int main()
     FPS fps(&assetManager.hudImage);
     Status status(&assetManager.hudImage);
 
-    //init map
-    std::string mapPath = "resources/maps/map_arena.txt";
-    Map map(&assetManager.mapImage, mapPath);
+    //init map, GameController loads the level file when a game starts
+    Map map(&assetManager.mapImage);
 
     //init camera
     Camera cam;
@@ -90,7 +90,7 @@ int main()
                 Graphics::DrawImage(window, assetManager.mainMenuImage, 0, 0);
 
                 //check if enter is pressed
-                if (enterPressed) gameController.setState(PlayState, assetManager, entityManager);
+                if (enterPressed) gameController.startNewGame(assetManager, entityManager, map);
                 break;
 
         }
@@ -98,10 +98,17 @@ int main()
                 //------------------------------ UPDATE -------------------
                 entityManager.update(window, map, deltaTime); //update all entities
                 int kills = entityManager.cleanupKills(); //cleanup any entities killed
+                gameController.getStats().enemiesKilled += kills; //count kills before leaving the level
 
                 if (entityManager.getAllPlayersDead()) //check if all players are dead before camera work
                 {
-                    gameController.setState(TallyState, assetManager, entityManager);
+                    gameController.endLevel(false); //game over
+                    break;
+                }
+
+                if (entityManager.getLevelComplete()) //walked through the open exit
+                {
+                    gameController.endLevel(true); //level complete
                     break;
                 }
 
@@ -111,7 +118,6 @@ int main()
 
                 //increase stats
                 gameController.getStats().timeSurvived += deltaTime;
-                gameController.getStats().enemiesKilled += kills;
 
                 //------------------------------ DRAW ----------------------
                 map.draw(window, cam);
@@ -122,6 +128,12 @@ int main()
                 Player* player = entityManager.getFirstPlayer();
                 status.draw(window, player->getHealth(), player->getMaxHealth(), player->getMana(), player->getMaxMana());
 
+                //show the key under the mana bar once it has been picked up
+                if (entityManager.getHasKey())
+                {
+                    Graphics::DrawTilemapImage(window, assetManager.itemsImage, 32, 0, 22, windowWidth - 40, 72);
+                }
+
                 
                 break;
         }
@@ -129,12 +141,32 @@ int main()
                 //draw tally image
                 GameStats& s = gameController.getStats();
                 Graphics::DrawImage(window,  assetManager.tallyImage, 0, 0);
-                Graphics::DrawString(window, assetManager.hudImage, "TIME  -", 300, 300);
-                Graphics::DrawNumber(window, assetManager.hudImage, (int)s.timeSurvived, 550, 300);
-                Graphics::DrawString(window, assetManager.hudImage, "KILLS -", 300, 350);
-                Graphics::DrawNumber(window, assetManager.hudImage, s.enemiesKilled, 550, 350);
-                Graphics::DrawString(window, assetManager.hudImage, "PRESS ENTER TO RETURN", 200, 400);
-                if (enterPressed) gameController.setState(MenuState, assetManager, entityManager);
+
+                //title depends on how the level ended
+                const char* title = "GAME OVER";
+                const char* prompt = "PRESS ENTER TO RETURN";
+                if (gameController.getTallyResult() == TallyResult::LevelComplete)
+                {
+                    title = "LEVEL COMPLETE";
+                    prompt = "PRESS ENTER TO CONTINUE";
+                }
+                else if (gameController.getTallyResult() == TallyResult::GameComplete)
+                {
+                    title = "YOU ESCAPED";
+                }
+
+                //centre the title: each letter is 32 pixels wide
+                int titleX = (windowWidth - (int)strlen(title) * 32) / 2;
+                Graphics::DrawString(window, assetManager.hudImage, title, titleX, 220);
+
+                Graphics::DrawString(window, assetManager.hudImage, "LEVEL -", 300, 300);
+                Graphics::DrawNumber(window, assetManager.hudImage, gameController.getLevelNumber(), 550, 300);
+                Graphics::DrawString(window, assetManager.hudImage, "TIME  -", 300, 350);
+                Graphics::DrawNumber(window, assetManager.hudImage, (int)s.timeSurvived, 550, 350);
+                Graphics::DrawString(window, assetManager.hudImage, "KILLS -", 300, 400);
+                Graphics::DrawNumber(window, assetManager.hudImage, s.enemiesKilled, 550, 400);
+                Graphics::DrawString(window, assetManager.hudImage, prompt, (windowWidth - (int)strlen(prompt) * 32) / 2, 470);
+                if (enterPressed) gameController.continueFromTally(assetManager, entityManager, map);
                 break;
             }
         }

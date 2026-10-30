@@ -3,323 +3,85 @@
 #include "Utilities/Vector.h"
 #include "Spawner.h"
 #include "Projectile.h"
+#include "Pickup.h"
+#include "Door.h"
+#include "PressurePlate.h"
+#include "SpikeTrap.h"
 #include "Enemies/EnemyFactory.h"
+#include "Utilities/AssetManager.h"
 
 class EntityManager {
 
 private:
-	Vector<Player*> players;
-	Vector<Enemy*> enemies;
-	Vector<Spawner*> spawners;
-	Vector<Projectile> projectiles;
+	Vector<Player*> players; //list of players
+	Vector<Enemy*> enemies; //list of enemies
+	Vector<Spawner*> spawners; //spawners of enemies
+	Vector<Projectile> projectiles; //projectiles in the level
+	Vector<Pickup*> pickups; //potions dropped by enemies, and the level key
+	Vector<Door*> doors; //exit door and pressure plate doors
+	Vector<PressurePlate*> plates; //real and fake pressure plates
+	Vector<SpikeTrap*> traps; //spike traps
 
-	bool allPlayersDead = false;
-	float* gameTime;
+	bool allPlayersDead = false; //true once all players are dead
+	bool hasKey = false; //true once the key has been picked up
+	bool levelComplete = false; //true once a player walks through the open exit
+	float* gameTime; //time of how long the level has been running
 
-	EnemyFactory factory;
+	EnemyFactory factory; //factory for creating enemies
 
+	//drop settings
+	GamesEngineeringBase::Image* itemsImage; //sprite sheet the potions, key and trap arrows come from
+	const int dropChance = 30; //percent chance an enemy drops something when it dies
+	const int healthPotionAmount = 25; //health restored by a red potion
+	const int manaPotionAmount = 30; //mana restored by a blue potion
+
+	//arrow trap settings (fake pressure plates)
+	const int trapArrowDamage = 15; //damage per arrow
+	const float trapArrowSpeed = 350.0f; //pixels per second
+	const int trapLaunchDistance = 6; //how many tiles away the arrows start from
+
+	//update helpers, called from update()
+	void updateProjectiles(Map& map, float deltaTime);
+	void updatePickups(GamesEngineeringBase::Window& window, Map& map, float deltaTime);
+	void updateLevelObjects(GamesEngineeringBase::Window& window, Map& map, float deltaTime);
+
+	void tryDropPickup(Vector2f pos); //maybe drop a potion where an enemy died
+	void openDoorsWithId(int id, Map& map); //opens every door linked to a pressure plate
+	void fireArrowTrap(Vector2f target, Map& map); //fake plate: shoot arrows at the target from 4 directions
+
+	void drawProjectiles(GamesEngineeringBase::Window& window, Camera& cam);
 
 public:
-	EntityManager(AssetManager& am, float*_gameTime)
-	{
-		factory.init(&am.enemyImage, &am.itemsImage);
-		gameTime = _gameTime;
-	}
+	EntityManager(AssetManager& am, float* _gameTime);
+	~EntityManager();
 
-	~EntityManager()
-	{
-		clear();
-	}
+	void clear(); //deletes everything, used when starting a level
 
-	void clear()
-	{
-		for (int i = 0; i < players.getSize(); i++) delete players[i];
-		for (int i = 0; i < enemies.getSize(); i++) delete enemies[i];
-		for (int i = 0; i < spawners.getSize(); i++) delete spawners[i];
-		players.clear(); 
-		enemies.clear();
-		projectiles.clear();
-		spawners.clear();
-		allPlayersDead = false;
-	}
-
-	Player* getFirstPlayer() 
+	Player* getFirstPlayer()
 	{
 		if (players.getSize() == 0) return nullptr;
-		return players[0]; 
+		return players[0];
 	}
-	
-	bool getAllPlayersDead() { return allPlayersDead; }
+
+	bool getAllPlayersDead() const { return allPlayersDead; }
+	bool getHasKey() const { return hasKey; }
+	bool getLevelComplete() const { return levelComplete; }
 
 	void addPlayer(Player* player) { players.add(player); }
-
 	void addEnemy(Enemy* enemy) { enemies.add(enemy); }
-
-	void deletePlayer(Player* player) { players.removeSwap(player);	}
-
-	void deleteEnemy(Enemy* enemy) { enemies.removeSwap(enemy);	}
-
-	void addProjectile(const Projectile& projectile) { projectiles.add(projectile);	}
-
 	void addSpawner(Spawner* spawner) { spawners.add(spawner); }
-	
+	void addProjectile(const Projectile& projectile) { projectiles.add(projectile); }
+	void addPickup(Pickup* pickup) { pickups.add(pickup); }
+	void addDoor(Door* door) { doors.add(door); }
+	void addPlate(PressurePlate* plate) { plates.add(plate); }
+	void addTrap(SpikeTrap* trap) { traps.add(trap); }
+
+	void deletePlayer(Player* player) { players.removeSwap(player); }
+	void deleteEnemy(Enemy* enemy) { enemies.removeSwap(enemy); }
 	void deleteSpawner(Spawner* spawner) { spawners.removeSwap(spawner); }
 
-	void update(GamesEngineeringBase::Window& window, Map& map, float deltaTime) 
-	{
-		AttackContext attack = { enemies, projectiles, spawners };
-
-		//update all players
-		for (int i = 0; i < players.getSize(); i++)
-		{
-			players[i]->update(window, map, deltaTime);
-
-			players[i]->processAttack(attack);
-		}
-
-		//update all enemies
-		for (int i = 0; i < enemies.getSize(); i++)
-		{
-			enemies[i]->update(window, map, deltaTime); //update enemies
-			if (enemies[i]->getFireRequested()) //if fire has been requested
-			{
-				projectiles.add(enemies[i]->fireProjectile()); //add projectile to projectile list
-				enemies[i]->setFireRequested(false); //set fire requested to false
-			}
-		}
-
-		//update all spawners
-		for (int i = 0; i < spawners.getSize(); i++)
-		{
-			//work out range of spawner
-			Vector2f sp = spawners[i]->getCentrePoint(); //spawner 
-			Vector2f pl = getFirstPlayer()->getCentrePoint(); //player
-
-			float dx = sp.x - pl.x; //find the difference of the two points
-			float dy = sp.y - pl.y; //player to spawner
-			float distanceSquared = (dx * dx) + (dy * dy); //If dx² + dy² is less than range², the player is in range
-			float rangeSquared = spawners[i]->getSpawnerRange() * spawners[i]->getSpawnerRange();
-			if (distanceSquared >= rangeSquared) //spawner ISNT in range
-			{
-				continue; //skip to next spawner
-			}
-			spawners[i]->update(window, map, deltaTime); //update spawners
-			if (spawners[i]->getReadyToSpawn()) //if they are ready to spawn
-			{
-				spawnEnemy({ spawners[i]->getX(), spawners[i]->getY() }); //spawn enemy
-				spawners[i]->setReadyToSpawn(false); //set ready to spawn to false
-			}
-
-		}
-	
-		//check for collisions between players and enemies
-		for (int i = 0; i < players.getSize(); i++)
-		{
-			for (int j = 0; j < enemies.getSize(); j++)
-			{
-				if (players[i]->checkEntityCollision(enemies[j]))
-				{
-					players[i]->takeDamage(enemies[j]->getDamage());
-
-					//for knockback calculation
-					AABB player = players[i]->getHitbox();
-					AABB enemy = enemies[j]->getHitbox();
-					//calcualate the direction away from the enemy
-					float dirX = player.x - enemy.x;
-					float dirY = player.y - enemy.y;
-					float length = sqrt(dirX * dirX + dirY * dirY);
-					if (length > 0.0f)
-					{
-						dirX /= length; //normalise
-						dirY /= length;
-					}
-
-					//apply knockback
-					players[i]->applyImpulse(dirX, dirY, enemies[j]->getKnockbackForce(), enemies[j]->getKnockbackDuration());
-
-
-				}
-			}
-		}
-
-		updateProjectiles(map, deltaTime);
-	}
-
-	void spawnEnemy(Vector2f pos)
-	{
-		EnemyType type = factory.weightedRandomEnemyType(gameTime); //get a weighted random enemy type
-		enemies.add(factory.createEnemy(type, pos, getFirstPlayer())); //spawn that enemy at pos
-	}
-
-	void updateProjectiles(Map& map, float deltaTime)
-	{
-		//loop backwards so removeSwap() doesn't break our index tracking
-		for (int i = projectiles.getSize() - 1; i >= 0; i--)
-		{
-			Projectile& projectile = projectiles[i]; //get a reference for easy manipulation
-
-			//move the projectile based on direction, speed, and deltaTime
-			projectile.x += projectile.dirX * projectile.speed * deltaTime;
-			projectile.y += projectile.dirY * projectile.speed * deltaTime;
-
-			//count down the lifetime of the projectile
-			projectile.lifetime -= deltaTime;
-			if (projectile.lifetime <= 0.0f) //if the lifetime is up
-			{
-				projectiles.removeSwap(i); //remove it from the list
-				continue;
-			}
-
-			//check if its blocked by a wall
-			if (map.isBlockedByWall(projectile.x, projectile.y, projectile.width, projectile.height))
-			{
-				projectiles.removeSwap(i); //if its blocked remove the projectile
-				continue;
-			}
-
-			//if the owner of the projectile is the player
-			if (projectile.owner == ProjectileOwner::Player)
-			{
-				//we want to check player projectiles check against all enemies
-				for (int j = 0; j < enemies.getSize(); j++)
-				{
-					if (Collisions::checkAABBCollision(projectile.getAABB(), enemies[j]->getHitbox())) //projectile + enemy hitbox
-					{
-						enemies[j]->takeDamage(projectile.damage); //enemy take damage from projectile
-						enemies[j]->applyKnockback(projectile.dirX, projectile.dirY, projectile.knockbackForce, projectile.knockbackDuration);
-						projectile.dead = true; //mark projectile is dead
-						break; //hit an enemy so we should stop checking other enemies for this projectile
-					}
-				}
-
-				//if it didn't hit an enemy, check spawners (no knockback, spawners don't move)
-				if (!projectile.dead)
-				{
-					for (int j = 0; j < spawners.getSize(); j++)
-					{
-						if (spawners[j]->isDead()) continue; //skip already destroyed spawners
-
-						if (Collisions::checkAABBCollision(projectile.getAABB(), spawners[j]->getHitbox())) //projectile + spawner hitbox
-						{
-							spawners[j]->takeDamage(projectile.damage); //spawner takes damage
-							projectile.dead = true; //arrow is used up
-							break; //stop checking other spawners
-						}
-					}
-				}
-			}
-			else if (projectile.owner == ProjectileOwner::Enemy) //if the owner is an enemy
-			{
-				//check enemy projectile against all players
-				for (int j = 0; j < players.getSize(); j++)
-				{
-					if (Collisions::checkAABBCollision(projectile.getAABB(), players[j]->getHitbox()))
-					{
-						players[j]->takeDamage(projectile.damage); //take damage
-						//apply knockback
-						projectile.dead = true; //mark projectile as dead
-						break; //hit so we should stop checking
-					}
-				}
-			}
-
-			//remove if marked dead
-			if (projectile.dead)
-			{
-				projectiles.removeSwap(i);
-			}
-		}
-	}
-
-	int cleanupKills()
-	{
-		int killed = 0;
-
-		//update all enemies by using a backwards loop to prevent skipping elements
-		for (int i = enemies.getSize() - 1; i >= 0; i--)
-		{
-			if (enemies[i]->isDead())
-			{
-				delete enemies[i];
-				enemies.removeSwap(i);
-				killed++;
-			}
-		}
-
-		//remove destroyed spawners, backwards loop for the same reason
-		for (int i = spawners.getSize() - 1; i >= 0; i--)
-		{
-			if (spawners[i]->isDead())
-			{
-				delete spawners[i]; //free the memory
-				spawners.removeSwap(i);
-			}
-		}
-
-		//update all players by using a backwards loop to prevent skipping elements
-		for (int i = players.getSize() - 1; i >= 0; i--)
-		{
-			if (players[i]->isDead())
-			{
-				delete players[i];
-				players.removeSwap(i);
-			}
-		}
-
-		if (players.getSize() == 0)
-		{
-			allPlayersDead = true;
-		}
-		return killed;
-	}
-
-	void draw(GamesEngineeringBase::Window& window, Camera& cam)
-	{
-		for (int i = 0; i < players.getSize(); i++)
-		{
-			players[i]->draw(window, cam);
-		}
-
-		for (int i = 0; i < enemies.getSize(); i++)
-		{
-			enemies[i]->draw(window, cam);
-		}
-
-		for (int i = 0; i < spawners.getSize(); i++)
-		{
-			spawners[i]->draw(window, cam);
-		}
-
-
-		drawProjectiles(window, cam);
-	}
-
-	void drawProjectiles(GamesEngineeringBase::Window& window, Camera& cam)
-	{
-		for (int i = 0; i < projectiles.getSize(); i++)
-		{
-			Projectile& p = projectiles[i]; //get projectile
-			if (p.image == nullptr) continue; //if projectile is null go to next element
-
-			//hitbox centre in world space
-			float centreX = p.x + p.width / 2.0f; // width/2 finds the centre in world space
-			float centreY = p.y + p.height / 2.0f;
-
-			//move the X/Y back half a tile so the 32x32 sprite is centred on the hitbox
-			const int halfTile = p.tileSize / 2; // 16
-			int worldX = centreX - halfTile;
-			int worldY = centreY - halfTile;
-
-			int screenX = cam.worldToScreenX(worldX);
-			int screenY = cam.worldToScreenY(worldY);
-
-			Graphics::DrawTilemapImage(window, *p.image, p.tileSize, p.tileX, p.tileY, screenX, screenY);
-
-#ifdef _DEBUG
-			Graphics::DrawRectOutline(window, cam.worldToScreenX(p.x), cam.worldToScreenY(p.y),	p.width, p.height, 255, 0, 255);
-#endif
-		}
-	}
-
-	
+	void update(GamesEngineeringBase::Window& window, Map& map, float deltaTime);
+	void spawnEnemy(Vector2f pos);
+	int cleanupKills(); //removes dead entities, returns how many enemies died
+	void draw(GamesEngineeringBase::Window& window, Camera& cam);
 };

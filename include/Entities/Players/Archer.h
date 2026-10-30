@@ -11,14 +11,14 @@ private:
 	int projectileTileY;
 
 	//primary attack
-	float arrowSpeed = 450.0f; //speed that the arrow travels
+	float arrowSpeed = 600.0f; //speed that the arrow travels
 	float arrowLifetime = 1.5f; //lifetime of the arrow
-	int arrowDamage = 20; //damage of the arrow
-	float fireCooldown = 0.4f; //cooldown to fire again
+	int arrowDamage = 50; //damage of the arrow
+	float fireCooldown = 0.35f; //cooldown to fire again
 	float fireCooldownTimer = 0.0f; //cooldown tracker
 	bool fireRequested = false; //tracks if fire has been activated
-	float arrowKnockbackForce = 150.0f; //force for knockback of the ranged attack
-	float arrowKnockbackDuration = 0.10f; //duration of knockback for the ranged attack
+	float arrowKnockbackForce = 250.0f; //force for knockback of the ranged attack
+	float arrowKnockbackDuration = 0.2f; //duration of knockback for the ranged attack
 
 	//dash (secondary skill)
 	float dashSpeed = 600.0f; //pixels per second while dashing
@@ -36,8 +36,9 @@ public:
 	Archer(EntityStats _stats, GamesEngineeringBase::Image* _image, Controls _controls, GamesEngineeringBase::Image* _projectileImage, int _projectileXOffet, int _projectileYOffset) :
 		Player(_stats, _image, _controls)
 	{
-		maxHealth = 70; //archer is less tanky than other heros
-		maxMana = 100; //
+		maxHealth = 70; //archer is more vulnerable, less tanky than other heros
+		maxMana = 100; //normal amount of mana
+		speed = 250; //normal speed
 		health = maxHealth;
 		mana = maxMana;
 

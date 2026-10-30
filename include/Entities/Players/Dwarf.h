@@ -17,10 +17,10 @@ private:
 	const float attackCooldown = 0.35f; //cooldown duration of the melee attack
 	const float attackReach = 32.0f; //reach of the melee attack
 
-	const float arrowKnockbackForce = 250.0f; //force for knockback of the melee attack
-	const float attackKnockbackDuration = 0.12f; //duration of knockback for the melee attack
+	const float knockbackForce = 300.0f; //force for knockback of the melee attack
+	const float knockbackDuration = 0.18f; //duration of knockback for the melee attack
 	
-	int meleeDamage = 35; //damage of melee attack
+	int meleeDamage = 75; //damage of melee attack
 
 	int attackDirX = 0; //direction of melee attack
 	int attackDirY = 0; //direction of melee attack
@@ -36,8 +36,8 @@ private:
 	float skillTimer = 0.0f; //timer for speed boost
 	float skillDuration = 3.0f; //speed boost duration
 	const float defenceMultiplier = 0.5f;
-	float normalSpeed = 200.0f; //nomral movement speed
-	float boostedSpeed = 330.0f; //boosted movement speed
+	float normalSpeed = 300.0f; //nomral movement speed
+	float boostedSpeed = 440.0f; //boosted movement speed
 
 	int manaCost; //mana cost for secondary skill
 public:
@@ -49,9 +49,9 @@ public:
 		weaponImageXOffset = _weaponXOffset;
 		weaponImageYOffset = _weaponYOffset;
 
-		speed = normalSpeed;
-		maxHealth = 150;
-		maxMana = 100;
+		maxHealth = 150; //much tankier than other heros
+		maxMana = 70; //less mana than others
+		speed = normalSpeed; //normal speed is 300 which is much faster
 		manaCost = 25; 
 		health = maxHealth;
 		mana = maxMana;

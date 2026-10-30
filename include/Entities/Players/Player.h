@@ -72,4 +72,10 @@ public:
 	int getMana() { return mana; }
 	int getMaxMana() { return maxMana; }
 
+	void restoreMana(int amount)
+	{
+		mana += amount;
+		if (mana > maxMana) mana = maxMana; //never go above max
+	}
+
 };

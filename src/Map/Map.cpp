@@ -1,6 +1,31 @@
 #include "Map/Map.h"
 #include "Rendering/Camera.h"
 
+void Map::unload()
+{
+	delete[] tilemapData; //deleting a nullptr is safe, so this works even if nothing was loaded
+	delete[] blockedTiles;
+	tilemapData = nullptr;
+	blockedTiles = nullptr;
+	tilemapWidth = 0;
+	tilemapHeight = 0;
+	spawnerPositions.clear();
+	mapObjects.clear();
+	playerStart = { 64.0f, 64.0f };
+}
+
+bool Map::loadLevel(const std::string& path)
+{
+	unload(); //throw away the previous level first, otherwise we leak memory and keep old spawners
+	return loadMap(path);
+}
+
+void Map::setTileBlocked(int tileX, int tileY, bool blocked)
+{
+	if (tileX < 0 || tileX >= tilemapWidth || tileY < 0 || tileY >= tilemapHeight) return; //outside the map
+	blockedTiles[tileY * tilemapWidth + tileX] = blocked;
+}
+
 bool Map::loadMap(const std::string& path)
 {
 	//load values from file
@@ -26,12 +51,66 @@ bool Map::loadMap(const std::string& path)
 	mapHeight = height * tilePixelSize;
 	//allocate array of new map
 	tilemapData = new int[tilemapWidth * tilemapHeight];
+	//allocate the blocked array, the () at the end sets every value to false
+	blockedTiles = new bool[tilemapWidth * tilemapHeight]();
 
 	//read the data from the file and insert it into the array
 	for (int i = 0; i < tilemapWidth * tilemapHeight; i++)
 	{
 		mapFile >> tilemapData[i];
+
+		//protect against typos in the map file, an unknown ID would read outside tileDefinitions and crash
+		if (tilemapData[i] < 0 || tilemapData[i] >= tileCount)
+		{
+			Logger::Error("Invalid tile ID " + std::to_string(tilemapData[i]) + " at slot " + std::to_string(i) + " in " + path);
+			tilemapData[i] = 13; //replace with GreyFloorBlank so the game can still run
+		}
 	}
+
+	//entities spawned via tilemap
+	std::string tag;
+	while (mapFile >> tag) //>> will return false when nothing is left, so the loop stops
+	{
+		if (tag == "SPAWNER")
+		{
+			int tileX, tileY;
+			mapFile >> tileX >> tileY;
+			spawnerPositions.add({ (float)(tileX * tilePixelSize), (float)(tileY * tilePixelSize) });
+		}
+		else if (tag == "PLAYER")
+		{
+			int tileX, tileY;
+			mapFile >> tileX >> tileY;
+			playerStart = { (float)(tileX * tilePixelSize), (float)(tileY * tilePixelSize) };
+		}
+		else if (tag == "KEY" || tag == "EXIT" || tag == "DOOR" || tag == "PLATE" || tag == "FAKEPLATE" || tag == "TRAP")
+		{
+			//all of these start with a tile position
+			int tileX, tileY;
+			mapFile >> tileX >> tileY;
+
+			MapObject object;
+			object.pos = { (float)(tileX * tilePixelSize), (float)(tileY * tilePixelSize) };
+
+			if (tag == "KEY") object.type = MapObjectType::Key;
+			else if (tag == "EXIT") object.type = MapObjectType::Exit;
+			else if (tag == "FAKEPLATE") object.type = MapObjectType::FakePlate;
+			else if (tag == "TRAP") object.type = MapObjectType::Trap;
+			else
+			{
+				//DOOR and PLATE have an extra number: the id that links them together
+				object.type = (tag == "DOOR") ? MapObjectType::Door : MapObjectType::Plate;
+				mapFile >> object.id;
+			}
+
+			mapObjects.add(object);
+		}
+		else
+		{
+			Logger::Error("Unknown tag in map file: " + tag); //catches typos like SPAWNR
+		}
+	}
+
 
 	mapFile.close();
 	Logger::Info("Successfully loaded map: " + path);
@@ -62,6 +141,13 @@ void Map::draw(GamesEngineeringBase::Window& window, Camera& cam)
 		int tileScreenX = cam.worldToScreenX(tileWorldX);
 		int tileScreenY = cam.worldToScreenY(tileWorldY);
 
+		//if this tile has a transparent background, draw its base tile first so it doesnt sit on black
+		if (tile.baseTile >= 0)
+		{
+			const TileDefinition& base = tileDefinitions[tile.baseTile];
+			Graphics::DrawTilemapImage(window, *tilesetImage, tilePixelSize, base.tileXOffset, base.tileYOffset, tileScreenX, tileScreenY);
+		}
+
 		//fill in information to draw
 		Graphics::DrawTilemapImage(window, *tilesetImage, tilePixelSize, tile.tileXOffset, tile.tileYOffset, tileScreenX, tileScreenY);
 	}
@@ -82,6 +168,8 @@ bool Map::isWalkable(float pixelX, float pixelY)
 
 	//convert the 2d coordinates to a 1d array index
 	int index = tileY * tilemapWidth + tileX;
+
+	if (blockedTiles[index]) return false; //a closed door is on this tile
 
 	//get the tile from the index
 	int tileValue = tilemapData[index];
@@ -126,6 +214,11 @@ bool Map::isBlockedByWall(float posX, float posY, int width, int height) const
 			if (!tileDefinitions[tileValue].walkable) //if its walkable
 			{
 				return true; //return true as it is blocked
+			}
+
+			if (blockedTiles[index]) //a closed door is on this tile
+			{
+				return true;
 			}
 		}
 	}

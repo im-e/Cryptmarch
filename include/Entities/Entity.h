@@ -84,7 +84,11 @@ public:
 
 	bool isDead() const;
 	void takeDamage(int damage);
-	void heal(int amount) { health += amount; }
+	void heal(int amount)
+	{
+		health += amount;
+		if (health > maxHealth) health = maxHealth; //never heal above max
+	}
 
 	void updateTimers(float deltaTime);
 
