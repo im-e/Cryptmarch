@@ -92,7 +92,7 @@ void Wizard::processAttack(AttackContext& attackContext) {
             Vector2f enemyCentre = attackContext.enemies[i]->getCentrePoint(); //find centre of enemy
             float distanceX = enemyCentre.x - centre.x; //find the difference of the two points
             float distanceY = enemyCentre.y - centre.y; 
-            float distanceSquared = (distanceX * distanceX) + (distanceY * distanceY); //pythagoras (dx² + dy²)
+            float distanceSquared = (distanceX * distanceX) + (distanceY * distanceY); //(dx² + dy²)
             //if dx = 60 and dy = 70 dx² + dy² = 8500 which is less than 9216 which means its a hit
             if (distanceSquared <= radSq) //if its less than our radius squared = hit
             {

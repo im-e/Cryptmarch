@@ -2,9 +2,9 @@
 
 enum class EnemyType {
 	Slime,
-	Ogre,
-	Skeleton,
-	Ghost,
 	Ant,
+	Ghost,
+	Skeleton,
+	Ogre,
 	Medusa
 };

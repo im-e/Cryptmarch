@@ -14,13 +14,16 @@ private:
 	Vector<Projectile> projectiles;
 
 	bool allPlayersDead = false;
+	float* gameTime;
 
 	EnemyFactory factory;
 
+
 public:
-	EntityManager(AssetManager& am)
+	EntityManager(AssetManager& am, float*_gameTime)
 	{
 		factory.init(&am.enemyImage, &am.itemsImage);
+		gameTime = _gameTime;
 	}
 
 	~EntityManager()
@@ -32,6 +35,7 @@ public:
 	{
 		for (int i = 0; i < players.getSize(); i++) delete players[i];
 		for (int i = 0; i < enemies.getSize(); i++) delete enemies[i];
+		for (int i = 0; i < spawners.getSize(); i++) delete spawners[i];
 		players.clear(); 
 		enemies.clear();
 		projectiles.clear();
@@ -63,7 +67,7 @@ public:
 
 	void update(GamesEngineeringBase::Window& window, Map& map, float deltaTime) 
 	{
-		AttackContext attack = { enemies, projectiles };
+		AttackContext attack = { enemies, projectiles, spawners };
 
 		//update all players
 		for (int i = 0; i < players.getSize(); i++)
@@ -76,21 +80,38 @@ public:
 		//update all enemies
 		for (int i = 0; i < enemies.getSize(); i++)
 		{
-			enemies[i]->update(window, map, deltaTime);
+			enemies[i]->update(window, map, deltaTime); //update enemies
+			if (enemies[i]->getFireRequested()) //if fire has been requested
+			{
+				projectiles.add(enemies[i]->fireProjectile()); //add projectile to projectile list
+				enemies[i]->setFireRequested(false); //set fire requested to false
+			}
 		}
 
 		//update all spawners
 		for (int i = 0; i < spawners.getSize(); i++)
 		{
+			//work out range of spawner
+			Vector2f sp = spawners[i]->getCentrePoint(); //spawner 
+			Vector2f pl = getFirstPlayer()->getCentrePoint(); //player
+
+			float dx = sp.x - pl.x; //find the difference of the two points
+			float dy = sp.y - pl.y; //player to spawner
+			float distanceSquared = (dx * dx) + (dy * dy); //If dx² + dy² is less than range², the player is in range
+			float rangeSquared = spawners[i]->getSpawnerRange() * spawners[i]->getSpawnerRange();
+			if (distanceSquared >= rangeSquared) //spawner ISNT in range
+			{
+				continue; //skip to next spawner
+			}
 			spawners[i]->update(window, map, deltaTime); //update spawners
 			if (spawners[i]->getReadyToSpawn()) //if they are ready to spawn
 			{
-				spawnEnemy(EnemyType::Slime, { spawners[i]->getX(), spawners[i]->getY() }); //spawn enemy
+				spawnEnemy({ spawners[i]->getX(), spawners[i]->getY() }); //spawn enemy
 				spawners[i]->setReadyToSpawn(false); //set ready to spawn to false
 			}
+
 		}
 	
-
 		//check for collisions between players and enemies
 		for (int i = 0; i < players.getSize(); i++)
 		{
@@ -124,9 +145,10 @@ public:
 		updateProjectiles(map, deltaTime);
 	}
 
-	void spawnEnemy(EnemyType type, Vector2f pos)
+	void spawnEnemy(Vector2f pos)
 	{
-		enemies.add(factory.createEnemy(type, pos, getFirstPlayer()));
+		EnemyType type = factory.weightedRandomEnemyType(gameTime); //get a weighted random enemy type
+		enemies.add(factory.createEnemy(type, pos, getFirstPlayer())); //spawn that enemy at pos
 	}
 
 	void updateProjectiles(Map& map, float deltaTime)

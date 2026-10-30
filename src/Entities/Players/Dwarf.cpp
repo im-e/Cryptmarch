@@ -130,6 +130,8 @@ void Dwarf::processAttack(AttackContext& attackContext) {
 			swingEnemies.add(enemy); //record that we hit this enemy
 		}
 	}
+
+
 }
 
 AABB Dwarf::getMeleeHitbox() const
@@ -144,7 +146,7 @@ AABB Dwarf::getMeleeHitbox() const
 	return { attackX, attackY, playerBox.width, playerBox.height };
 }
 
-bool Dwarf::checkMeleeCollision(Enemy* enemy) const
+bool Dwarf::checkMeleeCollision(Entity* entity) const
 {
 	//get the player's melee hitbox
 	AABB attackBox = getMeleeHitbox();

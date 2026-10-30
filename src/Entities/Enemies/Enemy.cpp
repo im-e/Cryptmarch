@@ -17,13 +17,38 @@ void Enemy::draw(GamesEngineeringBase::Window& window, Camera& cam)
 
 void Enemy::update(GamesEngineeringBase::Window& window, Map& map, float deltaTime)
 {
+	//--------------- ATTACK -----------
+	if (isRanged)
+	{
+		if (fireCooldownTimer > 0) fireCooldownTimer -= deltaTime;
+		if (target == nullptr)
+		{
+			return;
+		}
+
+		//work out if player is in range
+		Vector2f en = getCentrePoint(); //spawner 
+		Vector2f pl = target->getCentrePoint(); //player
+
+		float dx = en.x - pl.x; //find the difference of the two points
+		float dy = en.y - pl.y; //player to enemy
+		float distanceSquared = (dx * dx) + (dy * dy); //If dx² + dy² is less than range², the player is in range
+		float rangeSquared = fireRange * fireRange; //range squared
+
+		if (fireCooldownTimer <= 0 && distanceSquared < rangeSquared) //in range and off cooldown
+		{
+			fireRequested = true;
+			fireCooldownTimer = fireCooldown;
+		}
+	}
+
+	//-------------- MOVE ---------------
 	//if in knockback
 	if (knockbackTimer > 0.0f)
 	{	//knock enemy back
 		knockbackTimer -= deltaTime;
 
 		// Pull hitbox for wall checks
-
 		AABB hitbox = getHitbox();
 
 		float xMove = knockbackVelX * deltaTime;
@@ -98,5 +123,48 @@ void Enemy::applyKnockback(float dirX, float dirY, float force, float duration)
 	knockbackVelX = dirX * force; //multiply the knockback by force
 	knockbackVelY = dirY * force;
 	knockbackTimer = duration; //give it a duration of knockback, should be quite short
+}
+
+Projectile Enemy::fireProjectile()
+{
+	//get player's hitbox to spawn the projectile just outside them
+	AABB player = getHitbox();
+
+	Projectile proj;
+	proj.x = player.x + (player.width / 2.0f);
+	proj.y = player.y + (player.height / 2.0f);
+
+	//subtract the npc position from the player position to give a direction arrow
+	Vector2f targetMiddle = target->getCentrePoint();
+	Vector2f middle = getCentrePoint();
+	float dirX = targetMiddle.x - middle.x;
+	float dirY = targetMiddle.y - middle.y;
+
+	//work out the length
+	float length = sqrt(dirX * dirX + dirY * dirY);
+
+	//normalise to give us a direction vector
+	if (length > 0.0f) //if the length is greater than 0
+	{
+		dirX /= length; //divide the components by it 
+		dirY /= length;
+	}
+
+	proj.dirX = dirX;
+	proj.dirY = dirY;
+	proj.speed = arrowSpeed;
+	proj.lifetime = arrowLifetime;
+	proj.damage = arrowDamage;
+	proj.owner = ProjectileOwner::Enemy;
+
+	proj.knockbackDuration = arrowKnockbackDuration;
+	proj.knockbackForce = arrowKnockbackForce;
+
+	proj.image = projectileImage;
+	proj.tileX = projectileTileX;
+	proj.tileY = projectileTileY;
+
+	return proj;
+
 }
 

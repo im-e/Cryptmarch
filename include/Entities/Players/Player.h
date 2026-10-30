@@ -5,6 +5,7 @@
 #include "Utilities/Collisions.h"
 #include "Entities/Projectile.h"
 #include "Entities/Enemies/Enemy.h"
+#include "Entities/Spawner.h"
 
 struct Controls
 {
@@ -19,6 +20,7 @@ struct Controls
 struct AttackContext{
 	Vector<Enemy*>& enemies; //who you can hit
 	Vector<Projectile>& projectiles; //where new projectiles go
+	Vector<Spawner*>& spawners; //spawners to destory
 };
 
 

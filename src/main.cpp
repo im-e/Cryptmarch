@@ -21,6 +21,8 @@
 
 int main()
 {
+    srand(time(nullptr)); //random seed for time
+
     //constant definitions for calculations
     const int windowWidth = 1024;
     const int windowHeight = 768;
@@ -38,7 +40,7 @@ int main()
 
     //create the asset and entity managers
     AssetManager assetManager;
-    EntityManager entityManager(assetManager);
+    EntityManager entityManager(assetManager, &gameController.getStats().timeSurvived);
 
     //init hud
     FPS fps(&assetManager.hudImage);

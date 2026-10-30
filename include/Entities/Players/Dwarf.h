@@ -62,6 +62,6 @@ public:
 	void processAttack(AttackContext& attack) override;
 
 	AABB getMeleeHitbox() const;
-	bool checkMeleeCollision(Enemy* enemy) const;
+	bool checkMeleeCollision(Entity* entity) const;
 
 };
