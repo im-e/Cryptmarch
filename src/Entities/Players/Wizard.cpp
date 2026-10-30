@@ -109,9 +109,27 @@ void Wizard::processAttack(AttackContext& attackContext) {
                 attackContext.enemies[i]->applyKnockback(distanceX, distanceY, novaKnockbackForce, novaKnockbackDuration);
             }
         }
+        //spawners - same radius check, no knockback (spawners don't move)
+        for (int i = 0; i < attackContext.spawners.getSize(); i++)
+        {
+            Spawner* spawner = attackContext.spawners[i];
+            if (spawner->isDead()) continue; //skip dead spawner
+
+            Vector2f spawnerCentre = spawner->getCentrePoint(); //find centre of spawner
+            float distanceX = spawnerCentre.x - centre.x;
+            float distanceY = spawnerCentre.y - centre.y;
+            float distanceSquared = (distanceX * distanceX) + (distanceY * distanceY); //(dx² + dy²)
+
+            if (distanceSquared <= radSq) //inside the nova = hit
+            {
+                spawner->takeDamage(novaDamage);
+            }
+        }
+
         novaRequested = false;
     }
 
+    //the select spell only targets enemies, not spawners.
     if (selectRequested)
     {
         const int selectTargets = 3; //amount of targets the selection spell will hit

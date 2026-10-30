@@ -16,6 +16,8 @@ void Spawner::draw(GamesEngineeringBase::Window& window, Camera& cam)
 
 void Spawner::update(GamesEngineeringBase::Window& window, Map& map, float deltaTime)
 {
+	updateTimers(deltaTime); //tick iFrames + hit flash, without this takeDamage() never works on a spawner
+
 	spawnTimer -= deltaTime; //decrease the spawn timer
 	if (spawnTimer <= 0) { //if spawn timer is less than 0
 		readyToSpawn = true; //set spawn

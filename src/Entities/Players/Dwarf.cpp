@@ -42,6 +42,7 @@ void Dwarf::update(GamesEngineeringBase::Window& window, Map& map, float deltaTi
 			attackState = AttackState::Active; //set attack state to active
 			attackActiveTimer = attackDuration; //set the timer to the duration
 			swingEnemies.clear(); // Reset hit history for new swing
+			swingSpawners.clear(); // Reset spawner hit history for new swing
 
 			attackDirX = facingDirX; //lock the attack direction to current facing direction
 			attackDirY = facingDirY;
@@ -131,6 +132,32 @@ void Dwarf::processAttack(AttackContext& attackContext) {
 		}
 	}
 
+	//spawnmers - same check as enemies, but no knockback 
+	for (int i = 0; i < attackContext.spawners.getSize(); i++) //for every spawner
+	{
+		Spawner* spawner = attackContext.spawners[i];
+
+		if (spawner->isDead()) continue; //skip spawners already destroyed this frame
+
+		//check if this spawner was already hit during this swing
+		bool alreadyHit = false;
+		for (int k = 0; k < swingSpawners.getSize(); k++)
+		{
+			if (swingSpawners[k] == spawner) 
+			{
+				alreadyHit = true;
+				break;
+			}
+		}
+
+		if (alreadyHit) continue; //skip if already hit
+
+		if (checkMeleeCollision(spawner)) //check melee collision
+		{
+			spawner->takeDamage(meleeDamage); //spawner takes the damage
+			swingSpawners.add(spawner); //record that we hit this spawner
+		}
+	}
 
 }
 
@@ -152,7 +179,7 @@ bool Dwarf::checkMeleeCollision(Entity* entity) const
 	AABB attackBox = getMeleeHitbox();
 
 	//get the enemy's hitbox
-	AABB enemyBox = enemy->getHitbox();
+	AABB enemyBox = entity->getHitbox();
 
 	//AABB overlap test
 	return Collisions::checkAABBCollision(attackBox, enemyBox);

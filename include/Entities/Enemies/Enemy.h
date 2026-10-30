@@ -22,8 +22,6 @@ private:
 	float arrowKnockbackForce = 150.0f; //force for knockback of the ranged attack
 	float arrowKnockbackDuration = 0.10f; //duration of knockback for the ranged attack
 
-
-
 	Entity* target;
 	int contactDamage;
 

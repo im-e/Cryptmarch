@@ -26,6 +26,7 @@ private:
 	int attackDirY = 0; //direction of melee attack
 
 	Vector<Enemy*> swingEnemies; //vector of enemies hit by last swing
+	Vector<Spawner*> swingSpawners; //vector of spawners hit by last swing
 
 	GamesEngineeringBase::Image* weaponImage; //image for weapon
 	int weaponImageXOffset; //tilemap offset for weapon

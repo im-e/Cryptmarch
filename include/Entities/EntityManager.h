@@ -191,6 +191,22 @@ public:
 						break; //hit an enemy so we should stop checking other enemies for this projectile
 					}
 				}
+
+				//if it didn't hit an enemy, check spawners (no knockback, spawners don't move)
+				if (!projectile.dead)
+				{
+					for (int j = 0; j < spawners.getSize(); j++)
+					{
+						if (spawners[j]->isDead()) continue; //skip already destroyed spawners
+
+						if (Collisions::checkAABBCollision(projectile.getAABB(), spawners[j]->getHitbox())) //projectile + spawner hitbox
+						{
+							spawners[j]->takeDamage(projectile.damage); //spawner takes damage
+							projectile.dead = true; //arrow is used up
+							break; //stop checking other spawners
+						}
+					}
+				}
 			}
 			else if (projectile.owner == ProjectileOwner::Enemy) //if the owner is an enemy
 			{
@@ -230,7 +246,17 @@ public:
 			}
 		}
 
-		//update all enemies by using a backwards loop to prevent skipping elements
+		//remove destroyed spawners, backwards loop for the same reason
+		for (int i = spawners.getSize() - 1; i >= 0; i--)
+		{
+			if (spawners[i]->isDead())
+			{
+				delete spawners[i]; //free the memory
+				spawners.removeSwap(i);
+			}
+		}
+
+		//update all players by using a backwards loop to prevent skipping elements
 		for (int i = players.getSize() - 1; i >= 0; i--)
 		{
 			if (players[i]->isDead())
