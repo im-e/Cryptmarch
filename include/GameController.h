@@ -10,13 +10,32 @@
 
 enum GameState
 {
-    MenuState, PlayState, TallyState
+    MenuState, PlayerSelectState, CharacterSelectState, P2CharacterSelectState, ModeSelectState, PlayState, TallyState
+};
+
+enum class PlayerMode
+{
+    SinglePlayer,
+    Multiplayer
+};
+
+enum class CharacterType
+{
+    Dwarf,
+    Archer,
+    Wizard
+};
+
+enum class GameModeType
+{
+    Story,
+    Infinite
 };
 
 //what the tally screen should say
 enum class TallyResult
 {
-    GameOver, //all players died
+    GameOver, //all players dead
     LevelComplete, //reached the exit, there is another level
     GameComplete //reached the exit of the last level
 };
@@ -35,19 +54,51 @@ struct GameStats{
 class GameController
 {
 private:
-    GameState gameState = MenuState;
-    TallyResult tallyResult = TallyResult::GameOver;
+    GameState gameState = MenuState; //what state the game is in
+    TallyResult tallyResult = TallyResult::GameOver; //the result of the tally screen
 
-    GameStats stats;
+    GameStats stats; //game counter stats
+
+    // Menu selection states
+    int playerSelectIndex = 0;     //0: single player, 1: multiplayer
+    int characterSelectIndex = 0;  //0: dwarf, 1: archer, 2: wizard
+    int p2CharacterSelectIndex = 0;  //0: dwarf, 1: archer, 2: wizard
+    int modeSelectIndex = 0;       //0: story Mode, 1: infinite Mode
+
+    PlayerMode playerMode = PlayerMode::SinglePlayer; //mode which is chosen
+    CharacterType characterType = CharacterType::Dwarf; //character which is chosen
+    CharacterType p2CharacterType = CharacterType::Archer; //character which is chosen for player 2
+    GameModeType gameMode = GameModeType::Story; //gamemode which is chosen
 
     //levels are played in this order
-    static const int levelCount = 2;
-    inline static const char* levelPaths[levelCount] =
+    static const int levelCount = 2; //amount of levels we have
+    inline static const char* levelPaths[levelCount] = //string defs for levels
     {
         "resources/maps/map_dungeon.txt",
         "resources/maps/map_catacombs.txt",
     };
-    int currentLevel = 0;
+    int currentLevel = 0; //what level we are currently on
+
+    //helper to spawn player based on character type
+    void spawnPlayer(AssetManager& am, EntityManager& em, CharacterType type, float x, float y, Controls controls)
+    {
+        if (type == CharacterType::Dwarf)
+        {
+            EntityStats stats = { 100, 200, x, y, 0, 0 };
+            em.addPlayer(new Dwarf(stats, &am.playerImage, controls, &am.itemsImage, 3, 3));
+        }
+        else if (type == CharacterType::Archer)
+        {
+            EntityStats stats = { 100, 200, x, y, 2, 0 };
+            em.addPlayer(new Archer(stats, &am.playerImage, controls, &am.itemsImage, 0, 23));
+        }
+        else if (type == CharacterType::Wizard)
+        {
+            EntityStats stats = { 100, 200, x, y, 1, 4 };
+            em.addPlayer(new Wizard(stats, &am.playerImage, controls, &am.itemsImage, 0, 25));
+        }
+    }
+
 
     //loads the current level's map and fills the entity manager
     void startLevel(AssetManager& am, EntityManager& em, Map& map)
@@ -57,20 +108,21 @@ private:
 
         Vector2f start = map.getPlayerStart();
 
-        //create the player
-        //                       maxhp speed x y imX, imY
-        EntityStats dwarfStats = { 100, 200, start.x, start.y, 0, 0 };
-        EntityStats archerStats = { 100,  200, start.x, start.y, 2, 0 };
-        EntityStats wizardStats = { 100,  200, start.x, start.y, 1, 4 };
-        Controls playerControls = { VK_UP, VK_DOWN, VK_LEFT, VK_RIGHT, VK_SPACE, VK_SHIFT };
+        Controls p1Controls = { VK_UP, VK_DOWN, VK_LEFT, VK_RIGHT, 'L', 'K'};
+        Controls p2Controls = { 'W', 'S', 'A', 'D', 'B', 'V' }; 
 
-        //create the player 
-        Archer* archer = new Archer(archerStats, &am.playerImage, playerControls, &am.itemsImage, 0, 23);
-        //Dwarf* dwarf = new Dwarf(dwarfStats, &am.playerImage, playerControls, &am.itemsImage, 3, 3);
-        //Wizard* wizard = new Wizard(wizardStats, &am.playerImage, playerControls, &am.itemsImage, 0, 25);
-        //add the player to the entity list
-        em.addPlayer(archer);
 
+        //spawn players based on chosen character type and player mode
+        //spawn player 1
+        spawnPlayer(am, em, characterType, start.x, start.y, p1Controls);
+
+        //spawn player 2 if multiplayer is enabled
+        if (playerMode == PlayerMode::Multiplayer)
+        {
+            spawnPlayer(am, em, p2CharacterType, start.x + 30, start.y, p2Controls);
+        }
+
+        //create spawners
         Vector<Vector2f>& spawnPoints = map.getSpawnerPositions();
         for (int i = 0; i < spawnPoints.getSize(); i++)
         {
@@ -78,6 +130,7 @@ private:
             em.addSpawner(new Spawner(spawnerStats, &am.mapImage));
         }
 
+        //create map objects
         spawnMapObjects(am, em, map);
     }
 
@@ -140,6 +193,7 @@ private:
 public:
 
     GameState getState() { return gameState; }
+    void setState(GameState state) { gameState = state; }
 
     GameStats& getStats() { return stats; }
 
@@ -147,9 +201,62 @@ public:
 
     int getLevelNumber() { return currentLevel + 1; } //for displaying, +1 the index
 
-    //starts a brand new game
+    int getPlayerSelectIndex() const { return playerSelectIndex; }
+    void setPlayerSelectIndex(int idx) { playerSelectIndex = idx; }
+
+    int getCharacterSelectIndex() const { return characterSelectIndex; }
+    void setCharacterSelectIndex(int idx) { characterSelectIndex = idx; }
+
+    int getP2CharacterSelectIndex() const { return p2CharacterSelectIndex; }
+    void setP2CharacterSelectIndex(int idx) { p2CharacterSelectIndex = idx; }
+
+    int getModeSelectIndex() const { return modeSelectIndex; }
+    void setModeSelectIndex(int idx) { modeSelectIndex = idx; }
+
+    void confirmPlayerSelection()
+    {
+        if (playerSelectIndex == 0)
+        {
+            playerMode = PlayerMode::SinglePlayer;
+        }
+        else
+        {
+            playerMode = PlayerMode::Multiplayer;
+        }
+
+        gameState = CharacterSelectState;
+    }
+
+    void confirmCharacterSelection()
+    {
+        if (characterSelectIndex == 0) characterType = CharacterType::Dwarf;
+        else if (characterSelectIndex == 1) characterType = CharacterType::Archer;
+        else characterType = CharacterType::Wizard;
+
+        //if multiplayer go to p2 character select screen
+        if (playerMode == PlayerMode::Multiplayer)
+        {
+            gameState = P2CharacterSelectState;
+        }
+        else
+        {
+            gameState = ModeSelectState;
+        }
+    }
+
+    void confirmP2CharacterSelection()
+    {
+        if (p2CharacterSelectIndex == 0) p2CharacterType = CharacterType::Dwarf;
+        else if (p2CharacterSelectIndex == 1) p2CharacterType = CharacterType::Archer;
+        else p2CharacterType = CharacterType::Wizard;
+
+        gameState = ModeSelectState;
+    }
+
+    //starts a brand new game based on selections
     void startNewGame(AssetManager& am, EntityManager& em, Map& map)
     {
+        gameMode = (modeSelectIndex == 0) ? GameModeType::Story : GameModeType::Infinite;
         stats.reset();
         currentLevel = 0;
         startLevel(am, em, map);
@@ -171,13 +278,13 @@ public:
     {
         if (tallyResult == TallyResult::LevelComplete)
         {
-            currentLevel++; //move on to the next map, stats carry over
+            currentLevel++;
             startLevel(am, em, map);
             gameState = PlayState;
         }
         else
         {
-            gameState = MenuState; //died or finished every level
+            gameState = MenuState;
         }
     }
 };

@@ -8,3 +8,17 @@ Multiple Players can play simultaneously.
 
 The ability to save (to a file) the current state of the game at any point and reload it to the same exact point.
 	-saving....
+	
+	
+	
+Main menu 
+
+single player vs multiplayer
+
+character select screen
+
+story vs infinite mode
+
+play state
+
+tally state
