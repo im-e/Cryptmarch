@@ -83,7 +83,7 @@ public:
 	bool isFlashing() const { return hitFlashTimer > 0.0f; }
 
 	bool isDead() const;
-	void takeDamage(int damage);
+	bool takeDamage(int damage);
 	void heal(int amount)
 	{
 		health += amount;

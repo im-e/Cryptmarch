@@ -1,6 +1,6 @@
 #include "Entities/Entity.h"
 
-void Entity::takeDamage(int damage) {
+bool Entity::takeDamage(int damage) {
 	//only take damage if iFrames <= 0;
 	if (iFrameTimer <= 0)
 	{
@@ -10,6 +10,11 @@ void Entity::takeDamage(int damage) {
 		if (health < 0) health = 0; //dont let health go below 0
 		iFrameTimer = iFrameValue; //reset iFrameTimer to iFrameValue
 		hitFlashTimer = hitFlashDuration; //set flash timer to duration
+		return true;
+	}
+	else
+	{
+		return false;
 	}
 }
 

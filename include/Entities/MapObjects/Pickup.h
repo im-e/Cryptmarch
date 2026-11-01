@@ -1,5 +1,5 @@
 #pragma once
-#include "Entity.h"
+#include "Entities/Entity.h"
 
 //what type of pickup it is
 enum class PickupType { Health, Mana, Key };

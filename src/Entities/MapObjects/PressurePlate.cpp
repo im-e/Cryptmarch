@@ -1,4 +1,4 @@
-#include "Entities/PressurePlate.h"
+#include "Entities/MapObjects/PressurePlate.h"
 
 PressurePlate::PressurePlate(EntityStats _stats, GamesEngineeringBase::Image* _image, int _id, bool _isFake) :
 	Entity(_stats, _image)

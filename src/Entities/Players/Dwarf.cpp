@@ -73,6 +73,7 @@ void Dwarf::update(GamesEngineeringBase::Window& window, Map& map, float deltaTi
 		if (skillTimer <= 0.0f) //if time has run out
 		{
 			speed = normalSpeed; //set to normal speed
+			damageTakenMultiplier = normalDefenceMultiplier;
 		}
 	}
 
@@ -83,9 +84,8 @@ void Dwarf::update(GamesEngineeringBase::Window& window, Map& map, float deltaTi
 		{
 			mana -= manaCost; //reduce mana by the cost
 
-		
 			speed = boostedSpeed; //activate faster movement skill
-			damageTakenMultiplier = defenceMultiplier; //activate defence skill
+			damageTakenMultiplier = boostedDefenceMultiplier; //activate defence skill
 			skillTimer = skillDuration; //set the timer to the duration
 			keyWasReleased = false; //set keywasreleased to false
 		}

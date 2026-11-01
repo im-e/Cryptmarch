@@ -1,5 +1,5 @@
 #pragma once
-#include "Entity.h"
+#include "Entities/Entity.h"
 
 //fake and real pressure plates
 class PressurePlate : public Entity

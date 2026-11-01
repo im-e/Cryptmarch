@@ -89,27 +89,30 @@ void EntityManager::update(GamesEngineeringBase::Window& window, Map& map, float
 		{
 			if (players[i]->checkEntityCollision(enemies[j]))
 			{
-				players[i]->takeDamage(enemies[j]->getDamage());
+				bool tookDamage = players[i]->takeDamage(enemies[j]->getDamage()); //take damage and store if they did
+				if (tookDamage) //if damage taken
+				{ //apply knockback
+					//for knockback calculation
+					AABB player = players[i]->getHitbox();
+					AABB enemy = enemies[j]->getHitbox();
+					//calcualate the direction away from the enemy
+					float dirX = player.x - enemy.x;
+					float dirY = player.y - enemy.y;
+					float length = sqrt(dirX * dirX + dirY * dirY);
+					if (length > 0.0f)
+					{
+						dirX /= length; //normalise
+						dirY /= length;
+					}
 
-				//for knockback calculation
-				AABB player = players[i]->getHitbox();
-				AABB enemy = enemies[j]->getHitbox();
-				//calcualate the direction away from the enemy
-				float dirX = player.x - enemy.x;
-				float dirY = player.y - enemy.y;
-				float length = sqrt(dirX * dirX + dirY * dirY);
-				if (length > 0.0f)
-				{
-					dirX /= length; //normalise
-					dirY /= length;
+					//apply knockback
+					players[i]->applyImpulse(dirX, dirY, enemies[j]->getKnockbackForce(), enemies[j]->getKnockbackDuration());
 				}
 
-				//apply knockback
-				players[i]->applyImpulse(dirX, dirY, enemies[j]->getKnockbackForce(), enemies[j]->getKnockbackDuration());
 			}
 		}
 	}
-
+	//update things
 	updateProjectiles(map, deltaTime);
 	updatePickups(window, map, deltaTime);
 	updateLevelObjects(window, map, deltaTime);
@@ -155,8 +158,11 @@ void EntityManager::updateProjectiles(Map& map, float deltaTime)
 			{
 				if (Collisions::checkAABBCollision(projectile.getAABB(), enemies[j]->getHitbox())) //projectile + enemy hitbox
 				{
-					enemies[j]->takeDamage(projectile.damage); //enemy take damage from projectile
-					enemies[j]->applyKnockback(projectile.dirX, projectile.dirY, projectile.knockbackForce, projectile.knockbackDuration);
+					bool tookDamage = enemies[j]->takeDamage(projectile.damage); //enemy take damage from projectile
+					if (tookDamage) //if damage taken, apply knockback
+					{
+						enemies[j]->applyKnockback(projectile.dirX, projectile.dirY, projectile.knockbackForce, projectile.knockbackDuration);
+					}
 					projectile.dead = true; //mark projectile is dead
 					break; //hit an enemy so we should stop checking other enemies for this projectile
 				}
@@ -170,7 +176,7 @@ void EntityManager::updateProjectiles(Map& map, float deltaTime)
 					if (spawners[j]->isDead()) continue; //skip already destroyed spawners
 
 					if (Collisions::checkAABBCollision(projectile.getAABB(), spawners[j]->getHitbox())) //projectile + spawner hitbox
-					{
+					{ //dont need to check for damage as spawners dont take knockback
 						spawners[j]->takeDamage(projectile.damage); //spawner takes damage
 						projectile.dead = true; //arrow is used up
 						break; //stop checking other spawners
@@ -185,8 +191,12 @@ void EntityManager::updateProjectiles(Map& map, float deltaTime)
 			{
 				if (Collisions::checkAABBCollision(projectile.getAABB(), players[j]->getHitbox()))
 				{
-					players[j]->takeDamage(projectile.damage); //take damage
-					//apply knockback
+
+					bool tookDamage = players[j]->takeDamage(projectile.damage); //take damage
+					if (tookDamage) //if damage taken, knockback
+					{
+						players[j]->applyImpulse(projectile.dirX, projectile.dirY, projectile.knockbackForce, projectile.knockbackDuration);
+					}
 					projectile.dead = true; //mark projectile as dead
 					break; //hit so we should stop checking
 				}
@@ -204,17 +214,17 @@ void EntityManager::updateProjectiles(Map& map, float deltaTime)
 //rolls the dice when an enemy dies, and maybe drops a potion where it died
 void EntityManager::tryDropPickup(Vector2f pos)
 {
-	if (rand() % 100 >= dropChance) return; //rand() % 100 gives 0-99, so this fails (100 - dropChance)% of the time
+	if (rand() % 100 >= dropChance) return; //if 0-99 is more than or equal to drop chance
 
-	Pickup* pickup;
+	Pickup* pickup; //create a new pickup
 	if (rand() % 2 == 0) //50/50 between health and mana
-	{
+	{ // 0 = health potion
 		//                     hp speed x      y      sprite column, row in items.png
 		EntityStats stats = { 1, 0, pos.x, pos.y, 1, 19 }; //red potion
 		pickup = new Pickup(stats, itemsImage, PickupType::Health, healthPotionAmount);
 		Logger::Debug("Dropped health potion");
 	}
-	else
+	else // 1 = mana potion
 	{
 		EntityStats stats = { 1, 0, pos.x, pos.y, 3, 20 }; //blue potion
 		pickup = new Pickup(stats, itemsImage, PickupType::Mana, manaPotionAmount);
@@ -223,39 +233,40 @@ void EntityManager::tryDropPickup(Vector2f pos)
 	pickups.add(pickup);
 }
 
+//update pickups
 void EntityManager::updatePickups(GamesEngineeringBase::Window& window, Map& map, float deltaTime)
 {
-	for (int i = 0; i < pickups.getSize(); i++)
+	for (int i = 0; i < pickups.getSize(); i++) //for each pickup
 	{
-		Pickup* pickup = pickups[i];
+		Pickup* pickup = pickups[i]; //get pickup
 		pickup->update(window, map, deltaTime); //count down its lifetime
-		if (!pickup->canBeCollected()) continue; //just dropped, give the player a moment to see it
+		if (!pickup->canBeCollected()) continue; //if its just dropped, wait to collect so player cnat pick up instantly
 
-		for (int j = 0; j < players.getSize(); j++)
+		for (int j = 0; j < players.getSize(); j++) //for each player
 		{
-			Player* player = players[j];
-			if (!player->checkEntityCollision(pickup)) continue; //not touching
+			Player* player = players[j]; //get player
+			if (!player->checkEntityCollision(pickup)) continue; //check if player is touching a pickup
 
-			if (pickup->getType() == PickupType::Health)
+			if (pickup->getType() == PickupType::Health) //if its health
 			{
-				if (player->getHealth() >= player->getMaxHealth()) continue; //already full, leave it for later
-				player->heal(pickup->getAmount());
+				if (player->getHealth() >= player->getMaxHealth()) continue; //already full
+				player->heal(pickup->getAmount()); //heal for pickup amount
 				Logger::Debug("Picked up health potion, health now " + std::to_string(player->getHealth()));
 			}
-			else if (pickup->getType() == PickupType::Mana)
+			else if (pickup->getType() == PickupType::Mana) //if its a mana potion
 			{
-				if (player->getMana() >= player->getMaxMana()) continue; //already full, leave it for later
-				player->restoreMana(pickup->getAmount());
+				if (player->getMana() >= player->getMaxMana()) continue; //already full
+				player->restoreMana(pickup->getAmount()); //heal for pickup amount
 				Logger::Debug("Picked up mana potion, mana now " + std::to_string(player->getMana()));
 			}
-			else if (pickup->getType() == PickupType::Key)
+			else if (pickup->getType() == PickupType::Key) //if its a key
 			{
-				hasKey = true;
+				hasKey = true; //signal that key has been picked up
 
-				//unlock every exit door, this swaps its sprite to the open version
-				for (int k = 0; k < doors.getSize(); k++)
+				//unlock the exit
+				for (int k = 0; k < doors.getSize(); k++) //get all the doors
 				{
-					if (doors[k]->getIsExit()) doors[k]->open(map);
+					if (doors[k]->getIsExit()) doors[k]->open(map); //if its an exit door, open the door
 				}
 				Logger::Info("Key collected, exit unlocked");
 			}
@@ -280,44 +291,44 @@ void EntityManager::updatePickups(GamesEngineeringBase::Window& window, Map& map
 void EntityManager::updateLevelObjects(GamesEngineeringBase::Window& window, Map& map, float deltaTime)
 {
 	//PRESSURE PLATES
-	for (int i = 0; i < plates.getSize(); i++)
+	for (int i = 0; i < plates.getSize(); i++) //for each plate
 	{
-		PressurePlate* plate = plates[i];
-		plate->update(window, map, deltaTime); //fake plates count down until they reset
+		PressurePlate* plate = plates[i]; //get the plate
+		plate->update(window, map, deltaTime); //update the fake plates for reset
 
-		for (int j = 0; j < players.getSize(); j++)
+		for (int j = 0; j < players.getSize(); j++) //get players
 		{
-			if (!players[j]->checkEntityCollision(plate)) continue; //not standing on it
+			if (!players[j]->checkEntityCollision(plate)) continue; //check if being stood on
 
 			if (plate->press()) //true only on the frame the plate goes down
 			{
-				if (plate->getIsFake())
+				if (plate->getIsFake()) //if its a fake
 				{
 					Logger::Debug("Fake pressure plate triggered, firing arrows");
-					fireArrowTrap(plate->getCentrePoint(), map); //its a trap!
+					fireArrowTrap(plate->getCentrePoint(), map); //fire arrows
 				}
 				else
 				{
 					Logger::Debug("Pressure plate " + std::to_string(plate->getId()) + " pressed");
-					openDoorsWithId(plate->getId(), map);
+					openDoorsWithId(plate->getId(), map); //open doors related to id
 				}
 			}
 		}
 	}
 
 	//SPIKE TRAPS
-	for (int i = 0; i < traps.getSize(); i++)
+	for (int i = 0; i < traps.getSize(); i++) //for each spike trap
 	{
-		SpikeTrap* trap = traps[i];
+		SpikeTrap* trap = traps[i]; //get the trap
 		trap->update(window, map, deltaTime); //raise and lower the spikes
 
-		if (!trap->canHit()) continue; //spikes are down, or already hit someone this time
+		if (!trap->canHit()) continue; //if the spikes are down, skip
 
-		for (int j = 0; j < players.getSize(); j++)
+		for (int j = 0; j < players.getSize(); j++) //get players
 		{
-			if (players[j]->checkEntityCollision(trap))
+			if (players[j]->checkEntityCollision(trap)) //check if colliding
 			{
-				players[j]->takeDamage(trap->getDamage());
+				players[j]->takeDamage(trap->getDamage()); //no knockback needed for spikes
 				trap->markHit(); //only hurts once each time the spikes come up
 				break;
 			}
@@ -325,30 +336,30 @@ void EntityManager::updateLevelObjects(GamesEngineeringBase::Window& window, Map
 	}
 
 	//EXIT - walking into an open exit door finishes the level
-	for (int i = 0; i < doors.getSize(); i++)
+	for (int i = 0; i < doors.getSize(); i++) //for each door
 	{
-		Door* door = doors[i];
-		if (!door->getIsExit() || !door->isOpen()) continue;
+		Door* door = doors[i]; //get the door
+		if (!door->getIsExit() || !door->isOpen()) continue; //dont need to check non-exit doors or not open doors
 
-		for (int j = 0; j < players.getSize(); j++)
+		for (int j = 0; j < players.getSize(); j++) //get players
 		{
-			if (players[j]->checkEntityCollision(door))
+			if (players[j]->checkEntityCollision(door)) //check if player has exited
 			{
-				levelComplete = true;
+				levelComplete = true; //set level as complete
 				Logger::Info("Level complete");
 			}
 		}
 	}
 }
-
+//opens doors with corresponding id
 void EntityManager::openDoorsWithId(int id, Map& map)
 {
-	for (int i = 0; i < doors.getSize(); i++)
+	for (int i = 0; i < doors.getSize(); i++) //get all doors
 	{
-		//exit doors are only opened by the key, never by a plate
-		if (!doors[i]->getIsExit() && doors[i]->getId() == id)
+		//if the door isnt an exit door and the door has the right id
+		if (!doors[i]->getIsExit() && doors[i]->getId() == id) //this is because we want the key to open the final door, shouldnt happen anyways but i included it for safety
 		{
-			doors[i]->open(map);
+			doors[i]->open(map); //open the door
 		}
 	}
 }
@@ -358,34 +369,40 @@ void EntityManager::fireArrowTrap(Vector2f target, Map& map)
 	//the 4 directions the arrows come from: left, right, above, below
 	const int dirX[4] = { -1, 1, 0, 0 };
 	const int dirY[4] = { 0, 0, -1, 1 };
-	const int tile = 32;
+	const int tile = 32; //tile size
 
 	Projectile arrow; //template arrow, each direction copies it then changes position and direction
-	arrow.speed = trapArrowSpeed;
-	arrow.damage = trapArrowDamage;
+	arrow.speed = trapArrowSpeed; //set speed
+	arrow.damage = trapArrowDamage; //set damage
 	arrow.owner = ProjectileOwner::Enemy; //enemy owned so it hurts the player
-	arrow.knockbackForce = 0.0f;
+	arrow.knockbackForce = 0.0f; //no knockback, as its a trap (just a design choice)
 	arrow.knockbackDuration = 0.0f;
-	arrow.image = itemsImage;
+	arrow.image = itemsImage; //set to image which contains the arrows
 	arrow.tileX = 0; //arrow sprite in items.png
 	arrow.tileY = 23;
 
-	for (int d = 0; d < 4; d++)
+	for (int i = 0; i < 4; i++) //4 arrow trap
 	{
 		//start far away and walk towards the target until we find a spot that isnt inside a wall
 		//this way arrows come out of the room rather than spawning inside the wall and dying instantly
-		for (int distance = trapLaunchDistance; distance >= 2; distance--)
+		for (int distance = trapLaunchDistance; distance >= 2; distance--) 
+			//try 6 tiles away, then 5, then 4... stopping at 2, just so that its not unreactable
+			//this does make it so all the arrows are the same distance away so some traps are less forigivng than others depending on how close to the wall they are on one side
 		{
-			float startX = target.x + dirX[d] * distance * tile - arrow.width / 2.0f;
-			float startY = target.y + dirY[d] * distance * tile - arrow.height / 2.0f;
+			//work out the target start position in pixels
+			//target.x is centre, dirx/y are the directions, multiply by distance and tile width and - arrow.w/h /2 to centre
+			float startX = target.x + dirX[i] * distance * tile - arrow.width / 2.0f;
+			float startY = target.y + dirY[i] * distance * tile - arrow.height / 2.0f;
 
+			//if its blocked by a wall, skip and try again but closer
 			if (map.isBlockedByWall(startX, startY, arrow.width, arrow.height)) continue; //inside a wall, move closer
 
+			//if its not create the arrow
 			Projectile shot = arrow;
 			shot.x = startX;
 			shot.y = startY;
-			shot.dirX = (float)-dirX[d]; //fly back towards the plate
-			shot.dirY = (float)-dirY[d];
+			shot.dirX = (float)-dirX[i]; //fly back towards the plate
+			shot.dirY = (float)-dirY[i];
 			shot.lifetime = (distance * tile) / trapArrowSpeed + 0.5f; //long enough to reach the plate and a bit past it
 			projectiles.add(shot);
 			break; //found a launch spot for this direction

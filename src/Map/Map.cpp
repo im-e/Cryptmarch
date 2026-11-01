@@ -3,7 +3,7 @@
 
 void Map::unload()
 {
-	delete[] tilemapData; //deleting a nullptr is safe, so this works even if nothing was loaded
+	delete[] tilemapData; //delete the data, deleting nullptr is safe so this isnt a problem
 	delete[] blockedTiles;
 	tilemapData = nullptr;
 	blockedTiles = nullptr;
@@ -92,7 +92,7 @@ bool Map::loadMap(const std::string& path)
 			MapObject object;
 			object.pos = { (float)(tileX * tilePixelSize), (float)(tileY * tilePixelSize) };
 
-			if (tag == "KEY") object.type = MapObjectType::Key;
+			if (tag == "KEY") object.type = MapObjectType::Key; //then the object tag
 			else if (tag == "EXIT") object.type = MapObjectType::Exit;
 			else if (tag == "FAKEPLATE") object.type = MapObjectType::FakePlate;
 			else if (tag == "TRAP") object.type = MapObjectType::Trap;
@@ -107,7 +107,7 @@ bool Map::loadMap(const std::string& path)
 		}
 		else
 		{
-			Logger::Error("Unknown tag in map file: " + tag); //catches typos like SPAWNR
+			Logger::Error("Unknown tag in map file: " + tag); //catches typos or invalid tags
 		}
 	}
 

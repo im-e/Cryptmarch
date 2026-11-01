@@ -45,7 +45,8 @@ protected:
 	int keyPrimaryAttack; //player attack key
 	int keySecondaryAttack; //player attack key
 	float facingDirX = 0; //facing direction for when an attack is made
-	float facingDirY = 0; //facing direction for when an attack is made
+	float facingDirY = 1; //facing direction for when an attack is made
+	//set to 0,1 so that player faces a direction when starting to prevent unintended behaviour
 
 public:
 	Player(EntityStats stats, GamesEngineeringBase::Image* _image, Controls controls) :

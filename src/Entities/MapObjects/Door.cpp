@@ -1,4 +1,4 @@
-#include "Entities/Door.h"
+#include "Entities/MapObjects/Door.h"
 
 Door::Door(EntityStats _stats, GamesEngineeringBase::Image* _image, int _id, bool _isExit, int _openTileX, int _openTileY) :
 	Entity(_stats, _image)

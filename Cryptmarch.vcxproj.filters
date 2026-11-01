@@ -93,16 +93,16 @@
     <ClInclude Include="include\Entities\Spawner.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Entities\Pickup.h">
+    <ClInclude Include="include\Entities\MapObjects\Pickup.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Entities\Door.h">
+    <ClInclude Include="include\Entities\MapObjects\Door.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Entities\PressurePlate.h">
+    <ClInclude Include="include\Entities\MapObjects\PressurePlate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Entities\SpikeTrap.h">
+    <ClInclude Include="include\Entities\MapObjects\SpikeTrap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -143,13 +143,13 @@
     <ClCompile Include="src\Entities\EntityManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Entities\Door.cpp">
+    <ClCompile Include="src\Entities\MapObjects\Door.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Entities\PressurePlate.cpp">
+    <ClCompile Include="src\Entities\MapObjects\PressurePlate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Entities\SpikeTrap.cpp">
+    <ClCompile Include="src\Entities\MapObjects\SpikeTrap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,5 +1,5 @@
 #pragma once
-#include "Entity.h"
+#include "Entities/Entity.h"
 
 //a door that blocks its tile until it is opened
 //exit doors are opened by the key, other doors are opened by the pressure plate with the same id

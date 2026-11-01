@@ -3,10 +3,10 @@
 #include "Utilities/Vector.h"
 #include "Spawner.h"
 #include "Projectile.h"
-#include "Pickup.h"
-#include "Door.h"
-#include "PressurePlate.h"
-#include "SpikeTrap.h"
+#include "MapObjects/Pickup.h"
+#include "MapObjects/Door.h"
+#include "MapObjects/PressurePlate.h"
+#include "MapObjects/SpikeTrap.h"
 #include "Enemies/EnemyFactory.h"
 #include "Utilities/AssetManager.h"
 
@@ -45,11 +45,11 @@ private:
 	void updatePickups(GamesEngineeringBase::Window& window, Map& map, float deltaTime);
 	void updateLevelObjects(GamesEngineeringBase::Window& window, Map& map, float deltaTime);
 
-	void tryDropPickup(Vector2f pos); //maybe drop a potion where an enemy died
+	void tryDropPickup(Vector2f pos); //tries to drop a potion where an enemy died (30% chance)
 	void openDoorsWithId(int id, Map& map); //opens every door linked to a pressure plate
 	void fireArrowTrap(Vector2f target, Map& map); //fake plate: shoot arrows at the target from 4 directions
 
-	void drawProjectiles(GamesEngineeringBase::Window& window, Camera& cam); 
+	void drawProjectiles(GamesEngineeringBase::Window& window, Camera& cam); //draws projectiles
 
 public:
 	EntityManager(AssetManager& am, float* _gameTime);
@@ -63,10 +63,12 @@ public:
 		return players[0];
 	}
 
+	//getters
 	bool getAllPlayersDead() const { return allPlayersDead; }
 	bool getHasKey() const { return hasKey; }
 	bool getLevelComplete() const { return levelComplete; }
 
+	//add functions
 	void addPlayer(Player* player) { players.add(player); }
 	void addEnemy(Enemy* enemy) { enemies.add(enemy); }
 	void addSpawner(Spawner* spawner) { spawners.add(spawner); }
@@ -75,11 +77,13 @@ public:
 	void addDoor(Door* door) { doors.add(door); }
 	void addPlate(PressurePlate* plate) { plates.add(plate); }
 	void addTrap(SpikeTrap* trap) { traps.add(trap); }
-
+	
+	//delete functions
 	void deletePlayer(Player* player) { players.removeSwap(player); }
 	void deleteEnemy(Enemy* enemy) { enemies.removeSwap(enemy); }
 	void deleteSpawner(Spawner* spawner) { spawners.removeSwap(spawner); }
 
+	//utility functions
 	void update(GamesEngineeringBase::Window& window, Map& map, float deltaTime);
 	void spawnEnemy(Vector2f pos);
 	int cleanupKills(); //removes dead entities, returns how many enemies died

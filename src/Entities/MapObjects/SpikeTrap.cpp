@@ -1,4 +1,4 @@
-#include "Entities/SpikeTrap.h"
+#include "Entities/MapObjects/SpikeTrap.h"
 
 SpikeTrap::SpikeTrap(EntityStats _stats, GamesEngineeringBase::Image* _image) :
 	Entity(_stats, _image)
@@ -11,20 +11,20 @@ SpikeTrap::SpikeTrap(EntityStats _stats, GamesEngineeringBase::Image* _image) :
 void SpikeTrap::update(GamesEngineeringBase::Window& window, Map& map, float deltaTime)
 {
 	timer -= deltaTime;
-	if (timer > 0.0f) return; //still in the current phase
+	if (timer > 0.0f) return; //if still in the current phase dont do anything
 
-	spikesUp = !spikesUp; //flip between up and down
+	spikesUp = !spikesUp; //otherwise change between up and down
 
-	if (spikesUp)
+	if (spikesUp) //if spikes are up
 	{
-		timer = upTime;
-		tileXOffset = upTileX;
+		timer = upTime; //set to uptime
+		tileXOffset = upTileX; //change to up tile
 		hasHit = false; //new set of spikes, can hit again
 	}
 	else
 	{
-		timer = downTime;
-		tileXOffset = downTileX;
+		timer = downTime; //else set do down time
+		tileXOffset = downTileX; //change to down tile
 	}
 }
 

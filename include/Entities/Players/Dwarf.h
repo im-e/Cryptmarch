@@ -22,8 +22,8 @@ private:
 	
 	int meleeDamage = 75; //damage of melee attack
 
-	int attackDirX = 0; //direction of melee attack
-	int attackDirY = 0; //direction of melee attack
+	float attackDirX = 0; //direction of melee attack
+	float attackDirY = 0; //direction of melee attack
 
 	Vector<Enemy*> swingEnemies; //vector of enemies hit by last swing
 	Vector<Spawner*> swingSpawners; //vector of spawners hit by last swing
@@ -35,7 +35,8 @@ private:
 	bool keyWasReleased = true; //check to see if key has been released so multiple activations dont happen on the same frame
 	float skillTimer = 0.0f; //timer for speed boost
 	float skillDuration = 3.0f; //speed boost duration
-	const float defenceMultiplier = 0.5f;
+	const float boostedDefenceMultiplier = 0.5f; //multiplier for when in secondary skill
+	const float normalDefenceMultiplier = 1.0f;
 	float normalSpeed = 300.0f; //nomral movement speed
 	float boostedSpeed = 440.0f; //boosted movement speed
 

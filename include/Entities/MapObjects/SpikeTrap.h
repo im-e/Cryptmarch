@@ -1,5 +1,5 @@
 #pragma once
-#include "Entity.h"
+#include "Entities/Entity.h"
 
 
 class SpikeTrap : public Entity
@@ -21,8 +21,8 @@ public:
 	SpikeTrap(EntityStats _stats, GamesEngineeringBase::Image* _image);
 
 	bool canHit() const { return spikesUp && !hasHit; } //dangerous right now
-	void markHit() { hasHit = true; }
-	int getDamage() const { return damage; }
+	void markHit() { hasHit = true; } //sets has hit to true
+	int getDamage() const { return damage; } //gets the damage of the spikes
 
 	void update(GamesEngineeringBase::Window& window, Map& map, float deltaTime) override;
 	void draw(GamesEngineeringBase::Window& window, Camera& cam) override;
