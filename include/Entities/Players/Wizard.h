@@ -10,20 +10,20 @@ private:
 	int magicTileY;
 
 	//primary attack wave nova
-	float novaRadius = 96.0f; //how far the blast reaches in pixels
+	float novaRadius = 120.0f; //how far the blast reaches in pixels
 	int novaDamage = 50; //damage of the spell
 	bool novaRequested = false; //tracks if spell has been activated from player input
 	float novaVisualDuration = 0.18f; //how long the cirlce stays on screen
 	float novaVisualTimer = 0.0f; //timer for the screen display
 	float novaCooldownTimer = 0.0f; //cooldown timer tracker
-	float novaCooldown = 1.0f; //cooldown of the wave nova
-	float novaKnockbackForce = 400.0f; //force for knockback of the melee attack
+	float novaCooldown = 0.5f; //cooldown of the wave nova
+	float novaKnockbackForce = 600.0f; //force for knockback of the melee attack
 	float novaKnockbackDuration = 0.2f; //duration of knockback for the melee attack
 
 	//selection spell of highest health targets (secondary skill)
-	int manaCost = 20; //cost of secondary skill
-	int selectDamage = 20; //damage of select skill
-	int selectRange = 256.0f; //how far the select spell can reach in pixels (8 tiles)
+	int manaCost = 10; //cost of secondary skill
+	int selectDamage = 80; //damage of select skill
+	int selectRange = 312.0f; //how far the select spell can reach in pixels (8 tiles)
 	bool selectRequested = false; //tracks if the spell has been activated
 	float secondaryCooldown = 0.5f; //cooldown of select skill
 	float secondaryCooldownTimer = 0.0f; //cooldown timer of select skill

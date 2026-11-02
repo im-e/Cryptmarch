@@ -26,7 +26,7 @@ private:
 	int contactDamage;
 
 	float knockbackForce;
-	float knockbackDuration = 0.15f;
+	float knockbackDuration = 0.3f;
 
 	float shootCooldown = 0.0f;
 	float shootInterval = 2.0f;

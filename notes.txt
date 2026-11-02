@@ -2,23 +2,19 @@
 Show at least two levels with different maps (one infinite, one fixed)
 A version of the world which is unbounded (with repeating tiles)
 	- need to implement infinite level
+	- 6-8 different individual mini levels which randomly tile to create a whole infinite map
+	- started by selecting infinite mode on the menu screen
 	
 Multiple Players can play simultaneously.
-	-multiplayer...
+	- enemies wander if they aren't in range of the player, once they are, the target is set and they will go towards the player
+	- need enemies to attack both players
+	- need to have two health and mana bars
 
 The ability to save (to a file) the current state of the game at any point and reload it to the same exact point.
-	-saving....
+	- saving....
+	- pause the game mid level,
+	- be able to resume, quit or save in the pause screen
+	- load a game from the main menu, should go title screen -> new scene (new game, load game) -> (if new game) player select -> load game should start the game from previous place
 	
 	
 	
-Main menu 
-
-single player vs multiplayer
-
-character select screen
-
-story vs infinite mode
-
-play state
-
-tally state

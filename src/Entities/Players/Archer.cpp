@@ -90,6 +90,8 @@ Projectile Archer::fireProjectile()
     proj.lifetime = arrowLifetime; 
     proj.damage = arrowDamage;
     proj.owner = ProjectileOwner::Player;
+    proj.width = arrowHitboxSize;
+    proj.height = arrowHitboxSize;
 
     proj.knockbackDuration = arrowKnockbackDuration;
     proj.knockbackForce = arrowKnockbackForce;

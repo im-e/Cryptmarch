@@ -16,7 +16,6 @@ struct Projectile {
     float knockbackForce; //force for knockback of the melee attack
     float knockbackDuration; //duration of knockback for the melee attack
 
-
     ProjectileOwner owner; //who owns this projectile
     bool dead = false; //flag for deletion
 

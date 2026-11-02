@@ -17,6 +17,13 @@ struct MapObject //definition of map objects
 	int id = 0; //links DOOR and PLATE tags together
 };
 
+struct ChunkTemplate
+{//each chunk is made up of
+	int tiles[16 * 16]; //16*16 tiles = stored as tile id
+	Vector<Vector2f> spawners; //a vector of spawners
+};
+
+
 //forward declaration, tells the compiler camera is a class
 //so we can use camera& without compiler getting stuck in a loop
 class Camera; 
@@ -46,6 +53,14 @@ private:
 	bool* blockedTiles = nullptr;
 
 	void unload(); //frees the current level so a new one can be loaded
+
+	//infinite mode data
+	int templateTileSize = 16;
+	bool infinite = false; //if its infinite
+	int seed = 0; //seed for infinite generation
+	static const int maxTemplates = 8; //amount of chunk templates
+	ChunkTemplate templates[maxTemplates]; //array of our chunk templates
+	int templateCount = 0; //amount o
 
 
 	//tile type definitions for resources/32rogues/tiles.png
@@ -209,6 +224,14 @@ public:
 	}
 
 	bool loadLevel(const std::string& path); //clears the old level and loads a new one
+	bool loadInfinite(const std::string paths[], int templateCount, int customSeed = 0);
+
+	int getTileAt(int tileX, int tileY) const;
+
+	bool isInfinite() const { return infinite; } 
+	const ChunkTemplate& getTemplate(int index) const { return templates[index]; }
+	int getTemplateCount() const { return templateCount; }
+	int getSeed() const { return seed; }
 
 	void draw(GamesEngineeringBase::Window& window, Camera& cam); //draw the map relative to the camera position
 
@@ -223,9 +246,7 @@ public:
 	Vector<MapObject>& getMapObjects() { return mapObjects; } //returns key, exit, doors, plates and traps
 
 	void setTileBlocked(int tileX, int tileY, bool blocked); //used by doors
-
 	bool isWalkable(float pixelX, float pixelY); //returns if a point in 
-
 	bool isBlockedByWall(float posX, float posY, int width, int height) const;
 
 

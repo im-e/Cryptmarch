@@ -12,6 +12,8 @@ void Map::unload()
 	spawnerPositions.clear();
 	mapObjects.clear();
 	playerStart = { 64.0f, 64.0f };
+	infinite = false;
+	templateCount = 0;
 }
 
 bool Map::loadLevel(const std::string& path)
@@ -24,6 +26,62 @@ void Map::setTileBlocked(int tileX, int tileY, bool blocked)
 {
 	if (tileX < 0 || tileX >= tilemapWidth || tileY < 0 || tileY >= tilemapHeight) return; //outside the map
 	blockedTiles[tileY * tilemapWidth + tileX] = blocked;
+}
+
+bool Map::loadInfinite(const std::string paths[], int count, int customSeed = 0)
+{
+	unload();
+	if (count > maxTemplates) count = maxTemplates; //check if count exceeds how many templates we have
+
+	for (int i = 0; i < count; i++) //for each template, we want to load it
+	{
+		std::ifstream file(paths[i]); //open the path to the template
+		if (!file.is_open())
+		{
+			//if it fails to open
+			Logger::Error("Map Template Failed to load at: " + paths[i]);
+			return false;
+		} 
+
+		int w, h; //get width and height
+		file >> w >> h; //read from file
+		if (w != templateTileSize || h != templateTileSize)
+		{			
+			Logger::Error("Map Template not 16x16");
+			return false; //if they arent 16 x 16 return false
+		} 
+
+		for (int y = 0; y < templateTileSize; y++) //go through the template y
+		{
+			for (int x = 0; x < templateTileSize; x++)  //go through the template x
+			{ //for each tile
+				int tileId; //get the tile id
+				file >> tileId; //read from file
+				if (tileId < 0 || tileId >= tileCount) tileId = 13; //if its invalid, set to 13 as a fallback
+				templates[i].tiles[y * templateTileSize + x] = tileId; //assign the each tile id to its correct tile inside template.tiles
+			}
+		}
+
+		std::string tag; //load spawners
+		while (file >> tag) //while there is tags to be read
+		{
+			if (tag == "SPAWNER") //if the tag equals spawners
+			{
+				float sx, sy; //spawner x, spawner y
+				file >> sx >> sy; //read the x and y
+				templates[i].spawners.add({ sx, sy }); //add the spawner to the template
+			}
+		}
+		file.close(); //close the file
+	}
+
+	templateCount = count; //assign that we are using the chosen amount of templates
+	infinite = true; //set infinite to be true
+	if (customSeed != 0) seed = customSeed; //if we have a custom seed, use it
+	else seed = static_cast<int>(rand()); //else use a random seed
+	playerStart = { 32.0f, 32.0f }; //set player start
+	return true; //return true to know we successfully loaded the map
+
 }
 
 bool Map::loadMap(const std::string& path)

@@ -72,12 +72,26 @@ private:
 
     //levels are played in this order
     static const int levelCount = 2; //amount of levels we have
-    inline static const char* levelPaths[levelCount] = //string defs for levels
+    inline static const std::string levelPaths[levelCount] = //string defs for levels
     {
         "resources/maps/map_dungeon.txt",
         "resources/maps/map_catacombs.txt",
     };
     int currentLevel = 0; //what level we are currently on
+
+    //infinite mode
+    static const int templateCount = 8;
+    inline static const std::string templatePaths[templateCount] =
+    {
+        "resources/maps/infinite/chunk_0.txt",
+        "resources/maps/infinite/chunk_1.txt",
+        "resources/maps/infinite/chunk_2.txt",
+        "resources/maps/infinite/chunk_3.txt",
+        "resources/maps/infinite/chunk_4.txt",
+        "resources/maps/infinite/chunk_5.txt",
+        "resources/maps/infinite/chunk_6.txt",
+        "resources/maps/infinite/chunk_7.txt"
+    };
 
     //helper to spawn player based on character type
     void spawnPlayer(AssetManager& am, EntityManager& em, CharacterType type, float x, float y, Controls controls)
@@ -104,34 +118,61 @@ private:
     void startLevel(AssetManager& am, EntityManager& em, Map& map)
     {
         em.clear(); //wipe anything from the last level
-        map.loadLevel(levelPaths[currentLevel]);
-
-        Vector2f start = map.getPlayerStart();
-
-        Controls p1Controls = { VK_UP, VK_DOWN, VK_LEFT, VK_RIGHT, 'L', 'K'};
-        Controls p2Controls = { 'W', 'S', 'A', 'D', 'B', 'V' }; 
-
-
-        //spawn players based on chosen character type and player mode
-        //spawn player 1
-        spawnPlayer(am, em, characterType, start.x, start.y, p1Controls);
-
-        //spawn player 2 if multiplayer is enabled
-        if (playerMode == PlayerMode::Multiplayer)
+        if (gameMode == GameModeType::Story)
         {
-            spawnPlayer(am, em, p2CharacterType, start.x + 30, start.y, p2Controls);
-        }
+            map.loadLevel(levelPaths[currentLevel]);
 
-        //create spawners
-        Vector<Vector2f>& spawnPoints = map.getSpawnerPositions();
-        for (int i = 0; i < spawnPoints.getSize(); i++)
+            Vector2f start = map.getPlayerStart();
+
+            Controls p1Controls = { VK_UP, VK_DOWN, VK_LEFT, VK_RIGHT, 'L', 'K' };
+            Controls p2Controls = { 'W', 'S', 'A', 'D', 'B', 'V' };
+
+
+            //spawn players based on chosen character type and player mode
+            //spawn player 1
+            spawnPlayer(am, em, characterType, start.x, start.y, p1Controls);
+
+            //spawn player 2 if multiplayer is enabled
+            if (playerMode == PlayerMode::Multiplayer)
+            {
+                spawnPlayer(am, em, p2CharacterType, start.x + 30, start.y, p2Controls); //spawn p2 with an x offset so no overlap
+            }
+
+            //create spawners
+            Vector<Vector2f>& spawnPoints = map.getSpawnerPositions();
+            for (int i = 0; i < spawnPoints.getSize(); i++)
+            {
+                EntityStats spawnerStats = { 100, 0, spawnPoints[i].x, spawnPoints[i].y, 2, 23 };
+                em.addSpawner(new Spawner(spawnerStats, &am.mapImage));
+            }
+
+            //create map objects
+            spawnMapObjects(am, em, map);
+        }
+        else if (gameMode == GameModeType::Infinite)
         {
-            EntityStats spawnerStats = { 100, 0, spawnPoints[i].x, spawnPoints[i].y, 2, 23 };
-            em.addSpawner(new Spawner(spawnerStats, &am.mapImage));
-        }
+            map.loadInfinite(templatePaths, templateCount, 0);
 
-        //create map objects
-        spawnMapObjects(am, em, map);
+            Vector2f start = map.getPlayerStart();
+            
+            Controls p1Controls = { VK_UP, VK_DOWN, VK_LEFT, VK_RIGHT, 'L', 'K' };
+            Controls p2Controls = { 'W', 'S', 'A', 'D', 'B', 'V' };
+            
+            //spawn players based on chosen character type and player mode
+            //spawn player 1
+            spawnPlayer(am, em, characterType, start.x, start.y, p1Controls);
+            
+            //spawn player 2 if multiplayer
+            if (playerMode == PlayerMode::Multiplayer)
+            {
+                spawnPlayer(am, em, p2CharacterType, start.x + 30, start.y, p2Controls);
+            }
+
+            //dont create spawners as we will do that dynamically
+            return;
+
+        }
+        
     }
 
     //turns the KEY, EXIT, DOOR, PLATE, FAKEPLATE and TRAP tags from the map file into entities

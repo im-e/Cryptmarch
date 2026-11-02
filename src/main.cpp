@@ -228,7 +228,7 @@ int main()
 
                 //set the camera to follow the player
                 Player* p1 = entityManager.getFirstPlayer();
-                cam.follow(window, map, p1 ->getX(), p1->getY(), true);
+                cam.follow(window, map, p1 ->getX(), p1->getY(), map.isInfinite());
 
                 //increase stats
                 gameController.getStats().timeSurvived += deltaTime;

@@ -240,7 +240,6 @@ void EntityManager::updatePickups(GamesEngineeringBase::Window& window, Map& map
 	{
 		Pickup* pickup = pickups[i]; //get pickup
 		pickup->update(window, map, deltaTime); //count down its lifetime
-		if (!pickup->canBeCollected()) continue; //if its just dropped, wait to collect so player cnat pick up instantly
 
 		for (int j = 0; j < players.getSize(); j++) //for each player
 		{

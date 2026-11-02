@@ -20,6 +20,13 @@ void Dwarf::draw(GamesEngineeringBase::Window& window, Camera& cam)
 		int screenY = cam.worldToScreenY(attackBox.y);
 		//draw weapon attack to screen
 		Graphics::DrawTilemapImage(window, *weaponImage, tileSize, weaponImageXOffset, weaponImageYOffset, screenX, screenY);
+
+#ifdef _DEBUG
+
+		Graphics::DrawRectOutline(window, cam.worldToScreenX(attackBox.x), cam.worldToScreenY(attackBox.y), attackBox.width, attackBox.height, 0, 255, 0);
+
+#endif
+
 	}
 
 #ifdef _DEBUG
@@ -164,13 +171,16 @@ void Dwarf::processAttack(AttackContext& attackContext) {
 AABB Dwarf::getMeleeHitbox() const
 {
 	//get the players normal hitbox
-	AABB playerBox = getHitbox();
+	Vector2f playerCentre = getCentrePoint();
+
+
 	//offset it forward using facing direction and reach distance
-	float attackX = playerBox.x + (attackDirX * attackReach);
-	float attackY = playerBox.y + (attackDirY * attackReach);
+	float attackX = playerCentre.x + (attackDirX * attackReach);
+	float attackY = playerCentre.y + (attackDirY * attackReach);
 
 	//return an AABB struct
-	return { attackX, attackY, playerBox.width, playerBox.height };
+	float half = meleeSize * 0.5f;
+	return { attackX - half, attackY - half, meleeSize, meleeSize };
 }
 
 bool Dwarf::checkMeleeCollision(Entity* entity) const

@@ -13,14 +13,15 @@ private:
 	float attackActiveTimer = 0.0f; //timer for how long the attack is active
 	float attackCooldownTimer = 0.0f; //cooldown for the attack
 
-	const float attackDuration = 0.15f; //duration of the melee attack
-	const float attackCooldown = 0.35f; //cooldown duration of the melee attack
+	const float attackDuration = 0.3f; //duration of the melee attack
+	const float attackCooldown = 0.2f; //cooldown duration of the melee attack
 	const float attackReach = 32.0f; //reach of the melee attack
 
-	const float knockbackForce = 300.0f; //force for knockback of the melee attack
-	const float knockbackDuration = 0.18f; //duration of knockback for the melee attack
+	const float knockbackForce = 450.0f; //force for knockback of the melee attack
+	const float knockbackDuration = 0.2f; //duration of knockback for the melee attack
 	
 	int meleeDamage = 75; //damage of melee attack
+	int meleeSize = 48; //size of melee attack
 
 	float attackDirX = 0; //direction of melee attack
 	float attackDirY = 0; //direction of melee attack
@@ -34,11 +35,11 @@ private:
 	
 	bool keyWasReleased = true; //check to see if key has been released so multiple activations dont happen on the same frame
 	float skillTimer = 0.0f; //timer for speed boost
-	float skillDuration = 3.0f; //speed boost duration
-	const float boostedDefenceMultiplier = 0.5f; //multiplier for when in secondary skill
+	float skillDuration = 5.0f; //stat boost duration
+	const float boostedDefenceMultiplier = 0.2f; //multiplier for when in secondary skill
 	const float normalDefenceMultiplier = 1.0f;
 	float normalSpeed = 300.0f; //nomral movement speed
-	float boostedSpeed = 440.0f; //boosted movement speed
+	float boostedSpeed = 500.0f; //boosted movement speed
 
 	int manaCost; //mana cost for secondary skill
 public:

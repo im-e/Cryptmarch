@@ -14,16 +14,17 @@ private:
 	float arrowSpeed = 600.0f; //speed that the arrow travels
 	float arrowLifetime = 1.5f; //lifetime of the arrow
 	int arrowDamage = 50; //damage of the arrow
-	float fireCooldown = 0.35f; //cooldown to fire again
+	float fireCooldown = 0.2f; //cooldown to fire again
 	float fireCooldownTimer = 0.0f; //cooldown tracker
 	bool fireRequested = false; //tracks if fire has been activated
-	float arrowKnockbackForce = 250.0f; //force for knockback of the ranged attack
-	float arrowKnockbackDuration = 0.2f; //duration of knockback for the ranged attack
+	float arrowKnockbackForce = 400.0f; //force for knockback of the ranged attack
+	float arrowKnockbackDuration = 0.3f; //duration of knockback for the ranged attack
+	int arrowHitboxSize = 16;
 
 	//dash (secondary skill)
-	float dashSpeed = 600.0f; //pixels per second while dashing
-	int manaCost = 20; //cost of secondary skill
-	float dashDuration = 0.2f; //seconds -> dash covers 600 * 0.2 = 120px (~4 tiles)
+	float dashSpeed = 800.0f; //pixels per second while dashing
+	int manaCost = 10; //cost of secondary skill
+	float dashDuration = 0.4f; //seconds dash covers
 	float dashCooldown = 0.5f; //stops dashes being chained back to back
 	float dashCooldownTimer = 0.0f; //cooldown timer for the dash
 	float dashTimer = 0.0f; //time dash is active
