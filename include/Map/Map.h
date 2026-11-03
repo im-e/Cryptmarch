@@ -214,8 +214,8 @@ private:
 		//TREES - TallTreeTop goes directly above TallTreeBottom
 		/*123*/ TileDefinition("TallTreeTop", 3, 24, false, 13),
 		/*124*/ TileDefinition("Sapling", 0, 25, true, 13),
-		/*125*/ TileDefinition("SmallTree", 1, 25, false, 13),
-		/*126*/ TileDefinition("Tree", 2, 25, false, 13),
+		/*125*/ TileDefinition("SmallTree", 1, 25, true, 13),
+		/*126*/ TileDefinition("Tree", 2, 25, true, 13),
 		/*127*/ TileDefinition("TallTreeBottom", 3, 25, false, 13),
 	};
 
