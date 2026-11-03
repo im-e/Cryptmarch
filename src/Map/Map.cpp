@@ -28,13 +28,56 @@ void Map::setTileBlocked(int tileX, int tileY, bool blocked)
 	blockedTiles[tileY * tilemapWidth + tileX] = blocked;
 }
 
-bool Map::loadInfinite(const std::string paths[], int count, int customSeed = 0)
+int Map::getTileAt(int tileX, int tileY) const //get the tile shown at x and y pos
+{
+	if (!infinite) //if not infinite
+	{
+		if (tileX < 0 || tileX >= tilemapWidth || tileY < 0 || tileY >= tilemapHeight) //check if in bounds
+		{
+			return -1; //tile is out of bounds of the tilemap
+		}
+		return tilemapData[tileY * tilemapWidth + tileX]; //else return the tile at index
+	}
+	else //find the tile inside the infinite map 
+	{
+		//the infinite map is made up from a formula
+		int chunkX = Math::floorDiv(tileX, 16); //floor div to find what chunk we are in
+		int chunkY = Math::floorDiv(tileY, 16);
+		int localX = Math::positiveModulo(tileX, 16); //positive modulo to find where we are in the chunk
+		int localY = Math::positiveModulo(tileY, 16);
+
+		int templateIndex = getTemplateIndex(chunkX, chunkY);
+
+		return templates[templateIndex].tiles[localY * templateTileSize + localX];
+	}
+}
+
+int Map::getTemplateIndex(int chunkX, int chunkY) const
+{
+	if (chunkX == 0 && chunkY == 0) //force chunk 0,0 
+	{//as template 0 
+		return 0; //to use template 0 which is a 'safe' room with no spawners
+	}
+
+	unsigned int ux = static_cast<unsigned int>(chunkX); //cast to unsigned int for our hash
+	unsigned int uy = static_cast<unsigned int>(chunkY); //so the result is never negative before % templateCount
+	unsigned int us = static_cast<unsigned int>(seed);
+
+	//index = hash(chunkX, chunkY, seed) % templateCount
+	//Teschner et al. (2003), Optimized Spatial Hashing for Collision Detection
+	unsigned int hashVal = (ux * 73856093U) ^ (uy * 19349663U) ^ us;
+	return hashVal % templateCount;
+}
+
+bool Map::loadInfinite(const std::string paths[], int count, int customSeed)
 {
 	unload();
 	if (count > maxTemplates) count = maxTemplates; //check if count exceeds how many templates we have
 
 	for (int i = 0; i < count; i++) //for each template, we want to load it
 	{
+		templates[i].spawners.clear(); //clear the spawners for a new load
+
 		std::ifstream file(paths[i]); //open the path to the template
 		if (!file.is_open())
 		{
@@ -79,7 +122,7 @@ bool Map::loadInfinite(const std::string paths[], int count, int customSeed = 0)
 	infinite = true; //set infinite to be true
 	if (customSeed != 0) seed = customSeed; //if we have a custom seed, use it
 	else seed = static_cast<int>(rand()); //else use a random seed
-	playerStart = { 32.0f, 32.0f }; //set player start
+	playerStart = { 256.0f, 256.0f }; //set player start
 	return true; //return true to know we successfully loaded the map
 
 }
@@ -177,61 +220,74 @@ bool Map::loadMap(const std::string& path)
 
 void Map::draw(GamesEngineeringBase::Window& window, Camera& cam)
 {
-	//for each tile, draw tile one by one
-	//i = slot in map
-	for (int i = 0; i < tilemapHeight * tilemapWidth; i++)
+	//loop over the tiles the camera can see
+	int firstTileX = Math::floorDiv(cam.getX(), tilePixelSize);
+	int lastTileX = Math::floorDiv(cam.getX() + window.getWidth(), tilePixelSize);
+	int firstTileY = Math::floorDiv(cam.getY(), tilePixelSize);
+	int lastTileY = Math::floorDiv(cam.getY() + window.getHeight(), tilePixelSize);
+
+	//loop through all the tiles
+	//loop y first
+	for (int y = firstTileY; y <= lastTileY; y++)
 	{
-		//get tile number
-		int tileNumber = tilemapData[i];
-		//get the tile definition from the tile number
-		//use a reference to avoid making a full copy
-		const TileDefinition& tile = tileDefinitions[tileNumber];
-
-		//calculate the x and y (in the tilemap) based on the slot position
-		int tilePosX = i % tilemapWidth; //the remainder after dividing is how far along the row you are
-		int tilePosY = i / tilemapWidth; //how many whole rows fit before it
-
-		//convert tilemap posx and posy to world space
-		int tileWorldX = tilePosX * tilePixelSize;
-		int tileWorldY = tilePosY * tilePixelSize;
-
-		//convert to screen coordinates using the camera
-		int tileScreenX = cam.worldToScreenX(tileWorldX);
-		int tileScreenY = cam.worldToScreenY(tileWorldY);
-
-		//if this tile has a transparent background, draw its base tile first so it doesnt sit on black
-		if (tile.baseTile >= 0)
+		//x second
+		for (int x = firstTileX; x <= lastTileX; x++)
 		{
-			const TileDefinition& base = tileDefinitions[tile.baseTile];
-			Graphics::DrawTilemapImage(window, *tilesetImage, tilePixelSize, base.tileXOffset, base.tileYOffset, tileScreenX, tileScreenY);
-		}
+			//get the tile id at current position
+			int id = getTileAt(x, y);
+			//if id is -1 (invalid will have logged), or above our tile count (also invalid)
+			if (id == -1 || id >= tileCount)
+			{
+				continue; //skip the tile
+			}
 
-		//fill in information to draw
-		Graphics::DrawTilemapImage(window, *tilesetImage, tilePixelSize, tile.tileXOffset, tile.tileYOffset, tileScreenX, tileScreenY);
+			//convert to screen coordinates using the camera
+			int screenX = cam.worldToScreenX(x * tilePixelSize);
+			int screenY = cam.worldToScreenY(y * tilePixelSize);
+
+			//if this tile has a transparent background, draw its base tile first so it doesnt sit on black
+			int base = tileDefinitions[id].baseTile;
+			if (base != -1) //ensure base isnt default (invalid tile)
+			{
+				Graphics::DrawTilemapImage(window, *tilesetImage, tilePixelSize, tileDefinitions[base].tileXOffset, tileDefinitions[base].tileYOffset, screenX, screenY);
+			}
+
+			//draw the tile
+			Graphics::DrawTilemapImage(window, *tilesetImage, tilePixelSize, tileDefinitions[id].tileXOffset, tileDefinitions[id].tileYOffset, screenX, screenY);
+
+			// Draw blocked indicator for fixed map doors if applicable
+			if (!infinite && blockedTiles)
+			{
+				int idx = y * tilemapWidth + x;
+				if (idx >= 0 && idx < tilemapWidth * tilemapHeight && blockedTiles[idx])
+				{
+					Graphics::DrawTilemapImage(window, *tilesetImage, tilePixelSize, 2, 16, screenX, screenY); // Shut door sprite
+				}
+			}
+		}
 	}
 }
 
 bool Map::isWalkable(float pixelX, float pixelY)
 {
-	//convert pixel coordinate into tile grid coordinate
-	//map is made up of 32x32 tiles if my character is at x=100 it will be tile 3. 
-	int tileX = pixelX / tilePixelSize;
-	int tileY = pixelY / tilePixelSize;
+	//convert pixel coordinate into tile grid coordinate 
+	int tileX = Math::floorDiv(static_cast<int>(floor(pixelX)), tilePixelSize); //using floor for negative numbers
+	int tileY = Math::floorDiv(static_cast<int>(floor(pixelY)), tilePixelSize);
 
-	//check if the tile coordinate exists within the map
-	if (tileX < 0 || tileX >= tilemapWidth || tileY < 0 || tileY >= tilemapHeight)
-	{
-		return false; //this means that anything outside the map will act like an invisible wall
+	//get the id of the tile at tilex and tiley
+	int id = getTileAt(tileX, tileY);
+	if (id == -1 || id >= tileCount) return false; //check for invalid tile, will treat as out of bounds for now so we want it to act like an invisible wall
+
+	//if its not infinite
+	if (!infinite)
+	{	//get the index
+		int index = tileY * tilemapWidth + tileX;
+		//check index if its a blocked tile
+		if (blockedTiles[index]) return false;
 	}
 
-	//convert the 2d coordinates to a 1d array index
-	int index = tileY * tilemapWidth + tileX;
-
-	if (blockedTiles[index]) return false; //a closed door is on this tile
-
-	//get the tile from the index
-	int tileValue = tilemapData[index];
-	return tileDefinitions[tileValue].walkable; //check if that tile's definition is walkable and return it
+	//return the walkable status of the tiledefinition
+	return tileDefinitions[id].walkable;
 }
 
 
@@ -248,38 +304,31 @@ bool Map::isBlockedByWall(float posX, float posY, int width, int height) const
 	//EG:   4
 	//    3   5
 	//      5
-	int leftTile = left / 32; // / 32 converts it into a tile coordinate
-	int rightTile = right / 32;
-	int topTile = top / 32;
-	int bottomTile = bottom / 32;
-
-	//loop through all tiles that the object edges overlap
-	for (int y = topTile; y <= bottomTile; ++y) 
+	//using floor division now for negative coordinates
+	int minTileX = Math::floorDiv(static_cast<int>(floor(left)), tilePixelSize);
+	int maxTileX = Math::floorDiv(static_cast<int>(floor(right)), tilePixelSize);
+	int minTileY = Math::floorDiv(static_cast<int>(floor(top)), tilePixelSize);
+	int maxTileY = Math::floorDiv(static_cast<int>(floor(bottom)), tilePixelSize);
+	
+	//loop through all the tiles that the object overlaps
+	for (int tileY = minTileY; tileY <= maxTileY; tileY++)
 	{
-		for (int x = leftTile; x <= rightTile; ++x) 
+		for (int tileX = minTileX; tileX <= maxTileX; tileX++)
 		{
-			///check if any part of the box is trying to move out fo the map
-			if (x < 0 || x >= tilemapWidth || y < 0 || y >= tilemapHeight)
-			{
-				return true; //its out of bounds, so its blocked 
-			}
-			
-			//convert the coordinates into a 1d array index
-			int index = y * tilemapWidth + x;
-			//get the tile value
-			int tileValue = tilemapData[index];
+			//get the tile at current position
+			int id = getTileAt(tileX, tileY);
+			if (id == -1 || id >= tileCount) return true; //check for invalid tile, will treat as out of bounds for now so we want it to act like an invisible wall
 
-			if (!tileDefinitions[tileValue].walkable) //if its walkable
-			{
-				return true; //return true as it is blocked
+			if (!infinite) //if not infinite
+			{ //blockedTiles is nullptr on infinite mode, so we only check on non-infinite mode
+				//get the index for blocked tiles
+				int index = tileY * tilemapWidth + tileX;
+				if (blockedTiles[index]) return true; //if that tile is blocked return true
 			}
 
-			if (blockedTiles[index]) //a closed door is on this tile
-			{
-				return true;
-			}
+			//check if this tile is not walkable
+			if (!tileDefinitions[id].walkable) return true;
 		}
 	}
-
-	return false; //if player isnt colliding with any tiles allow movement
+	return false; //else its walkable
 }

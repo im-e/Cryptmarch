@@ -445,26 +445,3 @@ STILL TO DO NEXT:
   - Player and renderer.
 
 
-==============================================================
-EVALUATION CHECKLIST (tick as you go: replace [ ] with [x])
-==============================================================
-[ ] Baseline FPS recorded (Release build, same machine, same
-    window size)
-[ ] FPS after each optimisation, one change at a time
-[ ] FPS with N enemies (try e.g. 10, 50, 200, 500)
-[ ] FPS with many projectiles on screen
-[ ] Debug vs Release noted
-[ ] Screenshots saved with clear file names
-
-
-==============================================================
-KNOWN BUGS / LIMITATIONS (feeds report section 4)
-==============================================================
-- Vector::operator[]: out-of-bounds path uses "return;" in a
-  function returning T&. Needs a valid return.
-- Vector: no copy constructor / copy assignment (copying would
-  double-delete the buffer).
-- Git history contains a 64.8 MB .vs database file from commit
-  276bba5 (removed from tracking afterwards).
-- Full-screen tile rendering is slow (see 2026-10-18).
-- (add more as you find them)

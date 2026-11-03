@@ -93,117 +93,172 @@ int main()
         switch (gameController.getState())
         {
         case MenuState: {
-            Graphics::DrawImage(window, assetManager.mainMenuImage, 0, 0);
+            Graphics::DrawImage(window, assetManager.mainMenuImage, 0, 0); //draw main menu image
 
-            const char* title = "CRYPTMARCH";
-            const char* prompt = "PRESS ENTER TO START";
-            int titleX = (windowWidth - (int)strlen(title) * 32) / 2;
+            const char* title = "CRYPTMARCH"; //title 
+            const char* prompt = "PRESS ENTER TO START"; //prompt
+            int titleX = (windowWidth - (int)strlen(title) * 32) / 2; //use strlen to find the length of the string for centering
             int promptX = (windowWidth - (int)strlen(prompt) * 32) / 2;
-            Graphics::DrawString(window, assetManager.hudImage, title, titleX, 200);
+            Graphics::DrawString(window, assetManager.hudImage, title, titleX, 200); //draw to screen
             Graphics::DrawString(window, assetManager.hudImage, prompt, promptX, 500);
 
-            if (enterPressed)
+            if (enterPressed) //if enter pressed
             {
-                gameController.setState(PlayerSelectState);
+                gameController.setState(PlayerSelectState); //go to player select state
             }
             break;
         }
         case PlayerSelectState: {
-            Graphics::DrawImage(window, assetManager.mainMenuImage, 0, 0);
+            Graphics::DrawImage(window, assetManager.mainMenuImage, 0, 0); //draw main menu image
 
-            const char* title = "PLAYER SELECT";
-            int titleX = (windowWidth - (int)strlen(title) * 32) / 2;
-            Graphics::DrawString(window, assetManager.hudImage, title, titleX, 180);
+            const char* title = "PLAYER SELECT"; //title
+            int titleX = (windowWidth - (int)strlen(title) * 32) / 2; //centre
+            Graphics::DrawString(window, assetManager.hudImage, title, titleX, 180); //draw
 
-            int idx = gameController.getPlayerSelectIndex();
-            if (upPressed) { idx = (idx == 0) ? 1 : 0; }
-            if (downPressed) { idx = (idx == 1) ? 0 : 1; }
-            gameController.setPlayerSelectIndex(idx);
 
-            const char* opt1 = (idx == 0) ? "- SINGLE PLAYER -" : "  SINGLE PLAYER  ";
-            const char* opt2 = (idx == 1) ? "- MULTIPLAYER   -" : "  MULTIPLAYER    ";
+            //get the index and change based on input
+            int index = gameController.getPlayerSelectIndex(); //get the index of current selection
+            if (upPressed) //if up is pressed
+            { //ternary operator ? - if true - result 1 , if false result 2
+                index = (index == 0) ? 1 : 0;  //set index to - (if index == 0) set to 1 if true, 0 if false
+            }
+            if (downPressed) //if down is pressed
+            { 
+                index = (index == 1) ? 0 : 1; 
+            }
+            //set the index
+            gameController.setPlayerSelectIndex(index); //set player selection index
 
-            Graphics::DrawString(window, assetManager.hudImage, opt1, (windowWidth - (int)strlen(opt1) * 32) / 2, 300);
-            Graphics::DrawString(window, assetManager.hudImage, opt2, (windowWidth - (int)strlen(opt2) * 32) / 2, 380);
+            //depending on the index value, change the options to highlight which index is current to player selection
+            const char* option1 = (index == 0) ? "- SINGLE PLAYER -" : "  SINGLE PLAYER  ";
+            const char* option2 = (index == 1) ? "- MULTIPLAYER   -" : "  MULTIPLAYER    ";
 
-            if (enterPressed)
+            //draw both
+            Graphics::DrawString(window, assetManager.hudImage, option1, (windowWidth - (int)strlen(option1) * 32) / 2, 300);
+            Graphics::DrawString(window, assetManager.hudImage, option2, (windowWidth - (int)strlen(option2) * 32) / 2, 380);
+
+            if (enterPressed) //if enter pressed
             {
+                //confirm selection
                 gameController.confirmPlayerSelection();
             }
             break;
         }
         case CharacterSelectState: {
-            Graphics::DrawImage(window, assetManager.mainMenuImage, 0, 0);
+            Graphics::DrawImage(window, assetManager.mainMenuImage, 0, 0); //draw background image
 
-            const char* title = "PLAYER 1: CHOOSE HERO";
-            int titleX = (windowWidth - (int)strlen(title) * 32) / 2;
-            Graphics::DrawString(window, assetManager.hudImage, title, titleX, 180);
+            const char* title = "PLAYER 1: CHOOSE HERO"; //title
+            int titleX = (windowWidth - (int)strlen(title) * 32) / 2; //centre title
+            Graphics::DrawString(window, assetManager.hudImage, title, titleX, 180); //draw title
 
-            int idx = gameController.getCharacterSelectIndex();
-            if (upPressed) { idx = (idx - 1 + 3) % 3; }
-            if (downPressed) { idx = (idx + 1) % 3; }
-            gameController.setCharacterSelectIndex(idx);
+            int index = gameController.getCharacterSelectIndex(); //get index
 
-            const char* opt1 = (idx == 0) ? "- DWARF  -" : "  DWARF  ";
-            const char* opt2 = (idx == 1) ? "- ARCHER -" : "  ARCHER ";
-            const char* opt3 = (idx == 2) ? "- WIZARD -" : "  WIZARD ";
+            //menu nav wrap around
+            if (upPressed) 
+            {   //%3 will always give back 0,1,2 
+                //we add + 3 to always do a full loop around to stop index from being -1 which would break the wrap around
+                index = (index - 1 + 3) % 3; 
+            }
+            if (downPressed) 
+            { 
+                //if index is 2, + 1 = 3 , %3 = 0, wrapping it back around
+                index = (index + 1) % 3; 
+            }
+            //set the index 
+            gameController.setCharacterSelectIndex(index);
 
-            Graphics::DrawString(window, assetManager.hudImage, opt1, (windowWidth - (int)strlen(opt1) * 32) / 2, 260);
-            Graphics::DrawString(window, assetManager.hudImage, opt2, (windowWidth - (int)strlen(opt2) * 32) / 2, 330);
-            Graphics::DrawString(window, assetManager.hudImage, opt3, (windowWidth - (int)strlen(opt3) * 32) / 2, 400);
+            //using the index we will choose which highlight is shown
+            const char* option1 = (index == 0) ? "- DWARF  -" : "  DWARF  ";
+            const char* option2 = (index == 1) ? "- ARCHER -" : "  ARCHER ";
+            const char* option3 = (index == 2) ? "- WIZARD -" : "  WIZARD ";
 
+            //draw the options with centering
+            Graphics::DrawString(window, assetManager.hudImage, option1, (windowWidth - (int)strlen(option1) * 32) / 2, 260);
+            Graphics::DrawString(window, assetManager.hudImage, option2, (windowWidth - (int)strlen(option2) * 32) / 2, 330);
+            Graphics::DrawString(window, assetManager.hudImage, option3, (windowWidth - (int)strlen(option3) * 32) / 2, 400);
+
+            //if enter pressed
             if (enterPressed)
             {
+                //confirm selection
                 gameController.confirmCharacterSelection();
             }
             break;
         }
         case P2CharacterSelectState: {
-            Graphics::DrawImage(window, assetManager.mainMenuImage, 0, 0);
 
-            const char* title = "PLAYER 2: CHOOSE HERO";
-            int titleX = (windowWidth - (int)strlen(title) * 32) / 2;
-            Graphics::DrawString(window, assetManager.hudImage, title, titleX, 180);
+            Graphics::DrawImage(window, assetManager.mainMenuImage, 0, 0); //draw background image
 
-            int idx = gameController.getP2CharacterSelectIndex();
-            if (upPressed) { idx = (idx - 1 + 3) % 3; }
-            if (downPressed) { idx = (idx + 1) % 3; }
-            gameController.setP2CharacterSelectIndex(idx);
+            const char* title = "PLAYER 2: CHOOSE HERO"; //title
+            int titleX = (windowWidth - (int)strlen(title) * 32) / 2; //centre title
+            Graphics::DrawString(window, assetManager.hudImage, title, titleX, 180); //draw title
 
-            const char* opt1 = (idx == 0) ? "- DWARF  -" : "  DWARF  ";
-            const char* opt2 = (idx == 1) ? "- ARCHER -" : "  ARCHER ";
-            const char* opt3 = (idx == 2) ? "- WIZARD -" : "  WIZARD ";
+            int index = gameController.getP2CharacterSelectIndex(); //get index
+            //menu nav wrap around
+            if (upPressed)
+            {   //%3 will always give back 0,1,2 
+                //we add + 3 to always do a full loop around to stop index from being -1 which would break the wrap around
+                index = (index - 1 + 3) % 3;
+            }
+            if (downPressed)
+            {
+                //if index is 2, + 1 = 3 , %3 = 0, wrapping it back around
+                index = (index + 1) % 3;
+            }
 
+            //set the index 
+            gameController.setP2CharacterSelectIndex(index);
+
+            //using the index we will choose which highlight is shown
+            const char* opt1 = (index == 0) ? "- DWARF  -" : "  DWARF  ";
+            const char* opt2 = (index == 1) ? "- ARCHER -" : "  ARCHER ";
+            const char* opt3 = (index == 2) ? "- WIZARD -" : "  WIZARD ";
+
+            //draw the options with centering
             Graphics::DrawString(window, assetManager.hudImage, opt1, (windowWidth - (int)strlen(opt1) * 32) / 2, 260);
             Graphics::DrawString(window, assetManager.hudImage, opt2, (windowWidth - (int)strlen(opt2) * 32) / 2, 330);
             Graphics::DrawString(window, assetManager.hudImage, opt3, (windowWidth - (int)strlen(opt3) * 32) / 2, 400);
 
+            //if enter pressed
             if (enterPressed)
             {
+                //confirm selection
                 gameController.confirmP2CharacterSelection();
             }
             break;
         }
         case ModeSelectState: {
+            //draw background image
             Graphics::DrawImage(window, assetManager.mainMenuImage, 0, 0);
 
-            const char* title = "SELECT MODE";
-            int titleX = (windowWidth - (int)strlen(title) * 32) / 2;
-            Graphics::DrawString(window, assetManager.hudImage, title, titleX, 180);
+            const char* title = "SELECT MODE"; //set title
+            int titleX = (windowWidth - (int)strlen(title) * 32) / 2; //centre title
+            Graphics::DrawString(window, assetManager.hudImage, title, titleX, 180); //draw title
 
-            int idx = gameController.getModeSelectIndex();
-            if (upPressed) { idx = (idx == 0) ? 1 : 0; }
-            if (downPressed) { idx = (idx == 1) ? 0 : 1; }
-            gameController.setModeSelectIndex(idx);
+            int index = gameController.getModeSelectIndex(); //get index
+            if (upPressed) 
+            {   //1 if true, 0 if false
+                index = (index == 0) ? 1 : 0; 
+            }
+            if (downPressed) 
+            {   //reverse
+                index = (index == 1) ? 0 : 1; 
+            }
+            //set index
+            gameController.setModeSelectIndex(index);
 
-            const char* opt1 = (idx == 0) ? "- STORY MODE    -" : "  STORY MODE     ";
-            const char* opt2 = (idx == 1) ? "- INFINITE MODE -" : "  INFINITE MODE  ";
+            //based on index show the highlight
+            const char* opt1 = (index == 0) ? "- STORY MODE    -" : "  STORY MODE     ";
+            const char* opt2 = (index == 1) ? "- INFINITE MODE -" : "  INFINITE MODE  ";
 
+            //draw image
             Graphics::DrawString(window, assetManager.hudImage, opt1, (windowWidth - (int)strlen(opt1) * 32) / 2, 300);
             Graphics::DrawString(window, assetManager.hudImage, opt2, (windowWidth - (int)strlen(opt2) * 32) / 2, 380);
 
+            //if enter pressed
             if (enterPressed)
             {
+                //start new game
                 gameController.startNewGame(assetManager, entityManager, map);
             }
             break;
@@ -211,6 +266,7 @@ int main()
             case PlayState: { //GAME STATE
                 //------------------------------ UPDATE -------------------
                 entityManager.update(window, map, deltaTime); //update all entities
+                gameController.updateInfiniteSpawners(assetManager, entityManager, map); //updates infinite level spawners
                 int kills = entityManager.cleanupKills(); //cleanup any entities killed
                 gameController.getStats().enemiesKilled += kills; //count kills before leaving the level
 
@@ -228,7 +284,7 @@ int main()
 
                 //set the camera to follow the player
                 Player* p1 = entityManager.getFirstPlayer();
-                cam.follow(window, map, p1 ->getX(), p1->getY(), map.isInfinite());
+                cam.follow(window, map, p1 ->getX(), p1->getY(), !map.isInfinite()); //cam follow param is fixedMap, so we use not infinite
 
                 //increase stats
                 gameController.getStats().timeSurvived += deltaTime;

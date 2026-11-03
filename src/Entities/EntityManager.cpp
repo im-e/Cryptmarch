@@ -58,8 +58,8 @@ void EntityManager::update(GamesEngineeringBase::Window& window, Map& map, float
 		}
 	}
 
+	Player* firstPlayer = getFirstPlayer(); //get firstPlayer
 	//update all spawners
-	Player* firstPlayer = getFirstPlayer();
 	for (int i = 0; i < spawners.getSize() && firstPlayer != nullptr; i++) //skip if there is no player to measure range from
 	{
 		//work out range of spawner

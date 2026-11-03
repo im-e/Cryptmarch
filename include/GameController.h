@@ -93,6 +93,49 @@ private:
         "resources/maps/infinite/chunk_7.txt"
     };
 
+    Vector<ChunkCoordinate> activatedChunks;
+
+
+    bool isChunkActivated(int chunkX, int chunkY)
+    {
+        ChunkCoordinate target = { chunkX, chunkY }; //get target chunk
+
+        for (int i = 0; i < activatedChunks.getSize(); i++) //loop through activated chunks vector
+        {
+            if (activatedChunks[i] == target) //if it matches our target
+            {
+                return true; //return true
+            }
+        }
+        
+        return false; //else return false
+    }
+
+    void activateChunk(int chunkX, int chunkY, AssetManager& am, EntityManager& em, Map& map)
+    {
+        ChunkCoordinate target = { chunkX, chunkY }; //get target chunk
+        activatedChunks.add(target); //add to activated chunks
+
+        int index = map.getTemplateIndex(chunkX, chunkY); //get the hashed inded of this chunk
+        const ChunkTemplate& temp = map.getTemplate(index); //get the template
+
+        for (int i = 0; i < temp.spawners.getSize(); i++) //for each spawner in the template
+        {
+            //get the local position inside the chunk
+            int localX = temp.spawners[i].x;
+            int localY = temp.spawners[i].y;
+
+            //convert into world position
+            int worldX = (chunkX * 16 + localX) * 32;
+            int worldY = (chunkY * 16 + localY) * 32;
+
+            //same as story-mode but with worldX and worldY
+            EntityStats spawnerStats = { 100, 0, worldX, worldY, 2, 23 };
+            em.addSpawner(new Spawner(spawnerStats, &am.mapImage));
+        }
+    }
+
+
     //helper to spawn player based on character type
     void spawnPlayer(AssetManager& am, EntityManager& em, CharacterType type, float x, float y, Controls controls)
     {
@@ -151,7 +194,7 @@ private:
         }
         else if (gameMode == GameModeType::Infinite)
         {
-            map.loadInfinite(templatePaths, templateCount, 0);
+            map.loadInfinite(templatePaths, templateCount);
 
             Vector2f start = map.getPlayerStart();
             
@@ -254,6 +297,44 @@ public:
     int getModeSelectIndex() const { return modeSelectIndex; }
     void setModeSelectIndex(int idx) { modeSelectIndex = idx; }
 
+    void updateInfiniteSpawners(AssetManager& am, EntityManager& em, Map& map)
+    {
+        if (!map.isInfinite()) return; //if map isnt infinite return
+        Player* firstPlayer = em.getFirstPlayer(); //get first player
+
+        if (firstPlayer == nullptr) return; //if first player is null return
+
+        //find first player tile
+        int playerTileX = Math::floorDiv(static_cast<int>(floor(firstPlayer->getX())), 32);
+        int playerTileY = Math::floorDiv(static_cast<int>(floor(firstPlayer->getY())), 32);
+        //find first player chunk
+        int playerChunkX = Math::floorDiv(playerTileX, 16);
+        int playerChunkY = Math::floorDiv(playerTileY, 16);
+
+        //dx and dy are steps away from the player, we are going to be checking the 3x3 chunks around the player
+        //-1, 0, 1
+        for (int dy = - 1; dy <= 1; dy++)
+        {
+            for (int dx = - 1; dx <= 1; dx++)
+            { //for current chunk
+                //get the x and y
+                int chunkX = playerChunkX + dx;
+                int chunkY = playerChunkY + dy;
+
+                if (chunkX == 0 && chunkY == 0)
+                {//chunk 0,0 has no spawners
+                    continue;
+                }
+                if (isChunkActivated(chunkX, chunkY))
+                {//already active, skip
+                    continue;
+                }
+
+                activateChunk(chunkX, chunkY, am, em, map); //activate chunk
+            }
+        }
+    }
+
     void confirmPlayerSelection()
     {
         if (playerSelectIndex == 0)
@@ -299,6 +380,7 @@ public:
     {
         gameMode = (modeSelectIndex == 0) ? GameModeType::Story : GameModeType::Infinite;
         stats.reset();
+        activatedChunks.clear();
         currentLevel = 0;
         startLevel(am, em, map);
         gameState = PlayState;

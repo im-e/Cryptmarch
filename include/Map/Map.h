@@ -6,6 +6,7 @@
 #include "Utilities/Logger.h"
 #include "Utilities/Vector.h"
 #include "Utilities/Vector2f.h"
+#include "Utilities/Math.h"
 
 //objects from tags in the map file, which are then created into game entities
 enum class MapObjectType { Key, Exit, Door, Plate, FakePlate, Trap };
@@ -23,6 +24,15 @@ struct ChunkTemplate
 	Vector<Vector2f> spawners; //a vector of spawners
 };
 
+struct ChunkCoordinate
+{ 
+	int x, y; //has an x,y
+	bool operator== (const ChunkCoordinate& other) const //overwrite the == operator to be able to compare chunk coords properly
+	{ 
+		return x == other.x && y == other.y; 
+	}
+};
+
 
 //forward declaration, tells the compiler camera is a class
 //so we can use camera& without compiler getting stuck in a loop
@@ -33,7 +43,6 @@ class Map
 private:
 
 	GamesEngineeringBase::Image* tilesetImage; //tileset image
-	bool loadImage(const std::string& path); //loads the image
 
 	int* tilemapData = nullptr; //map grid 1d flat array of tile ids
 	int tilemapWidth = 0; //width of tilemap (in tiles)
@@ -53,6 +62,7 @@ private:
 	bool* blockedTiles = nullptr;
 
 	void unload(); //frees the current level so a new one can be loaded
+	bool loadMap(const std::string& path); //loads map data, called by loadLevel (public)
 
 	//infinite mode data
 	int templateTileSize = 16;
@@ -209,8 +219,6 @@ private:
 		/*127*/ TileDefinition("TallTreeBottom", 3, 25, false, 13),
 	};
 
-	bool loadMap(const std::string& path); //loads map data
-
 public:
 
 	Map(GamesEngineeringBase::Image* _image) //constructor, the level is loaded later with loadLevel
@@ -226,12 +234,13 @@ public:
 	bool loadLevel(const std::string& path); //clears the old level and loads a new one
 	bool loadInfinite(const std::string paths[], int templateCount, int customSeed = 0);
 
-	int getTileAt(int tileX, int tileY) const;
-
+	//marked const as it only reads map data
+	int getTileAt(int tileX, int tileY) const; //gets the tile shown at x and y pos
 	bool isInfinite() const { return infinite; } 
 	const ChunkTemplate& getTemplate(int index) const { return templates[index]; }
 	int getTemplateCount() const { return templateCount; }
 	int getSeed() const { return seed; }
+	int getTemplateIndex(int chunkX, int chunk) const;
 
 	void draw(GamesEngineeringBase::Window& window, Camera& cam); //draw the map relative to the camera position
 
@@ -247,7 +256,8 @@ public:
 
 	void setTileBlocked(int tileX, int tileY, bool blocked); //used by doors
 	bool isWalkable(float pixelX, float pixelY); //returns if a point in 
-	bool isBlockedByWall(float posX, float posY, int width, int height) const;
+	bool isBlockedByWall(float posX, float posY, int width, int height) const; //check if collider is blocked by a wall
+
 
 
 };

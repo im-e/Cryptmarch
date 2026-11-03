@@ -63,7 +63,21 @@ public:
 	{
 		if (index >= size) //if index is bigger than size (>= to since index == size will be out of bounds)
 		{
-			Logger::Error("Index is outside of size"); //assert
+			Logger::Error("Vector T& []: Index is outside of size"); //assert
+			return data[0]; //safely return something after assert
+		}
+		else
+		{
+			return data[index]; //return data at index
+		}
+
+	}
+
+	const T& operator[](size_t index) const //const overload
+	{
+		if (index >= size) //if index is bigger than size (>= to since index == size will be out of bounds)
+		{
+			Logger::Error("Vector const T& []: Index is outside of size"); //assert
 			return data[0]; //safely return something after assert
 		}
 		else
@@ -135,7 +149,7 @@ public:
 		//we have the index so
 		if (index >= size) //if index is bigger than size (>= to since index == size will be out of bounds)
 		{
-			Logger::Error("Index is outside of size"); //assert
+			Logger::Error("Vector removeSwap: Index is outside of size"); //assert
 			return;
 		}
 
@@ -150,7 +164,7 @@ public:
 		size = 0;
 	}
 
-	const size_t getSize() //get size of vector
+	size_t getSize() const //get size of vector
 	{
 		return size;
 	}

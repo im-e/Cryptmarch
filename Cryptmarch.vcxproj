@@ -182,6 +182,7 @@
     <ClInclude Include="include\Utilities\Collisions.h" />
     <ClInclude Include="include\Utilities\Logger.h" />
     <ClInclude Include="include\Map\TileDefinition.h" />
+    <ClInclude Include="include\Utilities\Math.h" />
     <ClInclude Include="include\Utilities\Targeting.h" />
     <ClInclude Include="include\Utilities\Vector.h" />
     <ClInclude Include="include\Utilities\Vector2f.h" />
