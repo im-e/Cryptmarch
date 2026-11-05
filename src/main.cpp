@@ -282,21 +282,46 @@ int main()
                     break;
                 }
 
-                //set the camera to follow the player
-                Player* p1 = entityManager.getFirstPlayer();
-                cam.follow(window, map, p1 ->getX(), p1->getY(), !map.isInfinite()); //cam follow param is fixedMap, so we use not infinite
+
+                //camera control
+                Player* p1 = entityManager.getPlayerById(0); //get both players
+                Player* p2 = entityManager.getPlayerById(1);
+
+                if (p1 != nullptr && p2 != nullptr) //if both arent null
+                {
+                    float midpointX = (p1->getX() + p2->getX()) / 2; //get the midpoint of both players
+                    float midpointY = (p1->getY() + p2->getY()) / 2; //get the midpoint of both players
+
+                    cam.follow(window, map, midpointX, midpointY, !map.isInfinite());
+                }
+                else if (p1 != nullptr) //otherwise prioritise p1 camera
+                {
+                    cam.follow(window, map, p1->getX(), p1->getY(), !map.isInfinite()); 
+                }
+                else if (p2 != nullptr) //otherwise p1 is dead, so follow p2 instead
+                {
+                    cam.follow(window, map, p2->getX(), p2->getY(), !map.isInfinite()); 
+                }
+
+                   
+         
 
                 //increase stats
                 gameController.getStats().timeSurvived += deltaTime;
 
                 //------------------------------ DRAW ----------------------
-                map.draw(window, cam);
+               
+                map.draw(window, cam); //draw map
 
-                entityManager.draw(window, cam);
+                entityManager.draw(window, cam); //draw entities
+
                 fps.draw(window, trueDelta); //draw fps using true delta to enforce true fps readings
 
-                Player* player = entityManager.getFirstPlayer();
-                status.draw(window, player->getHealth(), player->getMaxHealth(), player->getMana(), player->getMaxMana());
+                //draw status for players
+                for (int i = 0; i < entityManager.getPlayerCount(); i++)
+                {
+                    status.draw(window, entityManager.getPlayer(i));
+                }
 
                 //show the key under the mana bar once it has been picked up
                 if (entityManager.getHasKey())

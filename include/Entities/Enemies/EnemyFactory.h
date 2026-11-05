@@ -31,7 +31,7 @@ public:
 		projectileImage = _projectileImage;
 	}
 
-	Enemy* createEnemy(EnemyType type, Vector2f pos, Entity* player)
+	Enemy* createEnemy(EnemyType type, Vector2f pos)
 	{
 		int enemy = static_cast<int>(type);
 		if (enemy > 5) //out of range
@@ -43,7 +43,7 @@ public:
 		EnemyDefinition& def = enemyTypes[enemy]; //get the definition
 
 		EntityStats stats = { def.maxHealth, def.speed, pos.x, pos.y, def.spriteOffset.x, def.spriteOffset.y }; //fill in stats
-		return new Enemy(stats, enemyImage, player, def.contactDamage, def.knockbackForce, def.isRanged, projectileImage, 2, 23); //fill in constructor
+		return new Enemy(stats, enemyImage, def.contactDamage, def.knockbackForce, def.isRanged, projectileImage, 2, 23); //fill in constructor
 	}
 
 	EnemyType weightedRandomEnemyType(float* gameTime) //returns a weighted randomised enemy

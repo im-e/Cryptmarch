@@ -53,58 +53,60 @@ public:
 		image = _image;
 	}
 
-	void draw(GamesEngineeringBase::Window& window, int health, int maxHealth, int mana, int maxMana)
+	void draw(GamesEngineeringBase::Window& window, Player* player)
 	{
-		//position for what y level the status will sit on
+		if (player == nullptr) return; //check if it died this frame, and is null
+
 		int healthYPos = 0;
 		int manaYPos = 32;
-		int healthStartXPos = window.getWidth();
-		int manaStartXPos = window.getWidth();
 
-		int percentageHP = maxHealth / 10; //5 tiles for health
-		int healthCounter = maxHealth; //take away a percentage for the first slice
+		int healthStartXPos = 320; 
+		int manaStartXPos = 320;
 
+		int percentageHP = player->getMaxHealth() / 10; //5 tiles for health
+		int healthCounter = player->getMaxHealth(); //take away a percentage for the first slice
 
-		int percentageMana = maxMana / 8; //4 tiles for mana
-		int manaCounter = maxMana; //take away a percentage for the first slice
+		int percentageMana = player->getMaxMana() / 8; //4 tiles for mana
+		int manaCounter = player->getMaxMana(); //take away a percentage for the first slice
+
+		if (player->getId() == 0)
+		{
+			healthStartXPos = window.getWidth(); //start bars on right side of screen as player 1 is right to left
+			manaStartXPos = window.getWidth();
+		}
 
 		//draw health right to left
-		for (int i = 9; i >= 0; i--) //for each tile (5 tiles in total)
+		for (int i = 9; i >= 0; i--) //for each tile 
 		{
-			if (health < healthCounter) //if health is less than health counter
+			if (player->getHealth() < healthCounter) //if health is less than health counter
 			{	//draw empty
 				Graphics::DrawTilemapImage(window, *image, tileSize, emptyHealthTileOffsets[0][i], emptyHealthTileOffsets[1][i], healthStartXPos - tileSize, healthYPos);
 			}
 			else //draw health
 			{
 				Graphics::DrawTilemapImage(window, *image, tileSize, healthTileOffsets[0][i], healthTileOffsets[1][i], healthStartXPos - tileSize, healthYPos);
-
 			}
-			
+
 			healthCounter -= percentageHP; //decrease health counter by maxhp / 5 , which is 1/5 as health is split into 5 segments
 			healthStartXPos -= tileSize; //decrease offset pos for next tile
 
 		}
-
-
 		//draw mana right to left
-		for (int i = 7; i >= 0; i--) //for each tile (4 tiles in total)
+		for (int i = 7; i >= 0; i--) //for each tile 
 		{
-			if (mana < manaCounter) //if mana is less than mana counter
+			if (player->getMana() < manaCounter) //if mana is less than mana counter
 			{	//draw empty
 				Graphics::DrawTilemapImage(window, *image, tileSize, emptyManaTileOffsets[0][i], emptyManaTileOffsets[1][i], manaStartXPos - tileSize, manaYPos);
 			}
 			else //draw health
 			{
 				Graphics::DrawTilemapImage(window, *image, tileSize, manaTileOffsets[0][i], manaTileOffsets[1][i], manaStartXPos - tileSize, manaYPos);
-
 			}
 
 			manaCounter -= percentageMana; //decrease health counter by maxhp / 5 , which is 1/5 as health is split into 5 segments
 			manaStartXPos -= tileSize; //decrease offset pos for next tile
 
 		}
-
 	}
 
 };

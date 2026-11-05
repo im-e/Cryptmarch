@@ -36,6 +36,62 @@ ENTRIES (NEWEST FIRST)
 ==============================================================
 
 --------------------------------------------------------------
+2026-11-03->04 : Multiplayer
+--------------------------------------------------------------
+WHAT I BUILT / CHANGED:
+  - Players: each player now has a playerId (0 = P1, 1 = P2) and a CharacterType, so players can be looked up by who they are rather than where they sit in the list. Added getPlayerById(id) for "one specific player" (HUD) and getPlayer(index) for "every living player" (spawners, chunks)
+  - CharacterType: moved the enum into its own header (CharacterType.h) so Player.h and GameController.h can both use it
+  - Enemy targeting: the EntityManager now picks each enemy's target every frame (nearest living player using squared distance) and hands it to the enemy before its update, instead of the enemy holding a pointer to player 1 forever
+  - Hysteresis: enemies start chasing inside aggroRange (350) and only give up once their current target leaves leashRange (550). If another player is clearly closer (less than half the squared distance, ~71% of the real distance) the enemy switches to them
+  - Enemy AI state machine: Wander / Chase. With no target, enemies wander in a random direction (cos/sin of a random angle, so it's already unit length) at 40% speed, pick a new direction every 1-3s, sometimes idle, and pick a new direction when they hit a wall. Ranged enemies only fire when they have a target
+  - Spawners: now activate if ANY player is in range, and update exactly once per frame
+  - Infinite mode: chunks around every living player get activated, not just player 1
+  - Camera: follows the midpoint between both players, or whichever player is alive
+  - Leash: the EntityManager works out a box each player has to stay inside (within a screen width/height of the other player, using max/min) and the player rejects any move on an axis that would take it outside, the same test-then-move as walls. Moving back towards the box is always allowed so players never get stuck. Turns off when only one player is left
+  - HUD: Status::draw now takes a Player* and draws on the right for P1 and the left for P2 based on the player's id
+
+WHAT WENT WRONG AND HOW I FIXED IT:
+  - Dangling pointer: enemies stored getFirstPlayer() as their target when they spawned. When P1 died, cleanupKills deleted them but enemies still pointed at the freed memory. Fixed by retargeting every frame from the living players list, and only ever comparing the old target pointer (never calling functions on it) to check if it's still alive
+  - Circular includes (twice): Player.h used CharacterType which lived in GameController.h, and Enemy.h included Player.h while Player.h included Enemy.h. #pragma once stops the infinite loop but one header gets read before the other is finished, giving 100+ errors. Fixed by moving the enum to its own header and removing the Player.h include from Enemy.h (it only needed Entity*). Learnt to fix the first error first as the rest were knock-on errors
+  - Wrong loop index: used players[i] instead of players[j] inside nested loops (targeting and spawners), which read the wrong player / off the end of the array
+  - Wrong distance: squared the player's world position instead of the difference between player and enemy, so I was measuring distance from the map origin
+  - Spawner double update: the spawner update was inside the player loop, so with both players in range it updated twice a frame and spawned twice as fast. Fixed by using the loop only to set an anyPlayerInRange bool, then updating once after
+  - Position doubling / black screen: wrote newX = worldX += xMove then worldX += newX, so the player moved twice and the position doubled every frame even standing still. In infinite mode nothing stopped it so the camera flew into empty space. Fixed by calculating with + and applying with =
+  - P2 HUD off screen: copied the right-to-left maths (x - tileSize, x -= tileSize) for the left side so every tile was drawn at a negative x and clipped. Also had off-by-one loop bounds (i < 9 instead of 10) which cut off the end cap
+  - Infinite spawners stopped after P1 died: looped 0 -> playerCount using getPlayerById, so after P1 died it asked for id 0 (dead) and never reached P2's id 1, and return on nullptr quit the whole function. Fixed by looping by index with getPlayer(i) and using continue
+  - Enemies never returned to wander: wrote state == EnemyState::Wander (compare) instead of = (assign)
+  - HUD loop read past the end: i <= playerCount with getPlayer(i). My Vector bounds check caught it and logged an error every frame. Changed to <
+  - Hysteresis too sticky in co-op: enemies locked onto P1 forever because the leash keeps players close, so P1 never left leash range. Added the "clearly closer" switch threshold
+
+ALTERNATIVES I CONSIDERED (AND WHY I CHOSE WHAT I DID):
+  - Targeting: could have kept the target pointer on the enemy and cleared it in cleanupKills when a player dies. Chose to retarget every frame in the manager so the enemy never owns a stale pointer, and it gives nearest-player targeting for free. Cost is O(E x P) but P is at most 2 so it's effectively O(E)
+  - Squared distance instead of sqrt: comparing squared values gives the same answer and avoids a slow sqrt per enemy per player per frame
+  - One range vs two ranges: one range makes enemies flicker between chase and wander at the boundary, two ranges (aggro/leash) fixes it, same idea as a thermostat
+  - Always target closest vs hysteresis vs threshold: always-closest makes enemies spin between two players standing together; pure hysteresis made them stick to P1; the threshold is a middle ground
+  - Leash: could have given each player a pointer to the other player, chose to have the manager pass in a box instead so the player doesn't need to know about other players (works for any number of players and no pointer to go stale)
+  - Camera: could have used split screen, but the brief's Gauntlet style suits a shared screen, so midpoint camera + leash
+  - Index vs id lookups: index for "every living player", id for "this specific player" since removeSwap reshuffles the list when someone dies
+
+NUMBERS (FPS, ms per frame, entity / tile counts, conditions):
+  - TODO: measure FPS singleplayer vs multiplayer on the same map with a similar enemy count (Release + Debug)
+
+REPORT SECTION THIS FEEDS:
+  4.6 Multiple Players can play simultaneously
+  2.3 General NPC behaviour that directs them directly towards the player (targeting, wander/chase state machine)
+  1.2 Camera Follows Hero (midpoint camera)
+  Limitations / do differently (circular includes, identity vs index bugs)
+
+SCREENSHOT TAKEN?  yes / no   (file name: )
+  - want: both players on screen with both HUD bars
+  - want: enemy switching target with debug outlines on
+
+STILL TO DO NEXT:
+  - pause screen (resume / save / quit)
+  - save + load, and New Game / Load Game menu
+
+
+
+--------------------------------------------------------------
 2026-11-01->02 : Game States, Main Menu, Infinite Levels
 --------------------------------------------------------------
 WHAT I BUILT / CHANGED:

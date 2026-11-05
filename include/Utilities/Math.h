@@ -3,6 +3,7 @@
 class Math
 {
 public:
+
 	//math helpers for negative numbers
 	//we need floor division for division that always rounds down
 	//floor division helps us find which chunk we are in
@@ -21,5 +22,12 @@ public:
 	inline static int positiveModulo(int a, int b)
 	{
 		return ((a % b) + b) % b;
+	}
+
+	//random number helper
+	inline static float randomFloat(float min, float max)
+	{
+		float t = rand() / (float)RAND_MAX; //0.0 -> 1.0
+		return min + t * (max - min); //stretch into min->max
 	}
 };

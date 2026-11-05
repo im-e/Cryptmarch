@@ -161,6 +161,7 @@
     <ClInclude Include="include\Entities\Enemies\EnemyTypes.h" />
     <ClInclude Include="include\Entities\Entity.h" />
     <ClInclude Include="include\Entities\Players\Archer.h" />
+    <ClInclude Include="include\Entities\Players\CharacterType.h" />
     <ClInclude Include="include\Entities\Players\Dwarf.h" />
     <ClInclude Include="include\Entities\Players\Wizard.h" />
     <ClInclude Include="include\Entities\Projectile.h" />

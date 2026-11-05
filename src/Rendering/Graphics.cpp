@@ -1,5 +1,7 @@
 #include "Rendering/Graphics.h"
 #include "Utilities/Logger.h"
+#include <numbers>
+
 void Graphics::DrawImage(GamesEngineeringBase::Window& window, GamesEngineeringBase::Image& image, int startX, int startY,
 	unsigned char tintR, unsigned char tintG, unsigned char tintB, unsigned char tintStrength)
 {
@@ -322,10 +324,9 @@ void Graphics::DrawCircleOutline(GamesEngineeringBase::Window& window, float mid
 	
 	//work out how far to turn each step
 	float step = 1 / radius;
-	const float pi = 3.14159265f;
 
 	//go once around the circle
-	for (float angle = 0; angle < 2 * pi; angle += step)
+	for (float angle = 0; angle < 2 * std::numbers::pi; angle += step)
 	{
 		int x = middleX + cos(angle) * radius;
 		int y = middleY + sin(angle) * radius;

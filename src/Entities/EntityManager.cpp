@@ -1,5 +1,6 @@
 #include "Entities/EntityManager.h"
 #include <cmath>
+#include <algorithm> //for min() and max()
 
 EntityManager::EntityManager(AssetManager& am, float* _gameTime)
 {
@@ -39,6 +40,43 @@ void EntityManager::update(GamesEngineeringBase::Window& window, Map& map, float
 {
 	AttackContext attack = { enemies, projectiles, spawners };
 
+
+	//player leash calculation
+	float maxApartX = window.getWidth() - 64; //max distance for players to be apart from each other
+	float maxApartY = window.getHeight() - 64;
+	if (players.getSize() < 2) //singleplayer, or one player left
+	{
+		for (int i = 0; i < players.getSize(); i++)
+		{
+			players[i]->clearLeash(); //no leash needed
+		}
+	}
+	else //multiplayer
+	{
+		for (int i = 0; i < players.getSize(); i++)
+		{
+			float minX = -FLT_MAX;
+			float maxX = FLT_MAX;
+			float minY = -FLT_MAX;
+			float maxY = FLT_MAX;
+
+			for (int j = 0; j < players.getSize(); j++)
+			{
+				if (i == j) continue; //if i and j are equal skip. this ensures were doing each other player
+				//i may be at most maxApart away from j on each axis
+				minX = std::max(minX, players[j]->getX() - maxApartX);
+				maxX = std::min(maxX, players[j]->getX() + maxApartX);
+				minY = std::max(minY, players[j]->getY() - maxApartY);
+				maxY = std::min(maxY, players[j]->getY() + maxApartY);
+
+			}
+
+			players[i]->setLeash(minX, maxX, minY, maxY);
+		}
+		
+	}
+
+
 	//update all players
 	for (int i = 0; i < players.getSize(); i++)
 	{
@@ -50,36 +88,90 @@ void EntityManager::update(GamesEngineeringBase::Window& window, Map& map, float
 	//update all enemies
 	for (int i = 0; i < enemies.getSize(); i++)
 	{
-		enemies[i]->update(window, map, deltaTime); //update enemies
-		if (enemies[i]->getFireRequested()) //if fire has been requested
+		Enemy* enemy = enemies[i]; //get enemy
+
+		//set target for enemies
+		Entity* current = enemy->getTarget(); //enemy current target
+		bool keepCurrent = false; //if we are keeping the current player target or not
+		Player* best = nullptr; //best is going to the closest player in range
+		float currentDistSq = FLT_MAX; //current distance squared - used for comparing two players distance between each other
+		float bestDistSq = enemy->getAggroRange() * enemy->getAggroRange(); //get the sq distance for aggro range
+		float leashSq = enemy->getLeashRange() * enemy->getLeashRange(); //get the dq distance for leash range (de-aggro range)
+		for (int j = 0; j < players.getSize(); j++) //for each player
 		{
-			projectiles.add(enemies[i]->fireProjectile()); //add projectile to projectile list
-			enemies[i]->setFireRequested(false); //set fire requested to false
+			Player* player = players[j]; //get player 
+			float dx = player->getCentrePoint().x - enemy->getCentrePoint().x; //get dx and dy
+			float dy = player->getCentrePoint().y - enemy->getCentrePoint().y;
+			float distSq = (dx * dx) + (dy * dy); // dx*dx + dy*dy squared distance
+
+			if (player == current && distSq < leashSq)
+			{
+				keepCurrent = true; //if player is current and within leash range, keep current
+				currentDistSq = distSq; //set the current dist sq
+			}
+			if (distSq < bestDistSq) //if player distance sq is less than best dist sq
+			{
+				best = player; //set best to player
+				bestDistSq = distSq; //set best dist sq to the player dist sq, to check if next player is closer
+			}
+		} //end of player loop
+
+		if (keepCurrent && best != nullptr && best != current) //if current player is in range, but best isnt the current target
+		{ 
+			if (bestDistSq < currentDistSq)  //best is closer than current, so we should swap to best
+			{
+				keepCurrent = false; //keep current to false, which switches to best
+			}
+		}
+		if (keepCurrent) enemy->setTarget(current); //keep target as current
+		else { enemy->setTarget(best); } //set target to best
+
+		enemy->update(window, map, deltaTime); //update enemies
+
+		if (enemy->getFireRequested()) //if fire has been requested
+		{
+			projectiles.add(enemy->fireProjectile()); //add projectile to projectile list
+			enemy->setFireRequested(false); //set fire requested to false
 		}
 	}
 
-	Player* firstPlayer = getFirstPlayer(); //get firstPlayer
-	//update all spawners
-	for (int i = 0; i < spawners.getSize() && firstPlayer != nullptr; i++) //skip if there is no player to measure range from
+
+	//update all spawners (that have a player in range)
+	for (int i = 0; i < spawners.getSize(); i++) //update spawners that have a player in range
 	{
 		//work out range of spawner
 		Vector2f sp = spawners[i]->getCentrePoint(); //spawner
-		Vector2f pl = firstPlayer->getCentrePoint(); //player
+		float rangeSquared = spawners[i]->getSpawnerRange() * spawners[i]->getSpawnerRange(); //get spawner range
+		bool anyPlayerInRange = false;
 
-		float dx = sp.x - pl.x; //find the difference of the two points
-		float dy = sp.y - pl.y; //player to spawner
-		float distanceSquared = (dx * dx) + (dy * dy); //If dx² + dy² is less than range², the player is in range
-		float rangeSquared = spawners[i]->getSpawnerRange() * spawners[i]->getSpawnerRange();
-		if (distanceSquared >= rangeSquared) //spawner ISNT in range
+		for (int j = 0; j < players.getSize(); j++)
+		{
+			Vector2f pl = players[j]->getCentrePoint(); //player
+
+			float dx = sp.x - pl.x; //find the difference of the two points
+			float dy = sp.y - pl.y; //player to spawner
+			float distanceSquared = (dx * dx) + (dy * dy); //If dx² + dy² is less than range², the player is in range
+			if (distanceSquared < rangeSquared) //check if in range
+			{
+				anyPlayerInRange = true; //set player is in range to true;
+				break;
+			}
+
+		}
+
+		if (!anyPlayerInRange) //spawner ISNT in range to either player
 		{
 			continue; //skip to next spawner
 		}
+
+		//spawner is in range to a player
 		spawners[i]->update(window, map, deltaTime); //update spawners
 		if (spawners[i]->getReadyToSpawn()) //if they are ready to spawn
 		{
 			spawnEnemy({ spawners[i]->getX(), spawners[i]->getY() }); //spawn enemy
 			spawners[i]->setReadyToSpawn(false); //set ready to spawn to false
 		}
+
 	}
 
 	//check for collisions between players and enemies
@@ -121,7 +213,7 @@ void EntityManager::update(GamesEngineeringBase::Window& window, Map& map, float
 void EntityManager::spawnEnemy(Vector2f pos)
 {
 	EnemyType type = factory.weightedRandomEnemyType(gameTime); //get a weighted random enemy type
-	enemies.add(factory.createEnemy(type, pos, getFirstPlayer())); //spawn that enemy at pos
+	enemies.add(factory.createEnemy(type, pos)); //spawn that enemy at pos
 }
 
 void EntityManager::updateProjectiles(Map& map, float deltaTime)

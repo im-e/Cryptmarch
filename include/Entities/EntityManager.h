@@ -57,16 +57,30 @@ public:
 
 	void clear(); //deletes everything, used when starting a level
 
-	Player* getFirstPlayer()
+
+
+	//get players by their id value
+	Player* getPlayerById(int id)
 	{
-		if (players.getSize() == 0) return nullptr;
-		return players[0];
+		for (int i = 0; i < players.getSize(); i++)
+		{
+			if (players[i]->getId() == id)
+				return players[i];
+		}
+		return nullptr;
 	}
+
+	Player* getPlayer(int index)
+	{
+		return players[index];
+	}
+
 
 	//getters
 	bool getAllPlayersDead() const { return allPlayersDead; }
 	bool getHasKey() const { return hasKey; }
 	bool getLevelComplete() const { return levelComplete; }
+	int getPlayerCount() const { return players.getSize(); }
 
 	//add functions
 	void addPlayer(Player* player) { players.add(player); }

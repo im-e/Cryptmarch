@@ -60,17 +60,31 @@ void Player::move(GamesEngineeringBase::Window& window, Map& map, float deltaTim
 
 	//test if the player is blocked then move
 	//i could have done move-then-undo but i didnt want my position to enter an illegal state
-	if (!map.isBlockedByWall(hitbox.x + xMove, hitbox.y, hitbox.width, hitbox.height))
+	float newX = worldX + xMove;
+	if (!map.isBlockedByWall(hitbox.x + xMove, hitbox.y, hitbox.width, hitbox.height) //if not blocked by wall
+		&& leashAllowsMove(worldX, newX, leashMinX, leashMaxX)) //and leash allows move
 	{
-		worldX += xMove;
+		worldX = newX; //allow move on x axis
 	}
 
 	hitbox = getHitbox(); //update hitbox after move
 
-	if (!map.isBlockedByWall(hitbox.x, hitbox.y + yMove, hitbox.width, hitbox.height))
+	float newY = worldY + yMove;
+	if (!map.isBlockedByWall(hitbox.x, hitbox.y + yMove, hitbox.width, hitbox.height)
+		&& leashAllowsMove(worldY, newY, leashMinY, leashMaxY))
 	{
-		worldY += yMove;
+		worldY = newY;
 	}
 
 	updateTimers(deltaTime);
+}
+
+bool Player::leashAllowsMove(float currentPos, float newPos, float leashMin, float leashMax)
+{
+	if (!leashActive) return true; //if leash not acttive, return true
+	if (newPos >= leashMin && newPos <= leashMax) return true; //still inside the container
+	//outside the box - only allow moving if its towards the inside of the box
+	if (newPos < leashMin && newPos > currentPos) return true; //left of box, moving right
+	if (newPos > leashMax && newPos < currentPos) return true; //right of box, moving left
+	return false; 
 }

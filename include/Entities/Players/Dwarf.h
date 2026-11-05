@@ -2,7 +2,6 @@
 #include "Entities/Players/Player.h"
 
 
-
 enum class AttackState { Ready, Active, Cooldown };
 
 class Dwarf : public Player
@@ -44,8 +43,8 @@ private:
 	int manaCost; //mana cost for secondary skill
 public:
 
-	Dwarf(EntityStats _stats, GamesEngineeringBase::Image* _image, Controls _controls, GamesEngineeringBase::Image* _weaponImage, int _weaponXOffset, int _weaponYOffset) :
-		Player(_stats, _image, _controls)
+	Dwarf(int id, CharacterType charType, EntityStats _stats, GamesEngineeringBase::Image* _image, Controls _controls, GamesEngineeringBase::Image* _weaponImage, int _weaponXOffset, int _weaponYOffset) :
+		Player(id, charType, _stats, _image, _controls)
 	{
 		weaponImage = _weaponImage;
 		weaponImageXOffset = _weaponXOffset;

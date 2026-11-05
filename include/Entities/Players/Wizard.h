@@ -34,8 +34,8 @@ private:
 
 public:
 
-	Wizard(EntityStats _stats, GamesEngineeringBase::Image* _image, Controls _controls, GamesEngineeringBase::Image* _magicImage, int _magicXOffset, int _magicYOffset) :
-		Player(_stats, _image, _controls)
+	Wizard(int id, CharacterType charType, EntityStats _stats, GamesEngineeringBase::Image* _image, Controls _controls, GamesEngineeringBase::Image* _magicImage, int _magicXOffset, int _magicYOffset) :
+		Player(id, charType, _stats, _image, _controls)
 	{
 		maxHealth = 100; //wizard is a normal health, is less tanky than other heros
 		maxMana = 150; //has more mana than other heroes

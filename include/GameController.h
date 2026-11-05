@@ -6,6 +6,7 @@
 #include "Entities/Enemies/Enemy.h"
 #include "Entities/Enemies/EnemyFactory.h"
 #include "Entities/EntityManager.h"
+#include "Entities/Players/CharacterType.h"
 #include "Map/Map.h"
 
 enum GameState
@@ -17,13 +18,6 @@ enum class PlayerMode
 {
     SinglePlayer,
     Multiplayer
-};
-
-enum class CharacterType
-{
-    Dwarf,
-    Archer,
-    Wizard
 };
 
 enum class GameModeType
@@ -137,22 +131,22 @@ private:
 
 
     //helper to spawn player based on character type
-    void spawnPlayer(AssetManager& am, EntityManager& em, CharacterType type, float x, float y, Controls controls)
+    void spawnPlayer(int id, AssetManager& am, EntityManager& em, CharacterType type, float x, float y, Controls controls)
     {
         if (type == CharacterType::Dwarf)
         {
             EntityStats stats = { 100, 200, x, y, 0, 0 };
-            em.addPlayer(new Dwarf(stats, &am.playerImage, controls, &am.itemsImage, 3, 3));
+            em.addPlayer(new Dwarf(id, type, stats, &am.playerImage, controls, &am.itemsImage, 3, 3));
         }
         else if (type == CharacterType::Archer)
         {
             EntityStats stats = { 100, 200, x, y, 2, 0 };
-            em.addPlayer(new Archer(stats, &am.playerImage, controls, &am.itemsImage, 0, 23));
+            em.addPlayer(new Archer(id, type, stats, &am.playerImage, controls, &am.itemsImage, 0, 23));
         }
         else if (type == CharacterType::Wizard)
         {
             EntityStats stats = { 100, 200, x, y, 1, 4 };
-            em.addPlayer(new Wizard(stats, &am.playerImage, controls, &am.itemsImage, 0, 25));
+            em.addPlayer(new Wizard(id, type, stats, &am.playerImage, controls, &am.itemsImage, 0, 25));
         }
     }
 
@@ -173,12 +167,12 @@ private:
 
             //spawn players based on chosen character type and player mode
             //spawn player 1
-            spawnPlayer(am, em, characterType, start.x, start.y, p1Controls);
+            spawnPlayer(0, am, em, characterType, start.x, start.y, p1Controls);
 
             //spawn player 2 if multiplayer is enabled
             if (playerMode == PlayerMode::Multiplayer)
             {
-                spawnPlayer(am, em, p2CharacterType, start.x + 30, start.y, p2Controls); //spawn p2 with an x offset so no overlap
+                spawnPlayer(1, am, em, p2CharacterType, start.x + 30, start.y, p2Controls); //spawn p2 with an x offset so no overlap
             }
 
             //create spawners
@@ -203,12 +197,12 @@ private:
             
             //spawn players based on chosen character type and player mode
             //spawn player 1
-            spawnPlayer(am, em, characterType, start.x, start.y, p1Controls);
+            spawnPlayer(0, am, em, characterType, start.x, start.y, p1Controls);
             
             //spawn player 2 if multiplayer
             if (playerMode == PlayerMode::Multiplayer)
             {
-                spawnPlayer(am, em, p2CharacterType, start.x + 30, start.y, p2Controls);
+                spawnPlayer(1, am, em, p2CharacterType, start.x + 30, start.y, p2Controls);
             }
 
             //dont create spawners as we will do that dynamically
@@ -300,37 +294,39 @@ public:
     void updateInfiniteSpawners(AssetManager& am, EntityManager& em, Map& map)
     {
         if (!map.isInfinite()) return; //if map isnt infinite return
-        Player* firstPlayer = em.getFirstPlayer(); //get first player
-
-        if (firstPlayer == nullptr) return; //if first player is null return
-
-        //find first player tile
-        int playerTileX = Math::floorDiv(static_cast<int>(floor(firstPlayer->getX())), 32);
-        int playerTileY = Math::floorDiv(static_cast<int>(floor(firstPlayer->getY())), 32);
-        //find first player chunk
-        int playerChunkX = Math::floorDiv(playerTileX, 16);
-        int playerChunkY = Math::floorDiv(playerTileY, 16);
-
-        //dx and dy are steps away from the player, we are going to be checking the 3x3 chunks around the player
-        //-1, 0, 1
-        for (int dy = - 1; dy <= 1; dy++)
+        for (int i = 0; i < em.getPlayerCount(); i++) //for each player update the chunks around them
         {
-            for (int dx = - 1; dx <= 1; dx++)
-            { //for current chunk
-                //get the x and y
-                int chunkX = playerChunkX + dx;
-                int chunkY = playerChunkY + dy;
+            Player* player = em.getPlayer(i); //get player
+            if (player == nullptr) continue; //if player is null
 
-                if (chunkX == 0 && chunkY == 0)
-                {//chunk 0,0 has no spawners
-                    continue;
-                }
-                if (isChunkActivated(chunkX, chunkY))
-                {//already active, skip
-                    continue;
-                }
+            //find player tile
+            int playerTileX = Math::floorDiv(static_cast<int>(floor(player->getX())), 32);
+            int playerTileY = Math::floorDiv(static_cast<int>(floor(player->getY())), 32);
+            //find player chunk
+            int playerChunkX = Math::floorDiv(playerTileX, 16);
+            int playerChunkY = Math::floorDiv(playerTileY, 16);
 
-                activateChunk(chunkX, chunkY, am, em, map); //activate chunk
+            //dx and dy are steps away from the player, we are going to be checking the 3x3 chunks around the player
+            //-1, 0, 1
+            for (int dy = -1; dy <= 1; dy++)
+            {
+                for (int dx = -1; dx <= 1; dx++)
+                { //for current chunk
+                    //get the x and y
+                    int chunkX = playerChunkX + dx;
+                    int chunkY = playerChunkY + dy;
+
+                    if (chunkX == 0 && chunkY == 0)
+                    {//chunk 0,0 has no spawners
+                        continue;
+                    }
+                    if (isChunkActivated(chunkX, chunkY))
+                    {//already active, skip
+                        continue;
+                    }
+
+                    activateChunk(chunkX, chunkY, am, em, map); //activate chunk
+                }
             }
         }
     }

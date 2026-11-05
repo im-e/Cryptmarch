@@ -34,8 +34,8 @@ private:
 
 public:
 
-	Archer(EntityStats _stats, GamesEngineeringBase::Image* _image, Controls _controls, GamesEngineeringBase::Image* _projectileImage, int _projectileXOffet, int _projectileYOffset) :
-		Player(_stats, _image, _controls)
+	Archer(int id, CharacterType charType, EntityStats _stats, GamesEngineeringBase::Image* _image, Controls _controls, GamesEngineeringBase::Image* _projectileImage, int _projectileXOffet, int _projectileYOffset) :
+		Player(id, charType, _stats, _image, _controls)
 	{
 		maxHealth = 70; //archer is more vulnerable, less tanky than other heros
 		maxMana = 100; //normal amount of mana

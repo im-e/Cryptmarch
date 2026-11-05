@@ -61,7 +61,7 @@ public:
 	void draw(GamesEngineeringBase::Window& window, float dt)
 	{
 		//position for what y level the fps will sit on
-		int fpsYPos = 0;
+		int fpsYPos = window.getHeight() - tileSize;
 
 		//draw fps label left to right
 		int labelStartPos = 0;
