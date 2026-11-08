@@ -18,13 +18,25 @@ If you run the `.exe` directly, launch it from the project root so the `resource
 
 ## Controls
 
+### Menus
+
 | Key | Action |
 | --- | --- |
-| Arrow keys | Move |
-| Space | Primary attack |
-| Shift | Secondary skill (costs mana) |
-| Enter | Start game / return to menu |
-| Esc | Quit |
+| Up / Down arrows | Change selection |
+| Enter | Confirm / start game / return to menu |
+
+### In game
+
+Player 2 only joins when **Multiplayer** is picked on the player select screen.
+
+| Action | Player 1 | Player 2 |
+| --- | --- | --- |
+| Move up | Up arrow | W |
+| Move down | Down arrow | S |
+| Move left | Left arrow | A |
+| Move right | Right arrow | D |
+| Primary attack | L | B |
+| Secondary skill (costs mana) | K | V |
 
 ## Features
 
